@@ -1,0 +1,100 @@
+# ====================================
+# Cubico Technologies Portfolio
+# Git Ignore File
+# ====================================
+
+# Operating System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# Editor Directories and Files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# Node Modules (if you add Node.js later)
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
+
+# Logs
+*.log
+logs/
+
+# Temporary Files
+*.tmp
+*.temp
+.cache/
+
+# Build Outputs (if you add build tools later)
+dist/
+build/
+.next/
+out/
+
+# Environment Variables (IMPORTANT - Never commit sensitive data!)
+.env
+.env.local
+.env.production
+.env.development
+.env.test
+*.env
+
+# Backup Files
+*.bak
+*.backup
+*-backup.*
+
+# MacOS
+.AppleDouble
+.LSOverride
+
+# Windows
+$RECYCLE.BIN/
+*.lnk
+
+# Linux
+*~
+
+# Archives (deployment packages should be in releases if needed)
+# Uncomment these lines if you don't want to commit ZIP files:
+# *.zip
+# *.tar.gz
+# *.rar
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# IDE - JetBrains
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Testing
+coverage/
+.nyc_output/
+*.lcov
+
+# Misc
+.sass-cache/
+.connect.lock
+.lock-wscript

@@ -1,0 +1,99 @@
+name: 🚀 Deploy to Namecheap via FTP
+
+# When to run this workflow
+on:
+  push:
+    branches:
+      - main                # Deploys when you push to main branch
+      - claude/**           # Also deploys from claude branches
+  workflow_dispatch:        # Allows manual deployment from GitHub Actions tab
+
+jobs:
+  deploy:
+    name: 📦 Deploy Website to Namecheap
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: 🔍 Show what will be deployed
+        run: |
+          echo "📦 Files to be deployed:"
+          echo "================================"
+          ls -lah *.html 2>/dev/null || echo "No HTML files"
+          echo ""
+          echo "CSS Files:"
+          ls -lah css/ 2>/dev/null || echo "No CSS folder"
+          echo ""
+          echo "JS Files:"
+          ls -lah js/ 2>/dev/null || echo "No JS folder"
+          echo "================================"
+
+      - name: 🚀 Deploy to Namecheap via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          # FTP Server Configuration (stored securely in GitHub Secrets)
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+
+          # Deployment Configuration
+          server-dir: /public_html/              # Deploy to public_html folder
+          protocol: ftps                         # Use FTPS (FTP over SSL) for security
+          port: 21                               # FTP port (usually 21)
+
+          # What to deploy
+          local-dir: ./                          # Deploy from root of repository
+
+          # What NOT to deploy (exclude these)
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/README.md
+            **/NAMECHEAP-DEPLOYMENT-GUIDE.md
+            **/QUICK-DEPLOY.md
+            **/AUTO-DEPLOY-SETUP.md
+            **/create-deployment-package.sh
+            **/cubico-website-package.zip
+            **/.github/**
+            **/.vscode/**
+            **/.DS_Store
+            **/Thumbs.db
+
+          # Deployment options
+          dangerous-clean-slate: false           # Don't delete all files first (safer)
+          dry-run: false                         # Set to true to test without deploying
+
+      - name: ✅ Deployment Complete
+        run: |
+          echo "================================"
+          echo "✅ Deployment Successful!"
+          echo "================================"
+          echo "🌐 Your website has been updated at:"
+          echo "   https://yourdomain.com"
+          echo ""
+          echo "📋 What was deployed:"
+          echo "   - All HTML pages"
+          echo "   - CSS styling"
+          echo "   - JavaScript files"
+          echo ""
+          echo "🎉 Your changes are now LIVE!"
+          echo "================================"
+
+      - name: 📊 Deployment Summary
+        if: always()
+        run: |
+          echo "### 🚀 Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **Status**: Deployment completed successfully" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📦 **Deployed Files**:" >> $GITHUB_STEP_SUMMARY
+          echo "- HTML pages (index, services, process, contact)" >> $GITHUB_STEP_SUMMARY
+          echo "- CSS styling (css/style.css)" >> $GITHUB_STEP_SUMMARY
+          echo "- JavaScript files (js/main.js, js/supabase-config.js)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "🌐 **Website**: Your changes are now live!" >> $GITHUB_STEP_SUMMARY
