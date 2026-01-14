@@ -1,4 +1,4 @@
-name: 🚀 Deploy to Namecheap via FTP
+name: 🚀 Deploy to Web Hosting via FTP
 
 # When to run this workflow
 on:
@@ -10,7 +10,7 @@ on:
 
 jobs:
   deploy:
-    name: 📦 Deploy Website to Namecheap
+    name: 📦 Deploy Website to Hosting
     runs-on: ubuntu-latest
 
     steps:
@@ -32,16 +32,22 @@ jobs:
           ls -lah js/ 2>/dev/null || echo "No JS folder"
           echo "================================"
 
-      - name: 🚀 Deploy to Namecheap via FTP
+      - name: 🚀 Deploy via FTP to Web Hosting
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           # FTP Server Configuration (stored securely in GitHub Secrets)
+          # Works with: HostGator, Namecheap, Bluehost, GoDaddy, and most cPanel hosting
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
 
           # Deployment Configuration
-          server-dir: /public_html/              # Deploy to public_html folder
+          # ⚙️ DEPLOYMENT DIRECTORY OPTIONS:
+          # - Replace WordPress: /public_html/
+          # - Subdomain (portfolio.domain.com): /public_html/portfolio/
+          # - Subfolder (domain.com/portfolio): /public_html/portfolio/
+          server-dir: /public_html/              # ⚠️ Change this based on your choice!
+
           protocol: ftps                         # Use FTPS (FTP over SSL) for security
           port: 21                               # FTP port (usually 21)
 
@@ -55,7 +61,10 @@ jobs:
             **/node_modules/**
             **/README.md
             **/NAMECHEAP-DEPLOYMENT-GUIDE.md
+            **/HOSTGATOR-DEPLOYMENT.md
+            **/HOSTGATOR-QUICKSTART.md
             **/QUICK-DEPLOY.md
+            **/QUICK-START.md
             **/AUTO-DEPLOY-SETUP.md
             **/create-deployment-package.sh
             **/cubico-website-package.zip
@@ -63,6 +72,7 @@ jobs:
             **/.vscode/**
             **/.DS_Store
             **/Thumbs.db
+            **/*.md
 
           # Deployment options
           dangerous-clean-slate: false           # Don't delete all files first (safer)
