@@ -32,24 +32,22 @@ jobs:
           ls -lah js/ 2>/dev/null || echo "No JS folder"
           echo "================================"
 
-      - name: 🚀 Deploy via SFTP to Web Hosting
+      - name: 🚀 Deploy via FTP to HostGator
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          # SFTP Server Configuration (stored securely in GitHub Secrets)
-          # Works with: HostGator, Namecheap, Bluehost, GoDaddy, and most cPanel hosting
+          # HostGator FTP Configuration (stored securely in GitHub Secrets)
+          # Server: cubicotech.com, Port: FTP (21)
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
 
           # Deployment Configuration
-          # ⚙️ DEPLOYMENT DIRECTORY OPTIONS:
-          # - Replace WordPress: /public_html/
-          # - Subdomain (portfolio.domain.com): /public_html/portfolio/
-          # - Subfolder (domain.com/portfolio): /public_html/portfolio/
-          server-dir: /public_html/              # ⚠️ Change this based on your choice!
+          # ⚠️ IMPORTANT: Deploy to FTP user's home directory
+          # Make sure FTP account home directory is set to /public_html/ in cPanel
+          server-dir: ./              # Deploy to FTP home directory (should be public_html)
 
-          protocol: ftps-legacy                  # Try ftps-legacy for better compatibility
-          port: 21                               # FTP port (usually 21)
+          protocol: ftp               # Standard FTP for HostGator
+          port: 21                    # FTP port
 
           # What to deploy
           local-dir: ./                          # Deploy from root of repository
