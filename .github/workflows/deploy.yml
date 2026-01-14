@@ -32,10 +32,10 @@ jobs:
           ls -lah js/ 2>/dev/null || echo "No JS folder"
           echo "================================"
 
-      - name: 🚀 Deploy via FTP to Web Hosting
+      - name: 🚀 Deploy via SFTP to Web Hosting
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          # FTP Server Configuration (stored securely in GitHub Secrets)
+          # SFTP Server Configuration (stored securely in GitHub Secrets)
           # Works with: HostGator, Namecheap, Bluehost, GoDaddy, and most cPanel hosting
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
@@ -48,7 +48,7 @@ jobs:
           # - Subfolder (domain.com/portfolio): /public_html/portfolio/
           server-dir: /public_html/              # ⚠️ Change this based on your choice!
 
-          protocol: ftps                         # Use FTPS (FTP over SSL) for security
+          protocol: ftps-legacy                  # Try ftps-legacy for better compatibility
           port: 21                               # FTP port (usually 21)
 
           # What to deploy
