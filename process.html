@@ -1,236 +1,540 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Learn about Cubico Technologies' proven process for delivering exceptional Islamic educational content and digital solutions.">
   <title>Our Process | Cubico Technologies</title>
-  
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
-  
-  <!-- Stylesheet -->
-  <link rel="stylesheet" href="css/style.css">
-  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
   <!-- Favicon -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%230d4f4f' rx='20' width='100' height='100'/><text x='50' y='68' font-size='50' text-anchor='middle' fill='white' font-family='Georgia'>C</text></svg>">
+  <link rel="icon" type="image/svg+xml" href="images/logos/favicon.png">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            display: ['Space Grotesk', 'system-ui', 'sans-serif'],
+          },
+          colors: {
+            primary: '#667eea',
+            secondary: '#764ba2',
+          },
+          animation: {
+            'blob': 'blob 7s infinite',
+          },
+          keyframes: {
+            blob: {
+              '0%': { transform: 'translate(0px, 0px) scale(1)' },
+              '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+              '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+              '100%': { transform: 'translate(0px, 0px) scale(1)' },
+            },
+          },
+        },
+      },
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #050505;
+      color: #fafafa;
+    }
+
+    .spotlight-card {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .spotlight-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(102, 126, 234, 0.15), transparent 40%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .spotlight-card:hover::before {
+      opacity: 1;
+    }
+
+    .glass {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .gradient-border {
+      position: relative;
+    }
+
+    .gradient-border::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      padding: 1px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      border-radius: inherit;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .gradient-border:hover::before {
+      opacity: 1;
+    }
+
+    /* Timeline Line */
+    .timeline-line {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: linear-gradient(180deg, transparent, rgba(102, 126, 234, 0.3), transparent);
+    }
+
+    @media (max-width: 768px) {
+      .timeline-line {
+        left: 30px;
+      }
+    }
+  </style>
 </head>
-<body>
+<body class="antialiased">
+
+  <!-- Animated Background Blobs -->
+  <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+    <div class="absolute top-0 -left-4 w-96 h-96 bg-primary/20 rounded-full mix-blend-screen filter blur-3xl opacity-20 animate-blob"></div>
+    <div class="absolute top-0 -right-4 w-96 h-96 bg-secondary/20 rounded-full mix-blend-screen filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+    <div class="absolute -bottom-8 left-20 w-96 h-96 bg-primary/20 rounded-full mix-blend-screen filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+  </div>
+
   <!-- Navigation -->
-  <nav class="navbar" id="navbar">
-    <div class="nav-container">
-      <a href="index.html" class="logo">
-        <div class="logo-icon">C</div>
-        <span>Cubico</span>
-      </a>
-      
-      <ul class="nav-links" id="navLinks">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="services.html">Services</a></li>
-        <li><a href="process.html" class="active">Our Process</a></li>
-        <li><a href="contact.html" class="nav-cta">Contact Us</a></li>
-      </ul>
-      
-      <div class="mobile-toggle" id="mobileToggle">
-        <span></span>
-        <span></span>
-        <span></span>
+  <nav class="fixed top-0 left-0 right-0 z-50 glass border-b border-white/5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        <!-- Logo -->
+        <a href="index.html" class="flex items-center space-x-3 group">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center font-display font-bold text-white text-xl group-hover:scale-110 transition-transform">
+            C
+          </div>
+          <span class="font-display font-bold text-xl text-white">Cubico</span>
+        </a>
+
+        <!-- Desktop Menu -->
+        <ul class="hidden md:flex items-center space-x-1">
+          <li><a href="index.html" class="px-4 py-2 rounded-lg text-zinc-400 font-medium transition-all hover:text-white hover:bg-white/5">Home</a></li>
+          <li><a href="services.html" class="px-4 py-2 rounded-lg text-zinc-400 font-medium transition-all hover:text-white hover:bg-white/5">Services</a></li>
+          <li><a href="process.html" class="px-4 py-2 rounded-lg text-white font-medium transition-all hover:bg-white/5">Process</a></li>
+          <li><a href="contact.html" class="ml-2 px-6 py-2.5 rounded-lg bg-gradient-to-r from-primary to-secondary text-white font-semibold hover:shadow-lg hover:shadow-primary/50 transition-all">Contact Us</a></li>
+        </ul>
+
+        <!-- Mobile Menu Button -->
+        <button id="mobileMenuBtn" class="md:hidden p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-white/5 transition-all">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="hidden md:hidden border-t border-white/5">
+      <div class="px-4 py-4 space-y-2">
+        <a href="index.html" class="block px-4 py-2 rounded-lg text-zinc-400 font-medium hover:text-white hover:bg-white/5 transition-all">Home</a>
+        <a href="services.html" class="block px-4 py-2 rounded-lg text-zinc-400 font-medium hover:text-white hover:bg-white/5 transition-all">Services</a>
+        <a href="process.html" class="block px-4 py-2 rounded-lg text-white font-medium bg-white/5">Process</a>
+        <a href="contact.html" class="block px-4 py-2 rounded-lg bg-gradient-to-r from-primary to-secondary text-white font-semibold text-center">Contact Us</a>
       </div>
     </div>
   </nav>
 
   <!-- Process Hero -->
-  <section class="process-hero">
-    <div class="container">
-      <h1>How We Work</h1>
-      <p style="color: var(--text-muted); font-size: 1.2rem; max-width: 600px; margin: 20px auto 0;">Our proven methodology ensures every project is delivered with excellence, on time, and aligned with your vision.</p>
+  <section class="relative pt-32 pb-20 overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div class="text-center max-w-4xl mx-auto">
+        <h1 class="font-display font-bold text-5xl sm:text-6xl lg:text-7xl mb-6">How We Work</h1>
+        <p class="text-xl text-zinc-400 leading-relaxed">Our proven methodology ensures every project is delivered with excellence, on time, and aligned with your vision.</p>
+      </div>
     </div>
   </section>
 
   <!-- Process Timeline -->
-  <section class="process-timeline">
-    <div class="timeline-line"></div>
-    <div class="container">
-      
-      <!-- Step 1: Discovery -->
-      <div class="timeline-item animate-on-scroll">
-        <div class="timeline-content">
-          <h3><span>🔍</span> Discovery & Consultation</h3>
-          <p>We begin by understanding your vision, goals, and requirements. Through detailed consultations, we gather all the information needed to create a tailored solution that meets your specific needs.</p>
-          <div class="timeline-tags">
-            <span class="timeline-tag">Requirements Gathering</span>
-            <span class="timeline-tag">Stakeholder Meetings</span>
-            <span class="timeline-tag">Goal Definition</span>
+  <section class="relative py-12 overflow-hidden">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="relative">
+        <!-- Timeline Line -->
+        <div class="timeline-line hidden md:block"></div>
+
+        <!-- Step 1: Discovery -->
+        <div class="relative mb-12 md:mb-20">
+          <div class="flex flex-col md:flex-row md:items-center gap-8">
+            <div class="md:w-1/2 md:pr-12 md:text-right">
+              <div class="glass rounded-2xl p-8 spotlight-card gradient-border">
+                <div class="relative z-10">
+                  <div class="flex items-center justify-between md:flex-row-reverse mb-4">
+                    <span class="text-5xl">🔍</span>
+                    <span class="font-display font-bold text-6xl text-white/5">01</span>
+                  </div>
+                  <h3 class="font-display font-bold text-2xl mb-3">Discovery & Consultation</h3>
+                  <p class="text-zinc-400 mb-4">We begin by understanding your vision, goals, and requirements. Through detailed consultations, we gather all the information needed to create a tailored solution.</p>
+                  <div class="flex flex-wrap gap-2 md:justify-end">
+                    <span class="px-3 py-1 rounded-lg bg-primary/10 text-primary text-xs font-medium">Requirements</span>
+                    <span class="px-3 py-1 rounded-lg bg-primary/10 text-primary text-xs font-medium">Stakeholder Meetings</span>
+                    <span class="px-3 py-1 rounded-lg bg-primary/10 text-primary text-xs font-medium">Goal Definition</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="hidden md:flex md:w-12 items-center justify-center flex-shrink-0">
+              <div class="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center font-display font-bold text-white shadow-lg shadow-primary/50">
+                1
+              </div>
+            </div>
+            <div class="md:w-1/2"></div>
           </div>
         </div>
-        <div class="timeline-number">1</div>
-        <div class="timeline-placeholder"></div>
-      </div>
-      
-      <!-- Step 2: Planning -->
-      <div class="timeline-item animate-on-scroll">
-        <div class="timeline-placeholder"></div>
-        <div class="timeline-number">2</div>
-        <div class="timeline-content">
-          <h3><span>📋</span> Planning & Strategy</h3>
-          <p>Based on our discovery findings, we create a comprehensive project plan including timelines, milestones, resource allocation, and detailed specifications. You'll receive a clear roadmap for the entire project.</p>
-          <div class="timeline-tags">
-            <span class="timeline-tag">Project Roadmap</span>
-            <span class="timeline-tag">Timeline Planning</span>
-            <span class="timeline-tag">Resource Allocation</span>
+
+        <!-- Step 2: Planning -->
+        <div class="relative mb-12 md:mb-20">
+          <div class="flex flex-col md:flex-row md:items-center gap-8">
+            <div class="md:w-1/2"></div>
+            <div class="hidden md:flex md:w-12 items-center justify-center flex-shrink-0">
+              <div class="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center font-display font-bold text-white shadow-lg shadow-primary/50">
+                2
+              </div>
+            </div>
+            <div class="md:w-1/2 md:pl-12">
+              <div class="glass rounded-2xl p-8 spotlight-card gradient-border">
+                <div class="relative z-10">
+                  <div class="flex items-center justify-between mb-4">
+                    <span class="text-5xl">📋</span>
+                    <span class="font-display font-bold text-6xl text-white/5">02</span>
+                  </div>
+                  <h3 class="font-display font-bold text-2xl mb-3">Planning & Strategy</h3>
+                  <p class="text-zinc-400 mb-4">We create a comprehensive project plan including timelines, milestones, resource allocation, and detailed specifications. You'll receive a clear roadmap.</p>
+                  <div class="flex flex-wrap gap-2">
+                    <span class="px-3 py-1 rounded-lg bg-primary/10 text-primary text-xs font-medium">Project Roadmap</span>
+                    <span class="px-3 py-1 rounded-lg bg-primary/10 text-primary text-xs font-medium">Timeline Planning</span>
+                    <span class="px-3 py-1 rounded-lg bg-primary/10 text-primary text-xs font-medium">Resource Allocation</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3: Design -->
+        <div class="relative mb-12 md:mb-20">
+          <div class="flex flex-col md:flex-row md:items-center gap-8">
+            <div class="md:w-1/2 md:pr-12 md:text-right">
+              <div class="glass rounded-2xl p-8 spotlight-card gradient-border">
+                <div class="relative z-10">
+                  <div class="flex items-center justify-between md:flex-row-reverse mb-4">
+                    <span class="text-5xl">🎨</span>
+                    <span class="font-display font-bold text-6xl text-white/5">03</span>
+                  </div>
+                  <h3 class="font-display font-bold text-2xl mb-3">Design & Prototyping</h3>
+                  <p class="text-zinc-400 mb-4">Our creative team develops initial concepts, wireframes, and prototypes. For animations, this includes storyboards and character designs.</p>
+                  <div class="flex flex-wrap gap-2 md:justify-end">
+                    <span class="px-3 py-1 rounded-lg bg-primary/10 text-primary text-xs font-medium">Storyboarding</span>
+                    <span class="px-3 py-1 rounded-lg bg-primary/10 text-primary text-xs font-medium">UI/UX Design</span>
+                    <span class="px-3 py-1 rounded-lg bg-primary/10 text-primary text-xs font-medium">Prototypes</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="hidden md:flex md:w-12 items-center justify-center flex-shrink-0">
+              <div class="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center font-display font-bold text-white shadow-lg shadow-primary/50">
+                3
+              </div>
+            </div>
+            <div class="md:w-1/2"></div>
+          </div>
+        </div>
+
+        <!-- Step 4: Development -->
+        <div class="relative mb-12 md:mb-20">
+          <div class="flex flex-col md:flex-row md:items-center gap-8">
+            <div class="md:w-1/2"></div>
+            <div class="hidden md:flex md:w-12 items-center justify-center flex-shrink-0">
+              <div class="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center font-display font-bold text-white shadow-lg shadow-primary/50">
+                4
+              </div>
+            </div>
+            <div class="md:w-1/2 md:pl-12">
+              <div class="glass rounded-2xl p-8 spotlight-card gradient-border">
+                <div class="relative z-10">
+                  <div class="flex items-center justify-between mb-4">
+                    <span class="text-5xl">⚙️</span>
+                    <span class="font-display font-bold text-6xl text-white/5">04</span>
+                  </div>
+                  <h3 class="font-display font-bold text-2xl mb-3">Development & Production</h3>
+                  <p class="text-zinc-400 mb-4">This is where the magic happens. Our skilled developers and animators bring the approved designs to life with agile methodologies and regular updates.</p>
+                  <div class="flex flex-wrap gap-2">
+                    <span class="px-3 py-1 rounded-lg bg-primary/10 text-primary text-xs font-medium">Agile Development</span>
+                    <span class="px-3 py-1 rounded-lg bg-primary/10 text-primary text-xs font-medium">Weekly Updates</span>
+                    <span class="px-3 py-1 rounded-lg bg-primary/10 text-primary text-xs font-medium">Quality Coding</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 5: Review -->
+        <div class="relative mb-12 md:mb-20">
+          <div class="flex flex-col md:flex-row md:items-center gap-8">
+            <div class="md:w-1/2 md:pr-12 md:text-right">
+              <div class="glass rounded-2xl p-8 spotlight-card gradient-border">
+                <div class="relative z-10">
+                  <div class="flex items-center justify-between md:flex-row-reverse mb-4">
+                    <span class="text-5xl">✅</span>
+                    <span class="font-display font-bold text-6xl text-white/5">05</span>
+                  </div>
+                  <h3 class="font-display font-bold text-2xl mb-3">Review & Refinement</h3>
+                  <p class="text-zinc-400 mb-4">We present the completed work for your review. Your feedback is invaluable, and we incorporate your suggestions to refine the final deliverables.</p>
+                  <div class="flex flex-wrap gap-2 md:justify-end">
+                    <span class="px-3 py-1 rounded-lg bg-primary/10 text-primary text-xs font-medium">Client Review</span>
+                    <span class="px-3 py-1 rounded-lg bg-primary/10 text-primary text-xs font-medium">Feedback Integration</span>
+                    <span class="px-3 py-1 rounded-lg bg-primary/10 text-primary text-xs font-medium">Quality Assurance</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="hidden md:flex md:w-12 items-center justify-center flex-shrink-0">
+              <div class="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center font-display font-bold text-white shadow-lg shadow-primary/50">
+                5
+              </div>
+            </div>
+            <div class="md:w-1/2"></div>
+          </div>
+        </div>
+
+        <!-- Step 6: Delivery -->
+        <div class="relative mb-12 md:mb-20">
+          <div class="flex flex-col md:flex-row md:items-center gap-8">
+            <div class="md:w-1/2"></div>
+            <div class="hidden md:flex md:w-12 items-center justify-center flex-shrink-0">
+              <div class="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center font-display font-bold text-white shadow-lg shadow-primary/50">
+                6
+              </div>
+            </div>
+            <div class="md:w-1/2 md:pl-12">
+              <div class="glass rounded-2xl p-8 spotlight-card gradient-border">
+                <div class="relative z-10">
+                  <div class="flex items-center justify-between mb-4">
+                    <span class="text-5xl">🚀</span>
+                    <span class="font-display font-bold text-6xl text-white/5">06</span>
+                  </div>
+                  <h3 class="font-display font-bold text-2xl mb-3">Delivery & Launch</h3>
+                  <p class="text-zinc-400 mb-4">Once approved, we handle the complete deployment and launch process. For web projects, this includes hosting setup and going live.</p>
+                  <div class="flex flex-wrap gap-2">
+                    <span class="px-3 py-1 rounded-lg bg-primary/10 text-primary text-xs font-medium">Deployment</span>
+                    <span class="px-3 py-1 rounded-lg bg-primary/10 text-primary text-xs font-medium">Launch Support</span>
+                    <span class="px-3 py-1 rounded-lg bg-primary/10 text-primary text-xs font-medium">Documentation</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 7: Support -->
+        <div class="relative">
+          <div class="flex flex-col md:flex-row md:items-center gap-8">
+            <div class="md:w-1/2 md:pr-12 md:text-right">
+              <div class="glass rounded-2xl p-8 spotlight-card gradient-border">
+                <div class="relative z-10">
+                  <div class="flex items-center justify-between md:flex-row-reverse mb-4">
+                    <span class="text-5xl">🤝</span>
+                    <span class="font-display font-bold text-6xl text-white/5">07</span>
+                  </div>
+                  <h3 class="font-display font-bold text-2xl mb-3">Ongoing Support</h3>
+                  <p class="text-zinc-400 mb-4">Our relationship doesn't end at delivery. We provide ongoing support, maintenance, and updates to ensure optimal performance.</p>
+                  <div class="flex flex-wrap gap-2 md:justify-end">
+                    <span class="px-3 py-1 rounded-lg bg-primary/10 text-primary text-xs font-medium">Technical Support</span>
+                    <span class="px-3 py-1 rounded-lg bg-primary/10 text-primary text-xs font-medium">Maintenance</span>
+                    <span class="px-3 py-1 rounded-lg bg-primary/10 text-primary text-xs font-medium">Future Updates</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="hidden md:flex md:w-12 items-center justify-center flex-shrink-0">
+              <div class="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center font-display font-bold text-white shadow-lg shadow-primary/50">
+                7
+              </div>
+            </div>
+            <div class="md:w-1/2"></div>
           </div>
         </div>
       </div>
-      
-      <!-- Step 3: Design -->
-      <div class="timeline-item animate-on-scroll">
-        <div class="timeline-content">
-          <h3><span>🎨</span> Design & Prototyping</h3>
-          <p>Our creative team develops initial concepts, wireframes, and prototypes. For animations, this includes storyboards and character designs. For web projects, we create UI/UX mockups for your approval.</p>
-          <div class="timeline-tags">
-            <span class="timeline-tag">Storyboarding</span>
-            <span class="timeline-tag">UI/UX Design</span>
-            <span class="timeline-tag">Prototypes</span>
-          </div>
-        </div>
-        <div class="timeline-number">3</div>
-        <div class="timeline-placeholder"></div>
-      </div>
-      
-      <!-- Step 4: Development -->
-      <div class="timeline-item animate-on-scroll">
-        <div class="timeline-placeholder"></div>
-        <div class="timeline-number">4</div>
-        <div class="timeline-content">
-          <h3><span>⚙️</span> Development & Production</h3>
-          <p>This is where the magic happens. Our skilled developers and animators bring the approved designs to life. We follow agile methodologies with regular progress updates and milestone reviews.</p>
-          <div class="timeline-tags">
-            <span class="timeline-tag">Agile Development</span>
-            <span class="timeline-tag">Weekly Updates</span>
-            <span class="timeline-tag">Quality Coding</span>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Step 5: Review -->
-      <div class="timeline-item animate-on-scroll">
-        <div class="timeline-content">
-          <h3><span>✅</span> Review & Refinement</h3>
-          <p>We present the completed work for your review. Your feedback is invaluable, and we incorporate your suggestions to refine and perfect the final deliverables until you're completely satisfied.</p>
-          <div class="timeline-tags">
-            <span class="timeline-tag">Client Review</span>
-            <span class="timeline-tag">Feedback Integration</span>
-            <span class="timeline-tag">Quality Assurance</span>
-          </div>
-        </div>
-        <div class="timeline-number">5</div>
-        <div class="timeline-placeholder"></div>
-      </div>
-      
-      <!-- Step 6: Delivery -->
-      <div class="timeline-item animate-on-scroll">
-        <div class="timeline-placeholder"></div>
-        <div class="timeline-number">6</div>
-        <div class="timeline-content">
-          <h3><span>🚀</span> Delivery & Launch</h3>
-          <p>Once approved, we handle the complete deployment and launch process. For web projects, this includes hosting setup, domain configuration, and going live. For content, we deliver in all required formats.</p>
-          <div class="timeline-tags">
-            <span class="timeline-tag">Deployment</span>
-            <span class="timeline-tag">Launch Support</span>
-            <span class="timeline-tag">Documentation</span>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Step 7: Support -->
-      <div class="timeline-item animate-on-scroll">
-        <div class="timeline-content">
-          <h3><span>🤝</span> Ongoing Support</h3>
-          <p>Our relationship doesn't end at delivery. We provide ongoing support, maintenance, and updates to ensure your solution continues to perform optimally and evolves with your needs.</p>
-          <div class="timeline-tags">
-            <span class="timeline-tag">Technical Support</span>
-            <span class="timeline-tag">Maintenance</span>
-            <span class="timeline-tag">Future Updates</span>
-          </div>
-        </div>
-        <div class="timeline-number">7</div>
-        <div class="timeline-placeholder"></div>
-      </div>
-      
     </div>
   </section>
 
   <!-- Why Our Process Works -->
-  <section class="section" style="background: var(--bg-light);">
-    <div class="container">
-      <div class="section-header">
-        <h2>Why Our Process Works</h2>
-        <p>Our methodology is designed to ensure transparency, quality, and client satisfaction at every step</p>
+  <section class="relative py-24 overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="font-display font-bold text-4xl lg:text-5xl mb-4">Why Our Process Works</h2>
+        <p class="text-xl text-zinc-400 max-w-2xl mx-auto">Our methodology is designed to ensure transparency, quality, and client satisfaction at every step</p>
       </div>
-      
-      <div class="features-grid">
-        <div class="feature-card animate-on-scroll">
-          <div class="feature-icon">🎯</div>
-          <h3>Clear Communication</h3>
-          <p>Regular updates and open channels ensure you're always informed about your project's progress. No surprises, just transparency.</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="glass rounded-2xl p-8 text-center spotlight-card gradient-border group hover:bg-white/5 transition-all">
+          <div class="relative z-10">
+            <div class="text-5xl mb-4 group-hover:scale-110 transition-transform">🎯</div>
+            <h3 class="font-display font-semibold text-xl mb-3">Clear Communication</h3>
+            <p class="text-zinc-400 text-sm">Regular updates and open channels ensure you're always informed. No surprises, just transparency.</p>
+          </div>
         </div>
-        
-        <div class="feature-card animate-on-scroll">
-          <div class="feature-icon">⏰</div>
-          <h3>On-Time Delivery</h3>
-          <p>We respect your timelines. Our structured approach and experienced team ensure projects are delivered when promised.</p>
+
+        <div class="glass rounded-2xl p-8 text-center spotlight-card gradient-border group hover:bg-white/5 transition-all">
+          <div class="relative z-10">
+            <div class="text-5xl mb-4 group-hover:scale-110 transition-transform">⏰</div>
+            <h3 class="font-display font-semibold text-xl mb-3">On-Time Delivery</h3>
+            <p class="text-zinc-400 text-sm">We respect your timelines. Our structured approach ensures projects are delivered when promised.</p>
+          </div>
         </div>
-        
-        <div class="feature-card animate-on-scroll">
-          <div class="feature-icon">💎</div>
-          <h3>Quality Focus</h3>
-          <p>Every deliverable goes through rigorous quality checks. We don't compromise on excellence, ensuring you receive the best.</p>
+
+        <div class="glass rounded-2xl p-8 text-center spotlight-card gradient-border group hover:bg-white/5 transition-all">
+          <div class="relative z-10">
+            <div class="text-5xl mb-4 group-hover:scale-110 transition-transform">💎</div>
+            <h3 class="font-display font-semibold text-xl mb-3">Quality Focus</h3>
+            <p class="text-zinc-400 text-sm">Every deliverable goes through rigorous quality checks. We don't compromise on excellence.</p>
+          </div>
         </div>
-        
-        <div class="feature-card animate-on-scroll">
-          <div class="feature-icon">🔄</div>
-          <h3>Flexible Iterations</h3>
-          <p>We understand requirements evolve. Our process accommodates changes and feedback at appropriate stages without derailing the project.</p>
+
+        <div class="glass rounded-2xl p-8 text-center spotlight-card gradient-border group hover:bg-white/5 transition-all">
+          <div class="relative z-10">
+            <div class="text-5xl mb-4 group-hover:scale-110 transition-transform">🔄</div>
+            <h3 class="font-display font-semibold text-xl mb-3">Flexible Iterations</h3>
+            <p class="text-zinc-400 text-sm">We accommodate changes and feedback at appropriate stages without derailing the project.</p>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
   <!-- What We Need From You -->
-  <section class="section">
-    <div class="container">
-      <div class="section-header">
-        <h2>What We Need From You</h2>
-        <p>To deliver the best results, here's what helps us serve you better</p>
+  <section class="relative py-24 overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="font-display font-bold text-4xl lg:text-5xl mb-4">What We Need From You</h2>
+        <p class="text-xl text-zinc-400 max-w-2xl mx-auto">To deliver the best results, here's what helps us serve you better</p>
       </div>
-      
-      <div class="about-content" style="gap: 60px;">
-        <div class="animate-on-scroll">
-          <div style="background: linear-gradient(135deg, var(--bg-cream), var(--bg-light)); padding: 40px; border-radius: 24px;">
-            <h3 style="margin-bottom: 24px;">📝 Project Information</h3>
-            <ul class="service-features" style="margin-bottom: 0;">
-              <li>Clear project objectives and goals</li>
-              <li>Target audience information</li>
-              <li>Brand guidelines (if available)</li>
-              <li>Reference materials and inspiration</li>
-              <li>Timeline expectations</li>
-              <li>Budget range for the project</li>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div class="glass rounded-2xl p-8 spotlight-card gradient-border">
+          <div class="relative z-10">
+            <h3 class="font-display font-semibold text-2xl mb-6 flex items-center">
+              <span class="text-3xl mr-3">📝</span>
+              Project Information
+            </h3>
+            <ul class="space-y-3">
+              <li class="flex items-start space-x-3 text-zinc-300">
+                <svg class="w-6 h-6 text-primary flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span>Clear project objectives and goals</span>
+              </li>
+              <li class="flex items-start space-x-3 text-zinc-300">
+                <svg class="w-6 h-6 text-primary flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span>Target audience information</span>
+              </li>
+              <li class="flex items-start space-x-3 text-zinc-300">
+                <svg class="w-6 h-6 text-primary flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span>Brand guidelines (if available)</span>
+              </li>
+              <li class="flex items-start space-x-3 text-zinc-300">
+                <svg class="w-6 h-6 text-primary flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span>Reference materials and inspiration</span>
+              </li>
+              <li class="flex items-start space-x-3 text-zinc-300">
+                <svg class="w-6 h-6 text-primary flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span>Timeline expectations</span>
+              </li>
+              <li class="flex items-start space-x-3 text-zinc-300">
+                <svg class="w-6 h-6 text-primary flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span>Budget range for the project</span>
+              </li>
             </ul>
           </div>
         </div>
-        
-        <div class="animate-on-scroll">
-          <div style="background: linear-gradient(135deg, var(--bg-cream), var(--bg-light)); padding: 40px; border-radius: 24px;">
-            <h3 style="margin-bottom: 24px;">🤝 Collaboration Needs</h3>
-            <ul class="service-features" style="margin-bottom: 0;">
-              <li>Designated point of contact</li>
-              <li>Timely feedback on deliverables</li>
-              <li>Access to necessary resources</li>
-              <li>Approval authority for decisions</li>
-              <li>Availability for scheduled meetings</li>
-              <li>Content and assets as needed</li>
+
+        <div class="glass rounded-2xl p-8 spotlight-card gradient-border">
+          <div class="relative z-10">
+            <h3 class="font-display font-semibold text-2xl mb-6 flex items-center">
+              <span class="text-3xl mr-3">🤝</span>
+              Collaboration Needs
+            </h3>
+            <ul class="space-y-3">
+              <li class="flex items-start space-x-3 text-zinc-300">
+                <svg class="w-6 h-6 text-primary flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span>Designated point of contact</span>
+              </li>
+              <li class="flex items-start space-x-3 text-zinc-300">
+                <svg class="w-6 h-6 text-primary flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span>Timely feedback on deliverables</span>
+              </li>
+              <li class="flex items-start space-x-3 text-zinc-300">
+                <svg class="w-6 h-6 text-primary flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span>Access to necessary resources</span>
+              </li>
+              <li class="flex items-start space-x-3 text-zinc-300">
+                <svg class="w-6 h-6 text-primary flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span>Approval authority for decisions</span>
+              </li>
+              <li class="flex items-start space-x-3 text-zinc-300">
+                <svg class="w-6 h-6 text-primary flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span>Availability for scheduled meetings</span>
+              </li>
+              <li class="flex items-start space-x-3 text-zinc-300">
+                <svg class="w-6 h-6 text-primary flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span>Content and assets as needed</span>
+              </li>
             </ul>
           </div>
         </div>
@@ -239,76 +543,133 @@
   </section>
 
   <!-- CTA Section -->
-  <section class="section" style="background: linear-gradient(135deg, var(--primary-dark), var(--primary)); text-align: center; color: white;">
-    <div class="container">
-      <h2 style="color: white; margin-bottom: 20px;">Ready to Get Started?</h2>
-      <p style="color: rgba(255,255,255,0.8); max-width: 600px; margin: 0 auto 40px; font-size: 1.1rem;">Let's begin with a discovery call to understand your project needs. We'll guide you through each step of our process.</p>
-      <a href="contact.html" class="btn btn-accent">
-        Schedule a Call
-        <span>→</span>
-      </a>
+  <section class="relative py-24 overflow-hidden">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div class="glass rounded-3xl p-12 lg:p-16 relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-r from-primary/10 to-secondary/10"></div>
+        <div class="relative z-10">
+          <h2 class="font-display font-bold text-4xl lg:text-5xl mb-6">Ready to Get Started?</h2>
+          <p class="text-xl text-zinc-400 mb-10 max-w-2xl mx-auto">Let's begin with a discovery call to understand your project needs. We'll guide you through each step of our process.</p>
+          <a href="contact.html" class="inline-flex items-center px-8 py-4 rounded-xl bg-gradient-to-r from-primary to-secondary text-white font-semibold hover:shadow-2xl hover:shadow-primary/50 transition-all space-x-2">
+            <span>Schedule a Call</span>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+            </svg>
+          </a>
+        </div>
+      </div>
     </div>
   </section>
 
   <!-- Footer -->
-  <footer class="footer">
-    <div class="container">
-      <div class="footer-grid">
-        <div class="footer-brand">
-          <a href="index.html" class="logo">
-            <div class="logo-icon">C</div>
-            <span>Cubico</span>
+  <footer class="relative border-t border-white/5 py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+        <!-- Brand -->
+        <div class="lg:col-span-1">
+          <a href="index.html" class="flex items-center space-x-3 mb-4">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center font-display font-bold text-white text-xl">
+              C
+            </div>
+            <span class="font-display font-bold text-xl">Cubico</span>
           </a>
-          <p>Empowering Islamic education through innovative digital solutions and creative content.</p>
-          <div class="footer-social">
-            <a href="#" aria-label="Facebook">📘</a>
-            <a href="#" aria-label="Twitter">🐦</a>
-            <a href="#" aria-label="LinkedIn">💼</a>
-            <a href="#" aria-label="YouTube">📺</a>
+          <p class="text-zinc-400 mb-6">Empowering Islamic education through innovative digital solutions and creative content.</p>
+          <div class="flex items-center space-x-3">
+            <a href="#" class="w-10 h-10 rounded-lg glass hover:bg-white/10 flex items-center justify-center transition-all">
+              <span class="text-xl">📘</span>
+            </a>
+            <a href="#" class="w-10 h-10 rounded-lg glass hover:bg-white/10 flex items-center justify-center transition-all">
+              <span class="text-xl">🐦</span>
+            </a>
+            <a href="#" class="w-10 h-10 rounded-lg glass hover:bg-white/10 flex items-center justify-center transition-all">
+              <span class="text-xl">💼</span>
+            </a>
+            <a href="#" class="w-10 h-10 rounded-lg glass hover:bg-white/10 flex items-center justify-center transition-all">
+              <span class="text-xl">📺</span>
+            </a>
           </div>
         </div>
-        
-        <div class="footer-column">
-          <h4>Quick Links</h4>
-          <ul>
-            <li><a href="index.html">Home</a></li>
-            <li><a href="services.html">Services</a></li>
-            <li><a href="process.html">Our Process</a></li>
-            <li><a href="contact.html">Contact</a></li>
+
+        <!-- Quick Links -->
+        <div>
+          <h4 class="font-display font-semibold text-lg mb-4">Quick Links</h4>
+          <ul class="space-y-3">
+            <li><a href="index.html" class="text-zinc-400 hover:text-white transition-colors">Home</a></li>
+            <li><a href="services.html" class="text-zinc-400 hover:text-white transition-colors">Services</a></li>
+            <li><a href="process.html" class="text-zinc-400 hover:text-white transition-colors">Our Process</a></li>
+            <li><a href="contact.html" class="text-zinc-400 hover:text-white transition-colors">Contact</a></li>
           </ul>
         </div>
-        
-        <div class="footer-column">
-          <h4>Services</h4>
-          <ul>
-            <li><a href="services.html">Animation Production</a></li>
-            <li><a href="services.html">Educational Content</a></li>
-            <li><a href="services.html">Web Development</a></li>
-            <li><a href="services.html">Digital Solutions</a></li>
+
+        <!-- Services -->
+        <div>
+          <h4 class="font-display font-semibold text-lg mb-4">Services</h4>
+          <ul class="space-y-3">
+            <li><a href="services.html" class="text-zinc-400 hover:text-white transition-colors">Animation Production</a></li>
+            <li><a href="services.html" class="text-zinc-400 hover:text-white transition-colors">Educational Content</a></li>
+            <li><a href="services.html" class="text-zinc-400 hover:text-white transition-colors">Web Development</a></li>
+            <li><a href="services.html" class="text-zinc-400 hover:text-white transition-colors">Digital Solutions</a></li>
           </ul>
         </div>
-        
-        <div class="footer-column">
-          <h4>Contact</h4>
-          <ul>
+
+        <!-- Contact -->
+        <div>
+          <h4 class="font-display font-semibold text-lg mb-4">Contact</h4>
+          <ul class="space-y-3 text-zinc-400">
             <li>Karachi, Pakistan</li>
-            <li>info@cubico.tech</li>
+            <li><a href="mailto:info@cubico.tech" class="hover:text-white transition-colors">info@cubico.tech</a></li>
             <li>+92 XXX XXXXXXX</li>
           </ul>
         </div>
       </div>
-      
-      <div class="footer-bottom">
-        <p>&copy; 2024 Cubico Technologies. All rights reserved.</p>
-        <div class="footer-bottom-links">
-          <a href="#">Privacy Policy</a>
-          <a href="#">Terms of Service</a>
+
+      <!-- Bottom Bar -->
+      <div class="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
+        <p class="text-zinc-400 text-sm">&copy; 2024 Cubico Technologies. All rights reserved.</p>
+        <div class="flex items-center space-x-6 text-sm">
+          <a href="#" class="text-zinc-400 hover:text-white transition-colors">Privacy Policy</a>
+          <a href="#" class="text-zinc-400 hover:text-white transition-colors">Terms of Service</a>
         </div>
       </div>
     </div>
   </footer>
 
   <!-- JavaScript -->
-  <script src="js/main.js"></script>
+  <script>
+    // Mobile Menu Toggle
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+
+    mobileMenuBtn.addEventListener('click', () => {
+      mobileMenu.classList.toggle('hidden');
+    });
+
+    // Spotlight Card Effect
+    document.querySelectorAll('.spotlight-card').forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 100;
+        const y = ((e.clientY - rect.top) / rect.height) * 100;
+        card.style.setProperty('--mouse-x', `${x}%`);
+        card.style.setProperty('--mouse-y', `${y}%`);
+      });
+    });
+
+    // Navbar Scroll Effect
+    const navbar = document.querySelector('nav');
+    let lastScroll = 0;
+
+    window.addEventListener('scroll', () => {
+      const currentScroll = window.pageYOffset;
+
+      if (currentScroll > 100) {
+        navbar.classList.add('shadow-lg', 'shadow-black/20');
+      } else {
+        navbar.classList.remove('shadow-lg', 'shadow-black/20');
+      }
+
+      lastScroll = currentScroll;
+    });
+  </script>
 </body>
 </html>
