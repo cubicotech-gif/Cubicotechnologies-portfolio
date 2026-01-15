@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 export default function Home() {
   const statsRef = useRef<HTMLDivElement>(null);
   const [typedText, setTypedText] = useState('');
-  const fullText = 'All Your School's Digital Needs — In One Smart Platform';
+  const fullText = 'All Your School\'s Digital Needs - In One Smart Platform';
   const [currentFeature, setCurrentFeature] = useState(0);
 
   // Typing animation effect
