@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 export default function Home() {
   const statsRef = useRef<HTMLDivElement>(null);
   const [typedText, setTypedText] = useState('');
-  const fullText = 'Transform Education with Award-Winning Digital Solutions';
+  const fullText = 'All Your School's Digital Needs — In One Smart Platform';
   const [currentFeature, setCurrentFeature] = useState(0);
 
   // Typing animation effect
@@ -27,7 +27,7 @@ export default function Home() {
   // Rotating features
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentFeature((prev) => (prev + 1) % 3);
+      setCurrentFeature((prev) => (prev + 1) % 4);
     }, 3000);
     return () => clearInterval(interval);
   }, []);
@@ -86,9 +86,10 @@ export default function Home() {
   }, []);
 
   const features = [
-    { icon: '🎬', text: 'Emmy-Quality Animations', color: 'from-purple-500 to-pink-500' },
-    { icon: '🚀', text: 'Enterprise LMS Platforms', color: 'from-blue-500 to-cyan-500' },
-    { icon: '📱', text: 'Mobile Learning Apps', color: 'from-green-500 to-emerald-500' },
+    { icon: '🏫', text: 'School Management', color: 'from-purple-500 to-pink-500' },
+    { icon: '📚', text: 'LMS', color: 'from-blue-500 to-cyan-500' },
+    { icon: '👥', text: 'Parent & Teacher Apps', color: 'from-green-500 to-emerald-500' },
+    { icon: '🎨', text: 'Animated Learning', color: 'from-orange-500 to-red-500' },
   ];
 
   return (
@@ -119,7 +120,7 @@ export default function Home() {
                 <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
               </span>
               <span className="text-sm font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                Trusted by 100+ Educational Institutions Worldwide
+                Trusted Digital Solutions for Educational Institutions
               </span>
             </div>
 
@@ -154,8 +155,8 @@ export default function Home() {
 
               {/* Description */}
               <p className="text-lg sm:text-xl text-gray-700 mb-8 leading-relaxed">
-                We craft <span className="font-bold text-gray-900">immersive learning experiences</span> that engage, educate, and inspire.
-                From interactive animations to scalable platforms, we're your partner in educational transformation.
+                Cubico helps schools and educational institutions <span className="font-bold text-gray-900">manage everything digitally</span> — from classrooms and teachers to parents, students, and finances.
+                We create <span className="font-bold text-gray-900">one connected system</span> that makes learning engaging and management simple.
               </p>
 
               {/* CTA Buttons with Hover Effects */}
@@ -165,7 +166,7 @@ export default function Home() {
                   className="group relative px-8 py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold text-base overflow-hidden hover:shadow-2xl hover:shadow-indigo-500/30 transition-all duration-300 hover:scale-105"
                 >
                   <span className="relative z-10 flex items-center justify-center space-x-2">
-                    <span>Start Your Project</span>
+                    <span>Book a Free Demo</span>
                     <svg className="w-5 h-5 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                     </svg>
@@ -176,7 +177,7 @@ export default function Home() {
                   className="group px-8 py-4 rounded-xl bg-white border-2 border-gray-300 text-gray-900 font-bold text-base hover:bg-gray-50 shadow-md transition-all duration-300 hover:scale-105"
                 >
                   <span className="flex items-center justify-center space-x-2">
-                    <span>View Our Work</span>
+                    <span>See How It Works</span>
                     <svg className="w-5 h-5 group-hover:rotate-45 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                     </svg>
@@ -190,19 +191,19 @@ export default function Home() {
                   <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
-                  <span className="font-semibold">100+ Clients</span>
+                  <span className="font-semibold">Complete School Management</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <svg className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                   </svg>
-                  <span className="font-semibold">4.9/5.0 Rating</span>
+                  <span className="font-semibold">Trusted by Institutions</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <svg className="w-5 h-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
+                    <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
                   </svg>
-                  <span className="font-semibold">50M+ Learners</span>
+                  <span className="font-semibold">One App for Everyone</span>
                 </div>
               </div>
             </div>
