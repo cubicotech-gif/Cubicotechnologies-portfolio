@@ -12,17 +12,15 @@ export default function Navigation() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-3 group">
-            <div className="relative w-10 h-10">
+          <Link href="/" className="flex items-center group">
+            <div className="relative w-40 h-14 px-4 py-2 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all">
               <Image
                 src="/images/logos/logo.png"
                 alt="Cubico Technologies Logo"
-                width={40}
-                height={40}
-                className="group-hover:scale-110 transition-transform"
+                fill
+                className="object-contain group-hover:scale-105 transition-transform"
               />
             </div>
-            <span className="font-display font-bold text-xl text-white">Cubico</span>
           </Link>
 
           {/* Desktop Menu */}
