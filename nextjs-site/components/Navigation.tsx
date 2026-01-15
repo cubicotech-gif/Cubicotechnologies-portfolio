@@ -15,7 +15,7 @@ export default function Navigation() {
           <Link href="/" className="flex items-center space-x-3 group">
             <div className="relative w-10 h-10">
               <Image
-                src="/images/logos/logo.svg"
+                src="/images/logos/logo.png"
                 alt="Cubico Technologies Logo"
                 width={40}
                 height={40}
