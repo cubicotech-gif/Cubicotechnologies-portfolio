@@ -4,6 +4,32 @@ Complete guide to deploy your Next.js website to Vercel using your custom domain
 
 ---
 
+## Understanding Your Repository Structure
+
+Your Git repository contains TWO separate websites:
+
+```
+Cubicotechnologies-portfolio/
+├── index.html              ← OLD HTML site (will be ignored)
+├── services.html           ← OLD HTML site (will be ignored)
+├── process.html            ← OLD HTML site (will be ignored)
+├── contact.html            ← OLD HTML site (will be ignored)
+├── styles.css              ← OLD HTML site (will be ignored)
+└── nextjs-site/            ← NEW Next.js site (THIS is what we'll deploy!)
+    ├── package.json
+    ├── app/
+    ├── components/
+    └── ...
+```
+
+**What Vercel Will Deploy:**
+- ✅ Only the `nextjs-site/` folder (Next.js application)
+- ❌ The old HTML files in root will be completely ignored
+
+**How?** By setting the "Root Directory" to `nextjs-site` during setup (explained below).
+
+---
+
 ## Part 1: Deploy to Vercel (5 minutes)
 
 ### Step 1: Create Vercel Account
@@ -16,14 +42,29 @@ Complete guide to deploy your Next.js website to Vercel using your custom domain
 1. Click "Add New..." → "Project"
 2. Find your `Cubicotechnologies-portfolio` repository
 3. Click "Import"
-4. Vercel will auto-detect Next.js configuration
 
-### Step 3: Configure Build Settings
-Vercel should auto-fill these, but verify:
-- **Framework Preset**: Next.js
-- **Root Directory**: `nextjs-site`
-- **Build Command**: `npm run build`
-- **Output Directory**: `.next`
+### Step 3: Configure Build Settings ⚠️ IMPORTANT
+
+Your repository contains BOTH old HTML files (root folder) AND the new Next.js app (nextjs-site folder). You MUST tell Vercel to use the Next.js app by setting the **Root Directory**.
+
+**Configure these settings:**
+
+1. **Root Directory**: Click "Edit" and enter: `nextjs-site`
+   - ⚠️ **CRITICAL**: This tells Vercel to IGNORE the old HTML files in root
+   - Vercel will ONLY look inside the `nextjs-site/` folder
+   - Without this, Vercel will try to deploy the wrong files!
+
+2. **Framework Preset**: Next.js (should auto-detect after setting root directory)
+
+3. **Build Command**: `npm run build` (auto-filled)
+
+4. **Output Directory**: `.next` (auto-filled)
+
+**Visual Check:**
+After setting "Root Directory" to `nextjs-site`, you should see Vercel detect:
+- ✅ `package.json` found
+- ✅ Next.js framework detected
+- ✅ Build command set automatically
 
 ### Step 4: Deploy
 1. Click "Deploy"
@@ -146,12 +187,31 @@ Vercel automatically provides free SSL certificates for custom domains:
 
 ## Troubleshooting
 
+### Vercel Deployed the Wrong Files (Shows HTML Site Instead of Next.js)
+**Problem:** You see the old HTML website instead of the new Next.js site.
+
+**Solution:**
+1. Go to Vercel project → Settings → General
+2. Scroll to "Root Directory"
+3. Click "Edit" and enter: `nextjs-site`
+4. Click "Save"
+5. Go to Deployments tab → Click ⋯ → Redeploy
+
+### Build Failed: "No package.json found"
+**Problem:** Vercel can't find your Next.js project.
+
+**Solution:**
+1. You forgot to set the Root Directory!
+2. Settings → General → Root Directory → Edit
+3. Enter: `nextjs-site`
+4. Save and redeploy
+
 ### Domain Shows "Invalid Configuration"
 1. Double-check DNS records match exactly
 2. Wait 30 more minutes for propagation
 3. Use [dnschecker.org](https://dnschecker.org) to verify DNS propagation globally
 
-### Site Shows 404 Error
+### Site Shows 404 Error After Deployment
 1. Verify "Root Directory" is set to `nextjs-site` in Vercel settings
 2. Redeploy: Deployments tab → Click ⋯ → Redeploy
 
