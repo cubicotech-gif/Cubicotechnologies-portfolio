@@ -97,27 +97,27 @@ export default function Home() {
       <section className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
         {/* Animated Gradient Mesh Background */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-20 left-20 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-blob"></div>
-          <div className="absolute top-40 right-20 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl animate-blob animation-delay-2000"></div>
-          <div className="absolute bottom-20 left-1/2 w-96 h-96 bg-pink-500/20 rounded-full blur-3xl animate-blob animation-delay-4000"></div>
+          <div className="absolute top-20 left-20 w-96 h-96 bg-purple-100 rounded-full blur-3xl animate-blob"></div>
+          <div className="absolute top-40 right-20 w-96 h-96 bg-cyan-100 rounded-full blur-3xl animate-blob animation-delay-2000"></div>
+          <div className="absolute bottom-20 left-1/2 w-96 h-96 bg-pink-100 rounded-full blur-3xl animate-blob animation-delay-4000"></div>
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
           <div className="text-center max-w-5xl mx-auto">
             {/* Floating Badge */}
-            <div className="inline-flex items-center px-6 py-3 rounded-full glass border border-white/20 mb-8 animate-float backdrop-blur-xl">
+            <div className="inline-flex items-center px-6 py-3 rounded-full glass border border-gray-300 mb-8 animate-float backdrop-blur-xl">
               <span className="relative flex h-3 w-3 mr-3">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
               </span>
-              <span className="text-sm font-semibold bg-gradient-to-r from-white to-zinc-300 bg-clip-text text-transparent">
+              <span className="text-sm font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
                 Trusted by 100+ Educational Institutions Worldwide
               </span>
             </div>
 
             {/* Typing Animation Heading */}
             <h1 className="font-display font-black text-5xl sm:text-6xl lg:text-8xl mb-8 leading-tight">
-              <span className="bg-gradient-to-r from-white via-zinc-200 to-zinc-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-700 bg-clip-text text-transparent">
                 {typedText}
               </span>
               <span className="animate-pulse">|</span>
@@ -145,8 +145,8 @@ export default function Home() {
             </div>
 
             {/* Description */}
-            <p className="text-xl sm:text-2xl text-zinc-300 mb-12 max-w-4xl mx-auto leading-relaxed">
-              We craft <span className="font-semibold text-white">immersive learning experiences</span> that engage, educate, and inspire.
+            <p className="text-xl sm:text-2xl text-gray-700 mb-12 max-w-4xl mx-auto leading-relaxed">
+              We craft <span className="font-semibold text-gray-900">immersive learning experiences</span> that engage, educate, and inspire.
               From interactive animations to scalable platforms, we're your partner in educational transformation.
             </p>
 
@@ -154,7 +154,7 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
               <Link
                 href="/contact"
-                className="group relative px-10 py-5 rounded-2xl bg-gradient-to-r from-white to-zinc-300 text-black font-bold text-lg overflow-hidden hover:shadow-2xl hover:shadow-white/20 transition-all duration-300 hover:scale-105"
+                className="group relative px-10 py-5 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold text-lg overflow-hidden hover:shadow-2xl hover:shadow-white/20 transition-all duration-300 hover:scale-105"
               >
                 <span className="relative z-10 flex items-center space-x-2">
                   <span>Start Your Project</span>
@@ -165,7 +165,7 @@ export default function Home() {
               </Link>
               <Link
                 href="/services"
-                className="group px-10 py-5 rounded-2xl glass border-2 border-white/20 text-white font-bold text-lg hover:bg-white/10 backdrop-blur-xl transition-all duration-300 hover:scale-105"
+                className="group px-10 py-5 rounded-2xl glass border-2 border-gray-300 text-gray-900 font-bold text-lg hover:bg-white shadow-lg backdrop-blur-xl transition-all duration-300 hover:scale-105"
               >
                 <span className="flex items-center space-x-2">
                   <span>View Our Work</span>
@@ -185,12 +185,12 @@ export default function Home() {
               ].map((card, idx) => (
                 <div
                   key={idx}
-                  className="glass rounded-2xl p-6 border border-white/10 hover:border-white/30 transition-all duration-300 hover:scale-105 hover:-translate-y-2 backdrop-blur-xl group"
+                  className="glass rounded-2xl p-6 border border-gray-200 hover:border-gray-400 transition-all duration-300 hover:scale-105 hover:-translate-y-2 backdrop-blur-xl group"
                   style={{ animationDelay: `${card.delay}ms` }}
                 >
                   <div className={`w-full h-32 rounded-xl bg-gradient-to-br ${card.gradient} mb-4 group-hover:scale-105 transition-transform`}></div>
-                  <h3 className="font-bold text-lg mb-2 text-white">{card.title}</h3>
-                  <p className="text-sm text-zinc-400">{card.desc}</p>
+                  <h3 className="font-bold text-lg mb-2 text-gray-900">{card.title}</h3>
+                  <p className="text-sm text-gray-600">{card.desc}</p>
                 </div>
               ))}
             </div>
@@ -202,10 +202,10 @@ export default function Home() {
       <section className="relative py-32 overflow-hidden fade-in-section opacity-0">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="font-display font-black text-5xl lg:text-6xl mb-6 bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">
+            <h2 className="font-display font-black text-5xl lg:text-6xl mb-6 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
               Featured Projects
             </h2>
-            <p className="text-xl text-zinc-400 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Discover how we've helped leading institutions transform their educational offerings
             </p>
           </div>
@@ -213,19 +213,19 @@ export default function Home() {
           {/* Bento Grid Layout */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Large Featured Project */}
-            <div className="md:col-span-2 md:row-span-2 glass rounded-3xl p-8 group hover:bg-white/5 transition-all duration-300 relative overflow-hidden border border-white/10">
-              <div className="absolute top-4 right-4 px-4 py-2 rounded-full bg-green-500/20 border border-green-500/30 backdrop-blur-xl">
-                <span className="text-green-400 font-semibold text-sm">Featured</span>
+            <div className="md:col-span-2 md:row-span-2 glass rounded-3xl p-8 group hover:bg-white shadow-lg border-2 border-gray-200 transition-all duration-300 relative overflow-hidden border border-gray-200">
+              <div className="absolute top-4 right-4 px-4 py-2 rounded-full bg-green-100 border border-green-300 backdrop-blur-xl">
+                <span className="text-green-600 font-semibold text-sm">Featured</span>
               </div>
               <div className="h-64 lg:h-96 rounded-2xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 mb-6 group-hover:scale-105 transition-transform"></div>
               <div className="space-y-4">
                 <div className="flex items-center space-x-2">
-                  <span className="px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 text-xs font-semibold">Animation</span>
-                  <span className="px-3 py-1 rounded-full bg-pink-500/20 text-pink-300 text-xs font-semibold">Emmy Winner</span>
+                  <span className="px-3 py-1 rounded-full bg-purple-100 text-purple-700 text-xs font-semibold">Animation</span>
+                  <span className="px-3 py-1 rounded-full bg-pink-100 text-pink-700 text-xs font-semibold">Emmy Winner</span>
                 </div>
-                <h3 className="font-bold text-2xl text-white">Islamic History Animated Series</h3>
-                <p className="text-zinc-400">A 24-episode animated series covering 1,400 years of Islamic civilization. Emmy-nominated for Outstanding Achievement in Animation.</p>
-                <div className="flex items-center space-x-4 text-sm text-zinc-500">
+                <h3 className="font-bold text-2xl text-gray-900">Islamic History Animated Series</h3>
+                <p className="text-gray-600">A 24-episode animated series covering 1,400 years of Islamic civilization. Emmy-nominated for Outstanding Achievement in Animation.</p>
+                <div className="flex items-center space-x-4 text-sm text-gray-500">
                   <span>🎬 24 Episodes</span>
                   <span>👥 50M+ Views</span>
                   <span>⭐ 4.9/5.0</span>
@@ -234,32 +234,32 @@ export default function Home() {
             </div>
 
             {/* Smaller Projects */}
-            <div className="glass rounded-3xl p-6 group hover:bg-white/5 transition-all duration-300 border border-white/10">
+            <div className="glass rounded-3xl p-6 group hover:bg-white shadow-lg border-2 border-gray-200 transition-all duration-300 border border-gray-200">
               <div className="h-40 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 mb-4 group-hover:scale-105 transition-transform"></div>
-              <span className="px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 text-xs font-semibold">LMS Platform</span>
-              <h3 className="font-bold text-lg mt-3 text-white">QuranPath Academy LMS</h3>
-              <p className="text-sm text-zinc-400 mt-2">Enterprise learning platform serving 10,000+ students</p>
+              <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold">LMS Platform</span>
+              <h3 className="font-bold text-lg mt-3 text-gray-900">QuranPath Academy LMS</h3>
+              <p className="text-sm text-gray-600 mt-2">Enterprise learning platform serving 10,000+ students</p>
             </div>
 
-            <div className="glass rounded-3xl p-6 group hover:bg-white/5 transition-all duration-300 border border-white/10">
+            <div className="glass rounded-3xl p-6 group hover:bg-white shadow-lg border-2 border-gray-200 transition-all duration-300 border border-gray-200">
               <div className="h-40 rounded-xl bg-gradient-to-br from-green-500/20 to-emerald-500/20 mb-4 group-hover:scale-105 transition-transform"></div>
-              <span className="px-3 py-1 rounded-full bg-green-500/20 text-green-300 text-xs font-semibold">Mobile App</span>
-              <h3 className="font-bold text-lg mt-3 text-white">Daily Adhkar App</h3>
-              <p className="text-sm text-zinc-400 mt-2">500K+ downloads, 4.8★ rating on app stores</p>
+              <span className="px-3 py-1 rounded-full bg-green-100 text-green-300 text-xs font-semibold">Mobile App</span>
+              <h3 className="font-bold text-lg mt-3 text-gray-900">Daily Adhkar App</h3>
+              <p className="text-sm text-gray-600 mt-2">500K+ downloads, 4.8★ rating on app stores</p>
             </div>
 
-            <div className="glass rounded-3xl p-6 group hover:bg-white/5 transition-all duration-300 border border-white/10">
+            <div className="glass rounded-3xl p-6 group hover:bg-white shadow-lg border-2 border-gray-200 transition-all duration-300 border border-gray-200">
               <div className="h-40 rounded-xl bg-gradient-to-br from-orange-500/20 to-red-500/20 mb-4 group-hover:scale-105 transition-transform"></div>
-              <span className="px-3 py-1 rounded-full bg-orange-500/20 text-orange-300 text-xs font-semibold">Web Platform</span>
-              <h3 className="font-bold text-lg mt-3 text-white">Hadith Search Engine</h3>
-              <p className="text-sm text-zinc-400 mt-2">AI-powered search across 300K+ authentic hadith</p>
+              <span className="px-3 py-1 rounded-full bg-orange-500/20 text-orange-700 text-xs font-semibold">Web Platform</span>
+              <h3 className="font-bold text-lg mt-3 text-gray-900">Hadith Search Engine</h3>
+              <p className="text-sm text-gray-600 mt-2">AI-powered search across 300K+ authentic hadith</p>
             </div>
 
-            <div className="glass rounded-3xl p-6 group hover:bg-white/5 transition-all duration-300 border border-white/10">
+            <div className="glass rounded-3xl p-6 group hover:bg-white shadow-lg border-2 border-gray-200 transition-all duration-300 border border-gray-200">
               <div className="h-40 rounded-xl bg-gradient-to-br from-yellow-500/20 to-orange-500/20 mb-4 group-hover:scale-105 transition-transform"></div>
-              <span className="px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-300 text-xs font-semibold">3D Animation</span>
-              <h3 className="font-bold text-lg mt-3 text-white">Virtual Hajj Experience</h3>
-              <p className="text-sm text-zinc-400 mt-2">Immersive 3D tour of Makkah and Madinah</p>
+              <span className="px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-700 text-xs font-semibold">3D Animation</span>
+              <h3 className="font-bold text-lg mt-3 text-gray-900">Virtual Hajj Experience</h3>
+              <p className="text-sm text-gray-600 mt-2">Immersive 3D tour of Makkah and Madinah</p>
             </div>
           </div>
         </div>
@@ -269,10 +269,10 @@ export default function Home() {
       <section className="relative py-32 overflow-hidden fade-in-section opacity-0">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="font-display font-black text-5xl lg:text-6xl mb-6 bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">
+            <h2 className="font-display font-black text-5xl lg:text-6xl mb-6 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
               Why Choose Cubico?
             </h2>
-            <p className="text-xl text-zinc-400 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               We don't just build products. We craft experiences that transform education.
             </p>
           </div>
@@ -324,19 +324,19 @@ export default function Home() {
             ].map((feature, idx) => (
               <div
                 key={idx}
-                className="group relative glass rounded-3xl p-8 border border-white/10 hover:border-white/30 transition-all duration-500 overflow-hidden hover:scale-105"
+                className="group relative glass rounded-3xl p-8 border border-gray-200 hover:border-gray-400 transition-all duration-500 overflow-hidden hover:scale-105"
               >
                 {/* Gradient Overlay on Hover */}
                 <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}></div>
 
                 <div className="relative z-10">
                   <div className="text-6xl mb-6 group-hover:scale-110 transition-transform duration-300">{feature.icon}</div>
-                  <h3 className="font-bold text-2xl mb-4 text-white">{feature.title}</h3>
-                  <p className="text-zinc-400 mb-6 leading-relaxed">{feature.description}</p>
+                  <h3 className="font-bold text-2xl mb-4 text-gray-900">{feature.title}</h3>
+                  <p className="text-gray-600 mb-6 leading-relaxed">{feature.description}</p>
 
                   <div className="flex flex-wrap gap-2">
                     {feature.stats.map((stat, i) => (
-                      <span key={i} className={`px-3 py-1 rounded-full bg-gradient-to-r ${feature.gradient} bg-opacity-20 text-xs font-semibold text-white`}>
+                      <span key={i} className={`px-3 py-1 rounded-full bg-gradient-to-r ${feature.gradient} bg-opacity-20 text-xs font-semibold text-gray-900`}>
                         {stat}
                       </span>
                     ))}
@@ -351,10 +351,10 @@ export default function Home() {
       {/* Smart Stats & Impact Metrics */}
       <section ref={statsRef} className="relative py-32 overflow-hidden fade-in-section opacity-0">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="glass rounded-3xl p-12 lg:p-16 border border-white/10">
+          <div className="glass rounded-3xl p-12 lg:p-16 border border-gray-200">
             <div className="text-center mb-16">
               <h2 className="font-display font-black text-5xl lg:text-6xl mb-6">Our Impact</h2>
-              <p className="text-xl text-zinc-400 max-w-3xl mx-auto">
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
                 Numbers that tell our story of transforming Islamic education globally
               </p>
             </div>
@@ -378,7 +378,7 @@ export default function Home() {
                         stroke="currentColor"
                         strokeWidth="8"
                         fill="none"
-                        className="text-white/10"
+                        className="text-gray-900/10"
                       />
                       <circle
                         cx="64"
@@ -399,7 +399,7 @@ export default function Home() {
                       </span>
                     </div>
                   </div>
-                  <p className="font-semibold text-white mb-1">{stat.label}</p>
+                  <p className="font-semibold text-gray-900 mb-1">{stat.label}</p>
                 </div>
               ))}
             </div>
@@ -411,15 +411,15 @@ export default function Home() {
                 { metric: 'Client Retention Rate', value: '98%', icon: '🔄', trend: '+18% vs average' },
                 { metric: 'On-Time Delivery', value: '95%', icon: '⚡', trend: 'Industry leading' },
               ].map((benchmark, idx) => (
-                <div key={idx} className="glass rounded-2xl p-6 border border-white/10 hover:bg-white/5 transition-all">
+                <div key={idx} className="glass rounded-2xl p-6 border border-gray-200 hover:bg-white shadow-lg border-2 border-gray-200 transition-all">
                   <div className="flex items-center justify-between mb-4">
                     <span className="text-4xl">{benchmark.icon}</span>
-                    <span className="text-sm text-green-400 font-semibold">{benchmark.trend}</span>
+                    <span className="text-sm text-green-600 font-semibold">{benchmark.trend}</span>
                   </div>
-                  <div className="text-4xl font-black mb-2 bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">
+                  <div className="text-4xl font-black mb-2 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
                     {benchmark.value}
                   </div>
-                  <p className="text-zinc-400 text-sm">{benchmark.metric}</p>
+                  <p className="text-gray-600 text-sm">{benchmark.metric}</p>
                 </div>
               ))}
             </div>
@@ -431,10 +431,10 @@ export default function Home() {
       <section className="relative py-32 overflow-hidden fade-in-section opacity-0">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="font-display font-black text-5xl lg:text-6xl mb-6 bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">
+            <h2 className="font-display font-black text-5xl lg:text-6xl mb-6 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
               Awards & Recognition
             </h2>
-            <p className="text-xl text-zinc-400 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Our work has been recognized by industry leaders and institutions worldwide
             </p>
           </div>
@@ -453,18 +453,18 @@ export default function Home() {
             ].map((award, idx) => (
               <div
                 key={idx}
-                className="glass rounded-2xl p-6 text-center group hover:bg-white/5 transition-all duration-300 hover:scale-105 border border-white/10"
+                className="glass rounded-2xl p-6 text-center group hover:bg-white shadow-lg border-2 border-gray-200 transition-all duration-300 hover:scale-105 border border-gray-200"
               >
                 <div className="text-5xl mb-4 group-hover:scale-110 transition-transform">{award.icon}</div>
-                <h4 className="font-bold text-white mb-1">{award.title}</h4>
-                <p className="text-xs text-zinc-500">{award.subtitle}</p>
+                <h4 className="font-bold text-gray-900 mb-1">{award.title}</h4>
+                <p className="text-xs text-gray-500">{award.subtitle}</p>
               </div>
             ))}
           </div>
 
           {/* Client Logos */}
-          <div className="glass rounded-3xl p-12 border border-white/10">
-            <p className="text-center text-sm font-semibold text-zinc-500 mb-8 uppercase tracking-wider">
+          <div className="glass rounded-3xl p-12 border border-gray-200">
+            <p className="text-center text-sm font-semibold text-gray-500 mb-8 uppercase tracking-wider">
               Trusted by Leading Organizations
             </p>
             <div className="grid grid-cols-3 md:grid-cols-6 gap-8 items-center opacity-60">
@@ -481,7 +481,7 @@ export default function Home() {
                   className="text-center group hover:opacity-100 transition-opacity"
                 >
                   <div className="text-4xl mb-2 group-hover:scale-110 transition-transform">{client.icon}</div>
-                  <p className="text-xs text-zinc-500">{client.name}</p>
+                  <p className="text-xs text-gray-500">{client.name}</p>
                 </div>
               ))}
             </div>
@@ -494,7 +494,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="font-display font-black text-5xl lg:text-6xl mb-6">Client Success Stories</h2>
-            <p className="text-xl text-zinc-400 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Don't just take our word for it—hear from education leaders who've transformed their institutions
             </p>
           </div>
@@ -525,29 +525,29 @@ export default function Home() {
             ].map((testimonial, i) => (
               <div
                 key={i}
-                className="glass rounded-3xl p-8 border border-white/10 hover:border-white/30 transition-all duration-300 hover:scale-105 group"
+                className="glass rounded-3xl p-8 border border-gray-200 hover:border-gray-400 transition-all duration-300 hover:scale-105 group"
               >
                 {/* Rating */}
                 <div className="flex items-center mb-4">
                   <div className="flex text-yellow-400 text-xl">
                     {'★'.repeat(testimonial.rating)}
                   </div>
-                  <span className="ml-auto px-3 py-1 rounded-full bg-green-500/20 text-green-400 text-xs font-semibold">
+                  <span className="ml-auto px-3 py-1 rounded-full bg-green-100 text-green-600 text-xs font-semibold">
                     {testimonial.impact}
                   </span>
                 </div>
 
                 {/* Quote */}
-                <p className="text-zinc-300 leading-relaxed mb-6 text-lg">"{testimonial.quote}"</p>
+                <p className="text-gray-700 leading-relaxed mb-6 text-lg">"{testimonial.quote}"</p>
 
                 {/* Author */}
                 <div className="flex items-center">
-                  <div className="w-14 h-14 rounded-full bg-gradient-to-br from-white to-zinc-400 flex items-center justify-center text-black font-bold text-lg mr-4">
+                  <div className="w-14 h-14 rounded-full bg-gradient-to-br from-gray-900 to-gray-700 flex items-center justify-center text-white font-bold text-lg mr-4">
                     {testimonial.author.split(' ').map(n => n[0]).join('')}
                   </div>
                   <div>
-                    <p className="font-bold text-white">{testimonial.author}</p>
-                    <p className="text-sm text-zinc-500">{testimonial.role}</p>
+                    <p className="font-bold text-gray-900">{testimonial.author}</p>
+                    <p className="text-sm text-gray-500">{testimonial.role}</p>
                   </div>
                 </div>
               </div>
@@ -556,28 +556,28 @@ export default function Home() {
 
           {/* Social Proof Banner */}
           <div className="mt-16 text-center">
-            <div className="inline-flex flex-wrap items-center justify-center gap-8 glass rounded-full px-12 py-6 border border-white/10">
+            <div className="inline-flex flex-wrap items-center justify-center gap-8 glass rounded-full px-12 py-6 border border-gray-200">
               <div className="flex items-center space-x-3">
                 <span className="text-yellow-400 text-3xl">★★★★★</span>
                 <div className="text-left">
-                  <span className="block font-bold text-white">4.9/5.0</span>
-                  <span className="text-sm text-zinc-400">Average Rating</span>
+                  <span className="block font-bold text-gray-900">4.9/5.0</span>
+                  <span className="text-sm text-gray-600">Average Rating</span>
                 </div>
               </div>
-              <div className="w-px h-12 bg-white/10"></div>
+              <div className="w-px h-12 bg-white shadow-lg"></div>
               <div className="flex items-center space-x-3">
-                <span className="text-green-400 text-3xl">✓</span>
+                <span className="text-green-600 text-3xl">✓</span>
                 <div className="text-left">
-                  <span className="block font-bold text-white">98%</span>
-                  <span className="text-sm text-zinc-400">Client Retention</span>
+                  <span className="block font-bold text-gray-900">98%</span>
+                  <span className="text-sm text-gray-600">Client Retention</span>
                 </div>
               </div>
-              <div className="w-px h-12 bg-white/10"></div>
+              <div className="w-px h-12 bg-white shadow-lg"></div>
               <div className="flex items-center space-x-3">
                 <span className="text-blue-400 text-3xl">🚀</span>
                 <div className="text-left">
-                  <span className="block font-bold text-white">100+</span>
-                  <span className="text-sm text-zinc-400">Success Stories</span>
+                  <span className="block font-bold text-gray-900">100+</span>
+                  <span className="text-sm text-gray-600">Success Stories</span>
                 </div>
               </div>
             </div>
@@ -588,7 +588,7 @@ export default function Home() {
       {/* Final CTA Section */}
       <section className="relative py-32 overflow-hidden fade-in-section opacity-0">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="glass rounded-3xl p-16 relative overflow-hidden border border-white/10">
+          <div className="glass rounded-3xl p-16 relative overflow-hidden border border-gray-200">
             {/* Gradient Background */}
             <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-pink-500/10 to-blue-500/10"></div>
 
@@ -596,14 +596,14 @@ export default function Home() {
               <h2 className="font-display font-black text-5xl lg:text-6xl mb-6">
                 Ready to Transform Your Institution?
               </h2>
-              <p className="text-xl text-zinc-300 mb-10 max-w-3xl mx-auto leading-relaxed">
+              <p className="text-xl text-gray-700 mb-10 max-w-3xl mx-auto leading-relaxed">
                 Join 100+ leading educational institutions worldwide who trust Cubico Technologies to bring their vision to life.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-8">
                 <Link
                   href="/contact"
-                  className="group px-12 py-6 rounded-2xl bg-gradient-to-r from-white to-zinc-300 text-black font-bold text-xl hover:shadow-2xl hover:shadow-white/30 transition-all duration-300 hover:scale-105"
+                  className="group px-12 py-6 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold text-xl hover:shadow-2xl hover:shadow-white/30 transition-all duration-300 hover:scale-105"
                 >
                   <span className="flex items-center space-x-3">
                     <span>Start Your Project</span>
@@ -614,13 +614,13 @@ export default function Home() {
                 </Link>
                 <Link
                   href="/services"
-                  className="px-12 py-6 rounded-2xl glass border-2 border-white/20 text-white font-bold text-xl hover:bg-white/10 transition-all duration-300 hover:scale-105"
+                  className="px-12 py-6 rounded-2xl glass border-2 border-gray-300 text-gray-900 font-bold text-xl hover:bg-white shadow-lg transition-all duration-300 hover:scale-105"
                 >
                   Browse Services
                 </Link>
               </div>
 
-              <p className="text-sm text-zinc-500">
+              <p className="text-sm text-gray-500">
                 💬 Free consultation • 🚀 2-week sprint start • ⚡ No long-term commitment required
               </p>
             </div>
