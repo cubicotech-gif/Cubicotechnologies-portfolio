@@ -94,16 +94,24 @@ export default function Home() {
   return (
     <>
       {/* Hero Section - Immersive Experience */}
-      <section className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
-        {/* Animated Gradient Mesh Background */}
+      <section className="relative min-h-screen flex items-center justify-center pt-32 pb-20 overflow-hidden">
+        {/* Particle Star Field Background */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-20 left-20 w-96 h-96 bg-purple-100 rounded-full blur-3xl animate-blob"></div>
-          <div className="absolute top-40 right-20 w-96 h-96 bg-cyan-100 rounded-full blur-3xl animate-blob animation-delay-2000"></div>
-          <div className="absolute bottom-20 left-1/2 w-96 h-96 bg-pink-100 rounded-full blur-3xl animate-blob animation-delay-4000"></div>
+          {/* Create particle star field with pure CSS */}
+          <div className="stars-small"></div>
+          <div className="stars-medium"></div>
+          <div className="stars-large"></div>
+
+          {/* Subtle gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/50 to-white"></div>
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
-          <div className="text-center max-w-5xl mx-auto">
+          {/* Two Column Layout: Text Left, 3D Dashboard Right */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+
+            {/* Left Column - Text Content */}
+            <div className="text-left max-w-2xl">
             {/* Floating Badge */}
             <div className="inline-flex items-center px-6 py-3 rounded-full glass border border-gray-300 mb-8 animate-float backdrop-blur-xl">
               <span className="relative flex h-3 w-3 mr-3">
@@ -115,85 +123,183 @@ export default function Home() {
               </span>
             </div>
 
-            {/* Typing Animation Heading */}
-            <h1 className="font-display font-black text-5xl sm:text-6xl lg:text-8xl mb-8 leading-tight">
-              <span className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-700 bg-clip-text text-transparent">
-                {typedText}
-              </span>
-              <span className="animate-pulse">|</span>
-            </h1>
+              {/* Typing Animation Heading */}
+              <h1 className="font-display font-black text-4xl sm:text-5xl lg:text-6xl mb-6 leading-tight">
+                <span className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-700 bg-clip-text text-transparent">
+                  {typedText}
+                </span>
+                <span className="animate-pulse text-indigo-600">|</span>
+              </h1>
 
-            {/* Rotating Feature Highlights */}
-            <div className="h-16 mb-10">
-              {features.map((feature, idx) => (
-                <div
-                  key={idx}
-                  className={`transition-all duration-500 ${
-                    currentFeature === idx
-                      ? 'opacity-100 transform translate-y-0'
-                      : 'opacity-0 transform -translate-y-4 absolute'
-                  }`}
+              {/* Rotating Feature Highlights */}
+              <div className="h-16 mb-8">
+                {features.map((feature, idx) => (
+                  <div
+                    key={idx}
+                    className={`transition-all duration-500 ${
+                      currentFeature === idx
+                        ? 'opacity-100 transform translate-y-0'
+                        : 'opacity-0 transform -translate-y-4 absolute'
+                    }`}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <span className="text-4xl">{feature.icon}</span>
+                      <span className={`text-xl font-bold bg-gradient-to-r ${feature.color} bg-clip-text text-transparent`}>
+                        {feature.text}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Description */}
+              <p className="text-lg sm:text-xl text-gray-700 mb-8 leading-relaxed">
+                We craft <span className="font-bold text-gray-900">immersive learning experiences</span> that engage, educate, and inspire.
+                From interactive animations to scalable platforms, we're your partner in educational transformation.
+              </p>
+
+              {/* CTA Buttons with Hover Effects */}
+              <div className="flex flex-col sm:flex-row gap-4 mb-8">
+                <Link
+                  href="/contact"
+                  className="group relative px-8 py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold text-base overflow-hidden hover:shadow-2xl hover:shadow-indigo-500/30 transition-all duration-300 hover:scale-105"
                 >
-                  <div className="flex items-center justify-center space-x-4">
-                    <span className="text-5xl">{feature.icon}</span>
-                    <span className={`text-2xl font-bold bg-gradient-to-r ${feature.color} bg-clip-text text-transparent`}>
-                      {feature.text}
-                    </span>
+                  <span className="relative z-10 flex items-center justify-center space-x-2">
+                    <span>Start Your Project</span>
+                    <svg className="w-5 h-5 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
+                  </span>
+                </Link>
+                <Link
+                  href="/services"
+                  className="group px-8 py-4 rounded-xl bg-white border-2 border-gray-300 text-gray-900 font-bold text-base hover:bg-gray-50 shadow-md transition-all duration-300 hover:scale-105"
+                >
+                  <span className="flex items-center justify-center space-x-2">
+                    <span>View Our Work</span>
+                    <svg className="w-5 h-5 group-hover:rotate-45 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                  </span>
+                </Link>
+              </div>
+
+              {/* Trust Metrics */}
+              <div className="flex flex-wrap gap-6 text-sm text-gray-600">
+                <div className="flex items-center space-x-2">
+                  <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  <span className="font-semibold">100+ Clients</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <svg className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                  <span className="font-semibold">4.9/5.0 Rating</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <svg className="w-5 h-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
+                  </svg>
+                  <span className="font-semibold">50M+ Learners</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column - 3D Tilted Dashboard Mockup */}
+            <div className="relative lg:block hidden perspective-container">
+              {/* 3D Dashboard Card */}
+              <div className="dashboard-3d-card relative">
+                {/* Main Dashboard Container */}
+                <div className="bg-white rounded-2xl shadow-2xl border-2 border-gray-200 overflow-hidden transform hover:scale-105 transition-transform duration-500">
+                  {/* Dashboard Header */}
+                  <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-6 text-white">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                          <span className="text-xl">📊</span>
+                        </div>
+                        <div>
+                          <h3 className="font-bold text-lg">Learning Dashboard</h3>
+                          <p className="text-xs text-white/80">Real-time Analytics</p>
+                        </div>
+                      </div>
+                      <div className="flex space-x-1">
+                        <div className="w-3 h-3 rounded-full bg-white/30"></div>
+                        <div className="w-3 h-3 rounded-full bg-white/30"></div>
+                        <div className="w-3 h-3 rounded-full bg-white/30"></div>
+                      </div>
+                    </div>
+
+                    {/* Stats Row */}
+                    <div className="grid grid-cols-3 gap-3">
+                      <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3">
+                        <div className="text-2xl font-black">2.4K</div>
+                        <div className="text-xs text-white/70">Students</div>
+                      </div>
+                      <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3">
+                        <div className="text-2xl font-black">94%</div>
+                        <div className="text-xs text-white/70">Complete</div>
+                      </div>
+                      <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3">
+                        <div className="text-2xl font-black">4.8★</div>
+                        <div className="text-xs text-white/70">Rating</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Dashboard Body */}
+                  <div className="p-6 space-y-4">
+                    {/* Progress Chart */}
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-semibold text-gray-700">Weekly Progress</span>
+                        <span className="text-xs text-green-600 font-bold">+12%</span>
+                      </div>
+                      <div className="flex items-end space-x-1 h-24">
+                        <div className="flex-1 bg-gradient-to-t from-blue-400 to-blue-200 rounded-t-lg h-16"></div>
+                        <div className="flex-1 bg-gradient-to-t from-purple-400 to-purple-200 rounded-t-lg h-20"></div>
+                        <div className="flex-1 bg-gradient-to-t from-indigo-400 to-indigo-200 rounded-t-lg h-24"></div>
+                        <div className="flex-1 bg-gradient-to-t from-pink-400 to-pink-200 rounded-t-lg h-18"></div>
+                        <div className="flex-1 bg-gradient-to-t from-cyan-400 to-cyan-200 rounded-t-lg h-14"></div>
+                      </div>
+                      <div className="flex justify-between mt-1 text-xs text-gray-500">
+                        <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span>
+                      </div>
+                    </div>
+
+                    {/* Course List */}
+                    <div className="space-y-2">
+                      {[
+                        { name: 'Web Development', progress: 85, color: 'bg-blue-500' },
+                        { name: 'UI/UX Design', progress: 92, color: 'bg-purple-500' },
+                        { name: 'Data Science', progress: 67, color: 'bg-green-500' },
+                      ].map((course, idx) => (
+                        <div key={idx} className="bg-gray-50 rounded-lg p-3">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-sm font-semibold text-gray-800">{course.name}</span>
+                            <span className="text-xs font-bold text-gray-600">{course.progress}%</span>
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div className={`${course.color} h-2 rounded-full transition-all`} style={{width: `${course.progress}%`}}></div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              ))}
-            </div>
 
-            {/* Description */}
-            <p className="text-xl sm:text-2xl text-gray-700 mb-12 max-w-4xl mx-auto leading-relaxed">
-              We craft <span className="font-semibold text-gray-900">immersive learning experiences</span> that engage, educate, and inspire.
-              From interactive animations to scalable platforms, we're your partner in educational transformation.
-            </p>
-
-            {/* CTA Buttons with Hover Effects */}
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
-              <Link
-                href="/contact"
-                className="group relative px-10 py-5 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold text-lg overflow-hidden hover:shadow-2xl hover:shadow-white/20 transition-all duration-300 hover:scale-105"
-              >
-                <span className="relative z-10 flex items-center space-x-2">
-                  <span>Start Your Project</span>
-                  <svg className="w-6 h-6 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                  </svg>
-                </span>
-              </Link>
-              <Link
-                href="/services"
-                className="group px-10 py-5 rounded-2xl glass border-2 border-gray-300 text-gray-900 font-bold text-lg hover:bg-white shadow-lg backdrop-blur-xl transition-all duration-300 hover:scale-105"
-              >
-                <span className="flex items-center space-x-2">
-                  <span>View Our Work</span>
-                  <svg className="w-6 h-6 group-hover:rotate-45 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                  </svg>
-                </span>
-              </Link>
-            </div>
-
-            {/* Floating 3D Cards Preview */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16">
-              {[
-                { title: 'LMS Dashboard', desc: 'Track student progress in real-time', gradient: 'from-blue-500/10 to-cyan-500/10', delay: '0' },
-                { title: 'Interactive Lessons', desc: 'Engaging content that captivates', gradient: 'from-purple-500/10 to-pink-500/10', delay: '200' },
-                { title: 'Analytics & Insights', desc: 'Data-driven decision making', gradient: 'from-green-500/10 to-emerald-500/10', delay: '400' },
-              ].map((card, idx) => (
-                <div
-                  key={idx}
-                  className="glass rounded-2xl p-6 border border-gray-200 hover:border-gray-400 transition-all duration-300 hover:scale-105 hover:-translate-y-2 backdrop-blur-xl group"
-                  style={{ animationDelay: `${card.delay}ms` }}
-                >
-                  <div className={`w-full h-32 rounded-xl bg-gradient-to-br ${card.gradient} mb-4 group-hover:scale-105 transition-transform`}></div>
-                  <h3 className="font-bold text-lg mb-2 text-gray-900">{card.title}</h3>
-                  <p className="text-sm text-gray-600">{card.desc}</p>
+                {/* Floating Elements for Depth */}
+                <div className="absolute -top-4 -right-4 w-20 h-20 bg-gradient-to-br from-yellow-400 to-orange-400 rounded-xl shadow-lg animate-float opacity-90 flex items-center justify-center text-2xl">
+                  🏆
                 </div>
-              ))}
+                <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-gradient-to-br from-green-400 to-emerald-400 rounded-lg shadow-lg animate-float-delay opacity-90 flex items-center justify-center text-xl" style={{animationDelay: '1s'}}>
+                  ✓
+                </div>
+              </div>
             </div>
+
           </div>
         </div>
       </section>
@@ -664,6 +770,84 @@ export default function Home() {
         .fade-in-section.animate-in {
           opacity: 1 !important;
           transform: translateY(0);
+        }
+
+        /* Particle Star Field Background */
+        .stars-small, .stars-medium, .stars-large {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-repeat: repeat;
+        }
+
+        .stars-small {
+          background-image:
+            radial-gradient(2px 2px at 20px 30px, rgba(99, 102, 241, 0.3), transparent),
+            radial-gradient(2px 2px at 60px 70px, rgba(168, 85, 247, 0.3), transparent),
+            radial-gradient(2px 2px at 120px 150px, rgba(59, 130, 246, 0.3), transparent),
+            radial-gradient(2px 2px at 180px 90px, rgba(139, 92, 246, 0.3), transparent);
+          background-size: 200px 200px;
+          animation: stars-move 60s linear infinite;
+        }
+
+        .stars-medium {
+          background-image:
+            radial-gradient(3px 3px at 50px 100px, rgba(99, 102, 241, 0.4), transparent),
+            radial-gradient(3px 3px at 150px 50px, rgba(168, 85, 247, 0.4), transparent),
+            radial-gradient(3px 3px at 100px 180px, rgba(59, 130, 246, 0.4), transparent);
+          background-size: 300px 300px;
+          animation: stars-move 90s linear infinite;
+        }
+
+        .stars-large {
+          background-image:
+            radial-gradient(4px 4px at 80px 120px, rgba(99, 102, 241, 0.5), transparent),
+            radial-gradient(4px 4px at 200px 80px, rgba(168, 85, 247, 0.5), transparent);
+          background-size: 400px 400px;
+          animation: stars-move 120s linear infinite;
+        }
+
+        @keyframes stars-move {
+          from { transform: translateY(0); }
+          to { transform: translateY(-200px); }
+        }
+
+        /* 3D Dashboard Card Perspective */
+        .perspective-container {
+          perspective: 1500px;
+          perspective-origin: center;
+        }
+
+        .dashboard-3d-card {
+          transform: rotateY(-15deg) rotateX(5deg);
+          transform-style: preserve-3d;
+          transition: transform 0.6s ease-out;
+          will-change: transform;
+        }
+
+        .dashboard-3d-card:hover {
+          transform: rotateY(-5deg) rotateX(2deg) scale(1.02);
+        }
+
+        /* Float Delay Animation */
+        .animate-float-delay {
+          animation: float 3s ease-in-out infinite;
+        }
+
+        /* Accessibility: Reduce motion for users who prefer it */
+        @media (prefers-reduced-motion: reduce) {
+          .animate-blob,
+          .animate-float,
+          .animate-float-delay,
+          .stars-small,
+          .stars-medium,
+          .stars-large,
+          .dashboard-3d-card {
+            animation: none !important;
+            transform: none !important;
+          }
         }
       `}</style>
     </>
