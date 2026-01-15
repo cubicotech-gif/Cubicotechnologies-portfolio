@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import Navigation from "@/components/Navigation";
+import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
   title: "Cubico Technologies | Islamic Educational Content & Digital Solutions",
@@ -10,12 +12,12 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.Node;
+  children: React.ReactNode;
 }>) {
   return (
     <html lang="en" className="scroll-smooth">
       <head>
-        <link rel="icon" type="image/png" href="/images/logos/logo.png" />
+        <link rel="icon" type="image/svg+xml" href="/images/logos/logo.svg" />
       </head>
       <body className="antialiased">
         {/* Animated Background Blobs */}
@@ -25,7 +27,11 @@ export default function RootLayout({
           <div className="absolute -bottom-8 left-20 w-96 h-96 bg-primary/20 rounded-full mix-blend-screen filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
         </div>
 
-        {children}
+        <Navigation />
+        <main className="relative z-10">
+          {children}
+        </main>
+        <Footer />
       </body>
     </html>
   );
