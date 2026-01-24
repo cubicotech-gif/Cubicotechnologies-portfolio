@@ -4,9 +4,9 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Cubico Technologies | Islamic Educational Content & Digital Solutions",
-  description: "Transform Islamic Education with award-winning digital solutions. From Emmy-quality animations to enterprise-grade learning platforms.",
-  keywords: ["Islamic education", "animations", "web development", "digital content", "educational technology"],
+  title: "Cubico Technologies | Digital Creative Agency",
+  description: "Award-winning creative studio specializing in visual artwork, logo design, and viral social media content. Transform your brand vision into digital masterpieces.",
+  keywords: ["creative agency", "graphic design", "logo design", "social media content", "digital artwork", "brand identity"],
 };
 
 export default function RootLayout({
@@ -20,11 +20,22 @@ export default function RootLayout({
         <link rel="icon" type="image/svg+xml" href="/images/logos/logo.svg" />
       </head>
       <body className="antialiased">
-        {/* Animated Background Blobs */}
+        {/* Cinematic Atmospheric Gradient Background */}
         <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-          <div className="absolute top-0 -left-4 w-96 h-96 bg-primary/20 rounded-full mix-blend-screen filter blur-3xl opacity-20 animate-blob"></div>
-          <div className="absolute top-0 -right-4 w-96 h-96 bg-secondary/20 rounded-full mix-blend-screen filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
-          <div className="absolute -bottom-8 left-20 w-96 h-96 bg-primary/20 rounded-full mix-blend-screen filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+          {/* Purple Gradient - Top Left */}
+          <div className="absolute -top-[40%] -left-[20%] w-[800px] h-[800px] opacity-[0.06]">
+            <div className="w-full h-full bg-purple-600 rounded-full blur-[120px] animate-gradient-drift-slow"></div>
+          </div>
+
+          {/* Cyan Gradient - Mid Right */}
+          <div className="absolute top-[30%] -right-[15%] w-[900px] h-[900px] opacity-[0.05]">
+            <div className="w-full h-full bg-cyan-500 rounded-full blur-[140px] animate-gradient-drift-medium"></div>
+          </div>
+
+          {/* Rose Gradient - Bottom Center */}
+          <div className="absolute -bottom-[30%] left-[20%] w-[850px] h-[850px] opacity-[0.07]">
+            <div className="w-full h-full bg-rose-500 rounded-full blur-[130px] animate-gradient-drift-long"></div>
+          </div>
         </div>
 
         <Navigation />

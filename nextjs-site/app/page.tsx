@@ -7,8 +7,9 @@ import { useEffect, useRef, useState } from 'react';
 export default function Home() {
   const statsRef = useRef<HTMLDivElement>(null);
   const [typedText, setTypedText] = useState('');
-  const fullText = 'Transform Education with Award-Winning Digital Solutions';
+  const fullText = 'Where Creativity Meets Digital Excellence';
   const [currentFeature, setCurrentFeature] = useState(0);
+  const [activeCategory, setActiveCategory] = useState('all');
 
   // Typing animation effect
   useEffect(() => {
@@ -87,22 +88,15 @@ export default function Home() {
   }, []);
 
   const features = [
-    { icon: '🎬', text: 'Emmy-Quality Animations', color: 'from-purple-500 to-pink-500' },
-    { icon: '🚀', text: 'Enterprise LMS Platforms', color: 'from-blue-500 to-cyan-500' },
-    { icon: '📱', text: 'Mobile Learning Apps', color: 'from-green-500 to-emerald-500' },
+    { icon: '🎨', text: 'Stunning Visual Artwork', color: 'from-purple-500 to-pink-500' },
+    { icon: '✨', text: 'Premium Logo Design', color: 'from-blue-500 to-cyan-500' },
+    { icon: '🎬', text: 'Engaging Social Media Content', color: 'from-green-500 to-emerald-500' },
   ];
 
   return (
     <>
       {/* Hero Section - Immersive Experience */}
       <section className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
-        {/* Animated Gradient Mesh Background */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-20 left-20 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-blob"></div>
-          <div className="absolute top-40 right-20 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl animate-blob animation-delay-2000"></div>
-          <div className="absolute bottom-20 left-1/2 w-96 h-96 bg-pink-500/20 rounded-full blur-3xl animate-blob animation-delay-4000"></div>
-        </div>
-
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
           <div className="text-center max-w-5xl mx-auto">
             {/* Floating Badge */}
@@ -112,7 +106,7 @@ export default function Home() {
                 <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
               </span>
               <span className="text-sm font-semibold bg-gradient-to-r from-white to-zinc-300 bg-clip-text text-transparent">
-                Trusted by 100+ Educational Institutions Worldwide
+                Trusted by 500+ Brands Worldwide • Award-Winning Creative Studio
               </span>
             </div>
 
@@ -147,8 +141,8 @@ export default function Home() {
 
             {/* Description */}
             <p className="text-xl sm:text-2xl text-zinc-300 mb-12 max-w-4xl mx-auto leading-relaxed">
-              We craft <span className="font-semibold text-white">immersive learning experiences</span> that engage, educate, and inspire.
-              From interactive animations to scalable platforms, we're your partner in educational transformation.
+              We craft <span className="font-semibold text-white">breathtaking visual experiences</span> that captivate, engage, and convert.
+              From stunning artworks to viral social media content, we transform your brand vision into digital masterpieces.
             </p>
 
             {/* CTA Buttons with Hover Effects */}
@@ -180,16 +174,16 @@ export default function Home() {
             {/* Floating 3D Cards Preview */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16">
               {[
-                { title: 'LMS Dashboard', desc: 'Track student progress in real-time', image: '/images/hero/dashboard-preview.svg', delay: '0' },
-                { title: 'Interactive Lessons', desc: 'Engaging content that captivates', image: '/images/hero/interactive-lessons.svg', delay: '200' },
-                { title: 'Analytics & Insights', desc: 'Data-driven decision making', image: '/images/hero/analytics-preview.svg', delay: '400' },
+                { title: 'Visual Artwork', desc: 'Illustrations, digital art & creative designs', image: '/images/categories/artwork.svg', gradient: 'from-purple-500/20 to-pink-500/20', delay: '0' },
+                { title: 'Logo Design', desc: 'Memorable brand identities that stand out', image: '/images/categories/logos.svg', gradient: 'from-blue-500/20 to-cyan-500/20', delay: '200' },
+                { title: 'Social Media', desc: 'Reels, videos & content for all platforms', image: '/images/categories/reels.svg', gradient: 'from-green-500/20 to-emerald-500/20', delay: '400' },
               ].map((card, idx) => (
                 <div
                   key={idx}
                   className="glass rounded-2xl p-6 border border-white/10 hover:border-white/30 transition-all duration-300 hover:scale-105 hover:-translate-y-2 backdrop-blur-xl group"
                   style={{ animationDelay: `${card.delay}ms` }}
                 >
-                  <div className="w-full h-32 rounded-xl mb-4 overflow-hidden relative bg-gradient-to-br from-zinc-800 to-zinc-900">
+                  <div className={`w-full h-32 rounded-xl mb-4 overflow-hidden relative bg-gradient-to-br ${card.gradient}`}>
                     <Image
                       src={card.image}
                       alt={card.title}
@@ -206,109 +200,236 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Portfolio / Case Studies - Bento Grid */}
+      {/* Interactive Logo Breakdown - Showcase Our Process */}
       <section className="relative py-32 overflow-hidden fade-in-section opacity-0">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="font-display font-black text-5xl lg:text-6xl mb-6 bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">
-              Featured Projects
+              Our Creative Process
             </h2>
             <p className="text-xl text-zinc-400 max-w-3xl mx-auto">
-              Discover how we've helped leading institutions transform their educational offerings
+              Every design tells a story. See how we blend strategy, creativity, and precision in every detail.
             </p>
           </div>
 
-          {/* Bento Grid Layout */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* Large Featured Project */}
-            <div className="md:col-span-2 md:row-span-2 glass rounded-3xl p-8 group hover:bg-white/5 transition-all duration-300 relative overflow-hidden border border-white/10">
-              <div className="absolute top-4 right-4 px-4 py-2 rounded-full bg-green-500/20 border border-green-500/30 backdrop-blur-xl z-10">
-                <span className="text-green-400 font-semibold text-sm">Featured</span>
-              </div>
-              <div className="h-64 lg:h-96 rounded-2xl mb-6 overflow-hidden relative bg-gradient-to-br from-purple-500/20 to-pink-500/20">
-                <Image
-                  src="/images/projects/islamic-history-series.svg"
-                  alt="Islamic History Animated Series"
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform"
-                />
-              </div>
-              <div className="space-y-4">
-                <div className="flex items-center space-x-2">
-                  <span className="px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 text-xs font-semibold">Animation</span>
-                  <span className="px-3 py-1 rounded-full bg-pink-500/20 text-pink-300 text-xs font-semibold">Emmy Winner</span>
+          {/* Interactive Logo Breakdown */}
+          <div className="glass rounded-3xl p-12 lg:p-16 border border-white/10 relative overflow-hidden">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+              {/* Logo Display with Annotations */}
+              <div className="relative">
+                <div className="aspect-square max-w-md mx-auto relative group">
+                  {/* Central Logo */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-64 h-64 rounded-3xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 border-2 border-white/10 flex items-center justify-center backdrop-blur-xl group-hover:scale-105 transition-transform duration-500">
+                      <Image
+                        src="/images/logo-breakdown/main-logo.png"
+                        alt="Logo Breakdown Example"
+                        width={200}
+                        height={200}
+                        className="object-contain"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Annotation 1 - Top Left */}
+                  <div className="absolute -top-4 -left-4 animate-float">
+                    <div className="glass rounded-2xl p-4 border border-purple-500/30 max-w-xs backdrop-blur-xl">
+                      <div className="flex items-start space-x-3">
+                        <div className="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center flex-shrink-0 text-sm font-bold">
+                          1
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-white text-sm">Color Psychology</h4>
+                          <p className="text-xs text-zinc-400 mt-1">Strategic palette for brand emotion</p>
+                        </div>
+                      </div>
+                      {/* Arrow */}
+                      <svg className="absolute -bottom-8 left-20 text-purple-500" width="40" height="40" viewBox="0 0 40 40">
+                        <path d="M20 0 L20 30 M20 30 L15 25 M20 30 L25 25" stroke="currentColor" strokeWidth="2" fill="none"/>
+                      </svg>
+                    </div>
+                  </div>
+
+                  {/* Annotation 2 - Top Right */}
+                  <div className="absolute -top-4 -right-4 animate-float animation-delay-2000">
+                    <div className="glass rounded-2xl p-4 border border-blue-500/30 max-w-xs backdrop-blur-xl">
+                      <div className="flex items-start space-x-3">
+                        <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center flex-shrink-0 text-sm font-bold">
+                          2
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-white text-sm">Typography</h4>
+                          <p className="text-xs text-zinc-400 mt-1">Custom font for uniqueness</p>
+                        </div>
+                      </div>
+                      <svg className="absolute -bottom-8 right-20 text-blue-500" width="40" height="40" viewBox="0 0 40 40">
+                        <path d="M20 0 L20 30 M20 30 L15 25 M20 30 L25 25" stroke="currentColor" strokeWidth="2" fill="none"/>
+                      </svg>
+                    </div>
+                  </div>
+
+                  {/* Annotation 3 - Bottom Left */}
+                  <div className="absolute -bottom-4 -left-4 animate-float animation-delay-4000">
+                    <div className="glass rounded-2xl p-4 border border-green-500/30 max-w-xs backdrop-blur-xl">
+                      <div className="flex items-start space-x-3">
+                        <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 text-sm font-bold">
+                          3
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-white text-sm">Symbolism</h4>
+                          <p className="text-xs text-zinc-400 mt-1">Hidden meaning in shapes</p>
+                        </div>
+                      </div>
+                      <svg className="absolute -top-8 left-20 text-green-500 rotate-180" width="40" height="40" viewBox="0 0 40 40">
+                        <path d="M20 0 L20 30 M20 30 L15 25 M20 30 L25 25" stroke="currentColor" strokeWidth="2" fill="none"/>
+                      </svg>
+                    </div>
+                  </div>
+
+                  {/* Annotation 4 - Bottom Right */}
+                  <div className="absolute -bottom-4 -right-4 animate-float">
+                    <div className="glass rounded-2xl p-4 border border-orange-500/30 max-w-xs backdrop-blur-xl">
+                      <div className="flex items-start space-x-3">
+                        <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center flex-shrink-0 text-sm font-bold">
+                          4
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-white text-sm">Scalability</h4>
+                          <p className="text-xs text-zinc-400 mt-1">Perfect at any size</p>
+                        </div>
+                      </div>
+                      <svg className="absolute -top-8 right-20 text-orange-500 rotate-180" width="40" height="40" viewBox="0 0 40 40">
+                        <path d="M20 0 L20 30 M20 30 L15 25 M20 30 L25 25" stroke="currentColor" strokeWidth="2" fill="none"/>
+                      </svg>
+                    </div>
+                  </div>
                 </div>
-                <h3 className="font-bold text-2xl text-white">Islamic History Animated Series</h3>
-                <p className="text-zinc-400">A 24-episode animated series covering 1,400 years of Islamic civilization. Emmy-nominated for Outstanding Achievement in Animation.</p>
-                <div className="flex items-center space-x-4 text-sm text-zinc-500">
-                  <span>🎬 24 Episodes</span>
-                  <span>👥 50M+ Views</span>
-                  <span>⭐ 4.9/5.0</span>
+              </div>
+
+              {/* Process Description */}
+              <div className="space-y-8">
+                <div>
+                  <span className="px-4 py-2 rounded-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 text-purple-300 text-sm font-semibold">
+                    Our Approach
+                  </span>
+                  <h3 className="font-bold text-3xl lg:text-4xl text-white mt-6 mb-4">
+                    Thoughtful Design, Every Time
+                  </h3>
+                  <p className="text-zinc-400 text-lg leading-relaxed">
+                    We don't just create pretty visuals. Every element is carefully crafted with strategic thinking,
+                    brand psychology, and attention to detail that sets your brand apart.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-6">
+                  {[
+                    { number: '50+', label: 'Design Revisions', icon: '🎨' },
+                    { number: '100%', label: 'Client Satisfaction', icon: '⭐' },
+                    { number: '24h', label: 'First Draft', icon: '⚡' },
+                    { number: '∞', label: 'Creative Ideas', icon: '💡' },
+                  ].map((stat, idx) => (
+                    <div key={idx} className="glass rounded-xl p-4 border border-white/10 text-center group hover:border-purple-500/30 transition-all">
+                      <div className="text-3xl mb-2">{stat.icon}</div>
+                      <div className="font-bold text-2xl bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">
+                        {stat.number}
+                      </div>
+                      <div className="text-xs text-zinc-500 mt-1">{stat.label}</div>
+                    </div>
+                  ))}
                 </div>
               </div>
-            </div>
-
-            {/* Smaller Projects */}
-            <div className="glass rounded-3xl p-6 group hover:bg-white/5 transition-all duration-300 border border-white/10">
-              <div className="h-40 rounded-xl mb-4 overflow-hidden relative bg-gradient-to-br from-blue-500/20 to-cyan-500/20">
-                <Image
-                  src="/images/projects/quranpath-lms.svg"
-                  alt="QuranPath Academy LMS"
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform"
-                />
-              </div>
-              <span className="px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 text-xs font-semibold">LMS Platform</span>
-              <h3 className="font-bold text-lg mt-3 text-white">QuranPath Academy LMS</h3>
-              <p className="text-sm text-zinc-400 mt-2">Enterprise learning platform serving 10,000+ students</p>
-            </div>
-
-            <div className="glass rounded-3xl p-6 group hover:bg-white/5 transition-all duration-300 border border-white/10">
-              <div className="h-40 rounded-xl mb-4 overflow-hidden relative bg-gradient-to-br from-green-500/20 to-emerald-500/20">
-                <Image
-                  src="/images/projects/adhkar-app.svg"
-                  alt="Daily Adhkar App"
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform"
-                />
-              </div>
-              <span className="px-3 py-1 rounded-full bg-green-500/20 text-green-300 text-xs font-semibold">Mobile App</span>
-              <h3 className="font-bold text-lg mt-3 text-white">Daily Adhkar App</h3>
-              <p className="text-sm text-zinc-400 mt-2">500K+ downloads, 4.8★ rating on app stores</p>
-            </div>
-
-            <div className="glass rounded-3xl p-6 group hover:bg-white/5 transition-all duration-300 border border-white/10">
-              <div className="h-40 rounded-xl mb-4 overflow-hidden relative bg-gradient-to-br from-orange-500/20 to-red-500/20">
-                <Image
-                  src="/images/projects/hadith-search.svg"
-                  alt="Hadith Search Engine"
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform"
-                />
-              </div>
-              <span className="px-3 py-1 rounded-full bg-orange-500/20 text-orange-300 text-xs font-semibold">Web Platform</span>
-              <h3 className="font-bold text-lg mt-3 text-white">Hadith Search Engine</h3>
-              <p className="text-sm text-zinc-400 mt-2">AI-powered search across 300K+ authentic hadith</p>
-            </div>
-
-            <div className="glass rounded-3xl p-6 group hover:bg-white/5 transition-all duration-300 border border-white/10">
-              <div className="h-40 rounded-xl mb-4 overflow-hidden relative bg-gradient-to-br from-yellow-500/20 to-orange-500/20">
-                <Image
-                  src="/images/projects/virtual-hajj.svg"
-                  alt="Virtual Hajj Experience"
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform"
-                />
-              </div>
-              <span className="px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-300 text-xs font-semibold">3D Animation</span>
-              <h3 className="font-bold text-lg mt-3 text-white">Virtual Hajj Experience</h3>
-              <p className="text-sm text-zinc-400 mt-2">Immersive 3D tour of Makkah and Madinah</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Interactive Feature Showcase */}
+      {/* Portfolio Gallery with Categories */}
+      <section className="relative py-32 overflow-hidden fade-in-section opacity-0">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="font-display font-black text-5xl lg:text-6xl mb-6 bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">
+              Our Creative Portfolio
+            </h2>
+            <p className="text-xl text-zinc-400 max-w-3xl mx-auto mb-12">
+              Explore our diverse range of work across artwork, branding, and social media content
+            </p>
+
+            {/* Category Filter */}
+            <div className="flex flex-wrap justify-center gap-4 mb-16">
+              {[
+                { id: 'all', label: 'All Work', icon: '✨' },
+                { id: 'artwork', label: 'Artwork', icon: '🎨' },
+                { id: 'logos', label: 'Logos', icon: '🏷️' },
+                { id: 'reels', label: 'Reels & Videos', icon: '🎬' },
+              ].map((category) => (
+                <button
+                  key={category.id}
+                  onClick={() => setActiveCategory(category.id)}
+                  className={`px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 ${
+                    activeCategory === category.id
+                      ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-2xl shadow-purple-500/50 scale-105'
+                      : 'glass border border-white/10 text-zinc-400 hover:border-white/30 hover:text-white'
+                  }`}
+                >
+                  <span className="mr-2">{category.icon}</span>
+                  {category.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Gallery Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              { id: 1, category: 'artwork', title: 'Digital Illustration', image: '/images/portfolio/artwork-1.svg', desc: 'Abstract modern art' },
+              { id: 2, category: 'artwork', title: 'Character Design', image: '/images/portfolio/artwork-2.svg', desc: 'Fantasy character' },
+              { id: 3, category: 'artwork', title: 'Concept Art', image: '/images/portfolio/artwork-3.svg', desc: 'Environment design' },
+              { id: 4, category: 'logos', title: 'Tech Startup Logo', image: '/images/portfolio/logo-1.svg', desc: 'Modern minimal' },
+              { id: 5, category: 'logos', title: 'Restaurant Branding', image: '/images/portfolio/logo-2.svg', desc: 'Elegant design' },
+              { id: 6, category: 'logos', title: 'Fitness Brand', image: '/images/portfolio/logo-3.svg', desc: 'Bold & energetic' },
+              { id: 7, category: 'reels', title: 'Instagram Reel', image: '/images/portfolio/reel-1.svg', desc: 'Product showcase' },
+              { id: 8, category: 'reels', title: 'TikTok Video', image: '/images/portfolio/reel-2.svg', desc: 'Viral content' },
+              { id: 9, category: 'reels', title: 'YouTube Short', image: '/images/portfolio/reel-3.svg', desc: 'Brand story' },
+            ]
+              .filter(item => activeCategory === 'all' || item.category === activeCategory)
+              .map((item, idx) => (
+                <div
+                  key={item.id}
+                  className="group glass rounded-3xl overflow-hidden border border-white/10 hover:border-white/30 transition-all duration-500 hover:scale-105 hover:-translate-y-2"
+                  style={{ animationDelay: `${idx * 100}ms` }}
+                >
+                  <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-purple-500/10 to-pink-500/10">
+                    <Image
+                      src={item.image}
+                      alt={item.title}
+                      fill
+                      className="object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+                    {/* Overlay on Hover */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+                      <div>
+                        <h4 className="font-bold text-xl text-white mb-2">{item.title}</h4>
+                        <p className="text-zinc-300 text-sm">{item.desc}</p>
+                        <button className="mt-4 px-6 py-2 rounded-full bg-white text-black font-semibold text-sm hover:bg-zinc-200 transition-colors">
+                          View Details
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+          </div>
+
+          {/* Load More */}
+          <div className="text-center mt-12">
+            <button className="px-12 py-5 rounded-2xl glass border-2 border-white/20 text-white font-bold text-lg hover:bg-white/10 backdrop-blur-xl transition-all duration-300 hover:scale-105">
+              Load More Work
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Why Choose Us - Updated for Creative Agency */}
       <section className="relative py-32 overflow-hidden fade-in-section opacity-0">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -316,7 +437,7 @@ export default function Home() {
               Why Choose Cubico?
             </h2>
             <p className="text-xl text-zinc-400 max-w-3xl mx-auto">
-              We don't just build products. We craft experiences that transform education.
+              We don't just create visuals. We craft brand experiences that captivate and convert.
             </p>
           </div>
 
@@ -324,45 +445,45 @@ export default function Home() {
             {[
               {
                 icon: '🎨',
-                title: 'World-Class Design',
-                description: 'Emmy-winning creative team delivering broadcast-quality content',
+                title: 'Award-Winning Artistry',
+                description: 'Creative team with international design awards and recognition',
                 gradient: 'from-purple-500 to-pink-500',
-                stats: ['15+ Awards', '50M+ Views', 'Netflix Quality']
+                stats: ['20+ Awards', 'Featured Work', 'Top 1% Designers']
               },
               {
                 icon: '⚡',
-                title: 'Enterprise-Grade Tech',
-                description: 'Scalable platforms handling 10,000+ concurrent users',
+                title: 'Lightning-Fast Turnaround',
+                description: 'First drafts in 24 hours, final delivery within a week',
                 gradient: 'from-blue-500 to-cyan-500',
-                stats: ['99.9% Uptime', '10K+ Users', 'Cloud Native']
+                stats: ['24h Draft', '7-Day Delivery', 'Rush Available']
               },
               {
-                icon: '🕌',
-                title: 'Cultural Authenticity',
-                description: 'Islamic scholars ensuring theological accuracy and cultural sensitivity',
+                icon: '✨',
+                title: 'Unlimited Revisions',
+                description: 'We work until you love it. Your satisfaction is our priority',
                 gradient: 'from-green-500 to-emerald-500',
-                stats: ['Scholar-Verified', '25+ Countries', 'Multilingual']
+                stats: ['∞ Revisions', '100% Satisfaction', 'Money Back']
               },
               {
                 icon: '📱',
-                title: 'Mobile-First',
-                description: 'Responsive designs optimized for all devices and screen sizes',
+                title: 'Multi-Platform Mastery',
+                description: 'Optimized content for Instagram, TikTok, YouTube, and all platforms',
                 gradient: 'from-orange-500 to-red-500',
-                stats: ['iOS & Android', 'PWA Ready', '60fps Smooth']
+                stats: ['All Platforms', 'Any Format', 'Viral Ready']
               },
               {
-                icon: '🔒',
-                title: 'Secure & Compliant',
-                description: 'Enterprise security with GDPR, COPPA, and FERPA compliance',
+                icon: '💎',
+                title: 'Premium Quality',
+                description: '4K resolution, vector formats, and print-ready files included',
                 gradient: 'from-indigo-500 to-purple-500',
-                stats: ['SOC 2', 'GDPR', 'Encrypted']
+                stats: ['4K Quality', 'Source Files', 'Print Ready']
               },
               {
                 icon: '🚀',
-                title: 'Rapid Delivery',
-                description: 'Agile methodology delivering MVPs in weeks, not months',
+                title: 'Trend-Driven Design',
+                description: 'Always ahead of trends with fresh, modern, and viral-worthy content',
                 gradient: 'from-pink-500 to-rose-500',
-                stats: ['2-Week Sprints', 'CI/CD', 'Fast Iteration']
+                stats: ['Trend Alerts', 'Modern Style', 'Viral Potential']
               },
             ].map((feature, idx) => (
               <div
@@ -398,17 +519,17 @@ export default function Home() {
             <div className="text-center mb-16">
               <h2 className="font-display font-black text-5xl lg:text-6xl mb-6">Our Impact</h2>
               <p className="text-xl text-zinc-400 max-w-3xl mx-auto">
-                Numbers that tell our story of transforming Islamic education globally
+                Numbers that showcase our creative excellence and client success stories
               </p>
             </div>
 
             {/* Circular Progress Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-12 mb-16">
               {[
-                { target: 150, label: 'Projects Delivered', color: 'blue', suffix: '+' },
-                { target: 100, label: 'Happy Clients', color: 'green', suffix: '+' },
-                { target: 50, label: 'Million Students Reached', color: 'purple', suffix: 'M+' },
-                { target: 98, label: 'Client Satisfaction', color: 'pink', suffix: '%' },
+                { target: 500, label: 'Projects Completed', color: 'blue', suffix: '+' },
+                { target: 200, label: 'Happy Brands', color: 'green', suffix: '+' },
+                { target: 10, label: 'Million Social Reach', color: 'purple', suffix: 'M+' },
+                { target: 99, label: 'Client Satisfaction', color: 'pink', suffix: '%' },
               ].map((stat, i) => (
                 <div key={i} className="text-center group">
                   {/* Circular Progress */}
@@ -450,9 +571,9 @@ export default function Home() {
             {/* Performance Benchmarks */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
               {[
-                { metric: 'Average Project Rating', value: '4.9/5.0', icon: '⭐', trend: '+0.2 vs industry' },
-                { metric: 'Client Retention Rate', value: '98%', icon: '🔄', trend: '+18% vs average' },
-                { metric: 'On-Time Delivery', value: '95%', icon: '⚡', trend: 'Industry leading' },
+                { metric: 'Average Design Rating', value: '5.0/5.0', icon: '⭐', trend: 'Perfect score' },
+                { metric: 'Client Retention Rate', value: '99%', icon: '🔄', trend: 'Industry leading' },
+                { metric: 'First Draft Delivery', value: '24h', icon: '⚡', trend: 'Lightning fast' },
               ].map((benchmark, idx) => (
                 <div key={idx} className="glass rounded-2xl p-6 border border-white/10 hover:bg-white/5 transition-all">
                   <div className="flex items-center justify-between mb-4">
@@ -485,14 +606,14 @@ export default function Home() {
           {/* Awards Grid */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16">
             {[
-              { icon: '🏆', title: 'Emmy Award', subtitle: 'Outstanding Animation' },
-              { icon: '⭐', title: 'Best EdTech', subtitle: 'Education Innovation Awards' },
-              { icon: '🎯', title: 'Top Rated', subtitle: 'Clutch.co 5.0/5.0' },
-              { icon: '🌟', title: 'Excellence', subtitle: 'Islamic Education Summit' },
-              { icon: '💎', title: 'Premium Partner', subtitle: 'Google Cloud' },
-              { icon: '🚀', title: 'Fast Growth', subtitle: 'Inc. 5000' },
-              { icon: '🎓', title: 'EdTech Leader', subtitle: 'Forbes Recognition' },
-              { icon: '🔒', title: 'SOC 2 Certified', subtitle: 'Enterprise Security' },
+              { icon: '🏆', title: 'Design Award', subtitle: 'Best Creative Studio 2024' },
+              { icon: '⭐', title: 'Top Rated', subtitle: 'Behance Featured Artist' },
+              { icon: '🎯', title: '5.0 Stars', subtitle: 'Dribbble Pro Top 1%' },
+              { icon: '🌟', title: 'Excellence', subtitle: 'Awwwards Winner' },
+              { icon: '💎', title: 'Premium Creator', subtitle: 'Adobe Creative Cloud' },
+              { icon: '🚀', title: 'Trending', subtitle: 'TikTok Creator Fund' },
+              { icon: '🎨', title: 'Art Direction', subtitle: 'Cannes Lions Finalist' },
+              { icon: '✨', title: 'Verified', subtitle: 'Instagram Blue Checkmark' },
             ].map((award, idx) => (
               <div
                 key={idx}
@@ -512,12 +633,12 @@ export default function Home() {
             </p>
             <div className="grid grid-cols-3 md:grid-cols-6 gap-8 items-center opacity-60">
               {[
-                { name: 'Islamic Universities', icon: '🎓' },
-                { name: 'Global NGOs', icon: '🌍' },
-                { name: 'Media Networks', icon: '📺' },
-                { name: 'Tech Companies', icon: '💻' },
-                { name: 'Publishers', icon: '📚' },
-                { name: 'Foundations', icon: '🏢' },
+                { name: 'Tech Startups', icon: '🚀' },
+                { name: 'Fashion Brands', icon: '👗' },
+                { name: 'Food & Beverage', icon: '🍔' },
+                { name: 'E-Commerce', icon: '🛒' },
+                { name: 'Influencers', icon: '⭐' },
+                { name: 'Agencies', icon: '💼' },
               ].map((client, idx) => (
                 <div
                   key={idx}
@@ -545,25 +666,25 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               {
-                quote: "Cubico's animation series transformed how our students engage with Islamic history. Enrollment increased 40% after launch. The quality rivals Netflix productions.",
-                author: 'Dr. Maryam Al-Hassan',
-                role: 'Principal, Al-Furqan Academy',
+                quote: "Cubico's logo design transformed our brand identity completely. Sales increased 150% in the first quarter. The attention to detail is unmatched!",
+                author: 'Sarah Chen',
+                role: 'CEO, TechFlow Startup',
                 rating: 5,
-                impact: '+40% Enrollment'
+                impact: '+150% Sales'
               },
               {
-                quote: "The LMS platform handles 10,000+ concurrent students seamlessly. ROI was evident within 6 months. Best investment we've made in a decade.",
-                author: 'Ahmed Rahman',
-                role: 'CTO, Islamic Online University',
+                quote: "Their social media content went viral! We gained 50K followers in one week. The creativity and execution are absolutely phenomenal.",
+                author: 'Marcus Johnson',
+                role: 'Marketing Director, FreshBites',
                 rating: 5,
-                impact: '6-Month ROI'
+                impact: '50K+ Followers'
               },
               {
-                quote: "Our app has 500K+ downloads and 4.8★ rating. Cubico understood our vision for accessible Quranic education and delivered beyond expectations.",
-                author: 'Fatima Sheikh',
-                role: 'Founder, QuranPath Learning',
+                quote: "Best creative agency we've worked with. Fast turnaround, unlimited revisions, and the final artwork exceeded all expectations. 10/10!",
+                author: 'Olivia Martinez',
+                role: 'Brand Manager, LuxeFashion',
                 rating: 5,
-                impact: '500K+ Downloads'
+                impact: '10/10 Quality'
               },
             ].map((testimonial, i) => (
               <div
@@ -637,10 +758,10 @@ export default function Home() {
 
             <div className="relative z-10">
               <h2 className="font-display font-black text-5xl lg:text-6xl mb-6">
-                Ready to Transform Your Institution?
+                Ready to Elevate Your Brand?
               </h2>
               <p className="text-xl text-zinc-300 mb-10 max-w-3xl mx-auto leading-relaxed">
-                Join 100+ leading educational institutions worldwide who trust Cubico Technologies to bring their vision to life.
+                Join 500+ brands worldwide who trust Cubico to transform their vision into stunning visual masterpieces.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-8">
@@ -649,7 +770,7 @@ export default function Home() {
                   className="group px-12 py-6 rounded-2xl bg-gradient-to-r from-white to-zinc-300 text-black font-bold text-xl hover:shadow-2xl hover:shadow-white/30 transition-all duration-300 hover:scale-105"
                 >
                   <span className="flex items-center space-x-3">
-                    <span>Start Your Project</span>
+                    <span>Get Your Free Quote</span>
                     <svg className="w-6 h-6 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                     </svg>
@@ -659,12 +780,12 @@ export default function Home() {
                   href="/services"
                   className="px-12 py-6 rounded-2xl glass border-2 border-white/20 text-white font-bold text-xl hover:bg-white/10 transition-all duration-300 hover:scale-105"
                 >
-                  Browse Services
+                  View Our Work
                 </Link>
               </div>
 
               <p className="text-sm text-zinc-500">
-                💬 Free consultation • 🚀 2-week sprint start • ⚡ No long-term commitment required
+                💬 Free consultation • ⚡ 24h first draft • ∞ Unlimited revisions • 💰 Money-back guarantee
               </p>
             </div>
           </div>
@@ -672,14 +793,13 @@ export default function Home() {
       </section>
 
       <style jsx>{`
-        @keyframes blob {
-          0%, 100% { transform: translate(0, 0) scale(1); }
-          33% { transform: translate(30px, -50px) scale(1.1); }
-          66% { transform: translate(-20px, 20px) scale(0.9); }
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-10px); }
         }
 
-        .animate-blob {
-          animation: blob 7s infinite;
+        .animate-float {
+          animation: float 3s ease-in-out infinite;
         }
 
         .animation-delay-2000 {
@@ -688,15 +808,6 @@ export default function Home() {
 
         .animation-delay-4000 {
           animation-delay: 4s;
-        }
-
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-10px); }
-        }
-
-        .animate-float {
-          animation: float 3s ease-in-out infinite;
         }
 
         .fade-in-section {

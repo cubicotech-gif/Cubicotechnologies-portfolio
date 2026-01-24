@@ -1,0 +1,11 @@
+<svg width="600" height="600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="a2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:rgb(236,72,153);stop-opacity:1" />
+      <stop offset="100%" style="stop-color:rgb(239,68,68);stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="600" height="600" fill="url(#a2)"/>
+  <polygon points="300,150 450,350 150,350" fill="rgba(255,255,255,0.25)"/>
+  <text x="300" y="580" font-family="Arial" font-size="20" font-weight="bold" fill="white" text-anchor="middle">Character Design</text>
+</svg>

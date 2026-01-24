@@ -60,3 +60,63 @@ body {
 .gradient-border:hover::before {
   opacity: 1;
 }
+
+/* Cinematic Gradient Drift Animations */
+@keyframes gradient-drift-slow {
+  0%, 100% {
+    transform: translate(0, 0) scale(0.95);
+  }
+  25% {
+    transform: translate(-30px, 40px) scale(0.98);
+  }
+  50% {
+    transform: translate(40px, -20px) scale(1.02);
+  }
+  75% {
+    transform: translate(-20px, -30px) scale(1.05);
+  }
+}
+
+@keyframes gradient-drift-medium {
+  0%, 100% {
+    transform: translate(0, 0) scale(1.0);
+  }
+  30% {
+    transform: translate(50px, -40px) scale(0.95);
+  }
+  60% {
+    transform: translate(-40px, 30px) scale(1.05);
+  }
+  90% {
+    transform: translate(20px, 20px) scale(0.98);
+  }
+}
+
+@keyframes gradient-drift-long {
+  0%, 100% {
+    transform: translate(0, 0) scale(1.03);
+  }
+  33% {
+    transform: translate(-50px, -50px) scale(0.95);
+  }
+  66% {
+    transform: translate(30px, 40px) scale(1.02);
+  }
+}
+
+.animate-gradient-drift-slow {
+  animation: gradient-drift-slow 18s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-gradient-drift-medium {
+  animation: gradient-drift-medium 15s ease-in-out infinite;
+  animation-delay: 2s;
+  will-change: transform;
+}
+
+.animate-gradient-drift-long {
+  animation: gradient-drift-long 12s ease-in-out infinite;
+  animation-delay: 4s;
+  will-change: transform;
+}
