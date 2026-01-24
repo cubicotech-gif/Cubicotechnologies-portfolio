@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 
 export default function Home() {
@@ -179,16 +180,23 @@ export default function Home() {
             {/* Floating 3D Cards Preview */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16">
               {[
-                { title: 'LMS Dashboard', desc: 'Track student progress in real-time', gradient: 'from-blue-500/10 to-cyan-500/10', delay: '0' },
-                { title: 'Interactive Lessons', desc: 'Engaging content that captivates', gradient: 'from-purple-500/10 to-pink-500/10', delay: '200' },
-                { title: 'Analytics & Insights', desc: 'Data-driven decision making', gradient: 'from-green-500/10 to-emerald-500/10', delay: '400' },
+                { title: 'LMS Dashboard', desc: 'Track student progress in real-time', image: '/images/hero/dashboard-preview.svg', delay: '0' },
+                { title: 'Interactive Lessons', desc: 'Engaging content that captivates', image: '/images/hero/interactive-lessons.svg', delay: '200' },
+                { title: 'Analytics & Insights', desc: 'Data-driven decision making', image: '/images/hero/analytics-preview.svg', delay: '400' },
               ].map((card, idx) => (
                 <div
                   key={idx}
                   className="glass rounded-2xl p-6 border border-white/10 hover:border-white/30 transition-all duration-300 hover:scale-105 hover:-translate-y-2 backdrop-blur-xl group"
                   style={{ animationDelay: `${card.delay}ms` }}
                 >
-                  <div className={`w-full h-32 rounded-xl bg-gradient-to-br ${card.gradient} mb-4 group-hover:scale-105 transition-transform`}></div>
+                  <div className="w-full h-32 rounded-xl mb-4 overflow-hidden relative bg-gradient-to-br from-zinc-800 to-zinc-900">
+                    <Image
+                      src={card.image}
+                      alt={card.title}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform"
+                    />
+                  </div>
                   <h3 className="font-bold text-lg mb-2 text-white">{card.title}</h3>
                   <p className="text-sm text-zinc-400">{card.desc}</p>
                 </div>
@@ -214,10 +222,17 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Large Featured Project */}
             <div className="md:col-span-2 md:row-span-2 glass rounded-3xl p-8 group hover:bg-white/5 transition-all duration-300 relative overflow-hidden border border-white/10">
-              <div className="absolute top-4 right-4 px-4 py-2 rounded-full bg-green-500/20 border border-green-500/30 backdrop-blur-xl">
+              <div className="absolute top-4 right-4 px-4 py-2 rounded-full bg-green-500/20 border border-green-500/30 backdrop-blur-xl z-10">
                 <span className="text-green-400 font-semibold text-sm">Featured</span>
               </div>
-              <div className="h-64 lg:h-96 rounded-2xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 mb-6 group-hover:scale-105 transition-transform"></div>
+              <div className="h-64 lg:h-96 rounded-2xl mb-6 overflow-hidden relative bg-gradient-to-br from-purple-500/20 to-pink-500/20">
+                <Image
+                  src="/images/projects/islamic-history-series.svg"
+                  alt="Islamic History Animated Series"
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform"
+                />
+              </div>
               <div className="space-y-4">
                 <div className="flex items-center space-x-2">
                   <span className="px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 text-xs font-semibold">Animation</span>
@@ -235,28 +250,56 @@ export default function Home() {
 
             {/* Smaller Projects */}
             <div className="glass rounded-3xl p-6 group hover:bg-white/5 transition-all duration-300 border border-white/10">
-              <div className="h-40 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 mb-4 group-hover:scale-105 transition-transform"></div>
+              <div className="h-40 rounded-xl mb-4 overflow-hidden relative bg-gradient-to-br from-blue-500/20 to-cyan-500/20">
+                <Image
+                  src="/images/projects/quranpath-lms.svg"
+                  alt="QuranPath Academy LMS"
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform"
+                />
+              </div>
               <span className="px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 text-xs font-semibold">LMS Platform</span>
               <h3 className="font-bold text-lg mt-3 text-white">QuranPath Academy LMS</h3>
               <p className="text-sm text-zinc-400 mt-2">Enterprise learning platform serving 10,000+ students</p>
             </div>
 
             <div className="glass rounded-3xl p-6 group hover:bg-white/5 transition-all duration-300 border border-white/10">
-              <div className="h-40 rounded-xl bg-gradient-to-br from-green-500/20 to-emerald-500/20 mb-4 group-hover:scale-105 transition-transform"></div>
+              <div className="h-40 rounded-xl mb-4 overflow-hidden relative bg-gradient-to-br from-green-500/20 to-emerald-500/20">
+                <Image
+                  src="/images/projects/adhkar-app.svg"
+                  alt="Daily Adhkar App"
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform"
+                />
+              </div>
               <span className="px-3 py-1 rounded-full bg-green-500/20 text-green-300 text-xs font-semibold">Mobile App</span>
               <h3 className="font-bold text-lg mt-3 text-white">Daily Adhkar App</h3>
               <p className="text-sm text-zinc-400 mt-2">500K+ downloads, 4.8★ rating on app stores</p>
             </div>
 
             <div className="glass rounded-3xl p-6 group hover:bg-white/5 transition-all duration-300 border border-white/10">
-              <div className="h-40 rounded-xl bg-gradient-to-br from-orange-500/20 to-red-500/20 mb-4 group-hover:scale-105 transition-transform"></div>
+              <div className="h-40 rounded-xl mb-4 overflow-hidden relative bg-gradient-to-br from-orange-500/20 to-red-500/20">
+                <Image
+                  src="/images/projects/hadith-search.svg"
+                  alt="Hadith Search Engine"
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform"
+                />
+              </div>
               <span className="px-3 py-1 rounded-full bg-orange-500/20 text-orange-300 text-xs font-semibold">Web Platform</span>
               <h3 className="font-bold text-lg mt-3 text-white">Hadith Search Engine</h3>
               <p className="text-sm text-zinc-400 mt-2">AI-powered search across 300K+ authentic hadith</p>
             </div>
 
             <div className="glass rounded-3xl p-6 group hover:bg-white/5 transition-all duration-300 border border-white/10">
-              <div className="h-40 rounded-xl bg-gradient-to-br from-yellow-500/20 to-orange-500/20 mb-4 group-hover:scale-105 transition-transform"></div>
+              <div className="h-40 rounded-xl mb-4 overflow-hidden relative bg-gradient-to-br from-yellow-500/20 to-orange-500/20">
+                <Image
+                  src="/images/projects/virtual-hajj.svg"
+                  alt="Virtual Hajj Experience"
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform"
+                />
+              </div>
               <span className="px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-300 text-xs font-semibold">3D Animation</span>
               <h3 className="font-bold text-lg mt-3 text-white">Virtual Hajj Experience</h3>
               <p className="text-sm text-zinc-400 mt-2">Immersive 3D tour of Makkah and Madinah</p>
