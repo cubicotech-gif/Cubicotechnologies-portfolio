@@ -95,107 +95,188 @@ export default function Home() {
 
   return (
     <>
-      {/* Hero Section - Immersive Experience */}
-      <section className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
-          <div className="text-center max-w-5xl mx-auto">
-            {/* Floating Badge */}
-            <div className="inline-flex items-center px-6 py-3 rounded-full glass border border-white/20 mb-8 animate-float backdrop-blur-xl">
-              <span className="relative flex h-3 w-3 mr-3">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
-              </span>
-              <span className="text-sm font-semibold bg-gradient-to-r from-white to-zinc-300 bg-clip-text text-transparent">
-                Trusted by 500+ Brands Worldwide • Award-Winning Creative Studio
-              </span>
+      {/* Hero Section - Split Layout */}
+      <section className="relative min-h-screen flex items-center pt-20 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10 w-full">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+
+            {/* LEFT SIDE - Content */}
+            <div className="space-y-8">
+              {/* Floating Badge */}
+              <div className="inline-flex items-center px-6 py-3 rounded-full glass border border-white/20 animate-float backdrop-blur-xl">
+                <span className="relative flex h-3 w-3 mr-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                </span>
+                <span className="text-sm font-semibold bg-gradient-to-r from-white to-zinc-300 bg-clip-text text-transparent">
+                  Trusted by 500+ Brands Worldwide
+                </span>
+              </div>
+
+              {/* Typing Animation Heading */}
+              <h1 className="font-display font-black text-4xl sm:text-5xl lg:text-6xl xl:text-7xl leading-tight">
+                <span className="bg-gradient-to-r from-white via-zinc-200 to-zinc-400 bg-clip-text text-transparent">
+                  {typedText}
+                </span>
+                <span className="animate-pulse">|</span>
+              </h1>
+
+              {/* Rotating Feature Highlights */}
+              <div className="h-16">
+                {features.map((feature, idx) => (
+                  <div
+                    key={idx}
+                    className={`transition-all duration-500 ${
+                      currentFeature === idx
+                        ? 'opacity-100 transform translate-y-0'
+                        : 'opacity-0 transform -translate-y-4 absolute'
+                    }`}
+                  >
+                    <div className="flex items-center space-x-4">
+                      <span className="text-4xl">{feature.icon}</span>
+                      <span className={`text-xl sm:text-2xl font-bold bg-gradient-to-r ${feature.color} bg-clip-text text-transparent`}>
+                        {feature.text}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Description */}
+              <p className="text-lg sm:text-xl text-zinc-300 leading-relaxed max-w-xl">
+                We craft <span className="font-semibold text-white">breathtaking visual experiences</span> that captivate, engage, and convert.
+                From stunning artworks to viral social media content, we transform your brand vision into digital masterpieces.
+              </p>
+
+              {/* CTA Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Link
+                  href="/contact"
+                  className="group relative px-8 py-4 rounded-2xl bg-gradient-to-r from-white to-zinc-300 text-black font-bold text-lg overflow-hidden hover:shadow-2xl hover:shadow-white/20 transition-all duration-300 hover:scale-105 text-center"
+                >
+                  <span className="relative z-10 flex items-center justify-center space-x-2">
+                    <span>Start Your Project</span>
+                    <svg className="w-5 h-5 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
+                  </span>
+                </Link>
+                <Link
+                  href="/services"
+                  className="group px-8 py-4 rounded-2xl glass border-2 border-white/20 text-white font-bold text-lg hover:bg-white/10 backdrop-blur-xl transition-all duration-300 hover:scale-105 text-center"
+                >
+                  <span className="flex items-center justify-center space-x-2">
+                    <span>View Our Work</span>
+                    <svg className="w-5 h-5 group-hover:rotate-45 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                  </span>
+                </Link>
+              </div>
+
+              {/* Trust Indicators */}
+              <div className="flex flex-wrap items-center gap-6 pt-4">
+                <div className="flex items-center space-x-2">
+                  <div className="flex -space-x-2">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 border-2 border-zinc-900"></div>
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 border-2 border-zinc-900"></div>
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 border-2 border-zinc-900"></div>
+                  </div>
+                  <span className="text-sm text-zinc-400">500+ Happy Clients</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="text-yellow-400 text-lg">★★★★★</span>
+                  <span className="text-sm text-zinc-400">5.0 Rating</span>
+                </div>
+              </div>
             </div>
 
-            {/* Typing Animation Heading */}
-            <h1 className="font-display font-black text-5xl sm:text-6xl lg:text-8xl mb-8 leading-tight">
-              <span className="bg-gradient-to-r from-white via-zinc-200 to-zinc-400 bg-clip-text text-transparent">
-                {typedText}
-              </span>
-              <span className="animate-pulse">|</span>
-            </h1>
+            {/* RIGHT SIDE - Visual Elements */}
+            <div className="relative lg:h-[600px] flex items-center justify-center">
+              {/* Main Visual Container */}
+              <div className="relative w-full h-full">
 
-            {/* Rotating Feature Highlights */}
-            <div className="h-16 mb-10">
-              {features.map((feature, idx) => (
-                <div
-                  key={idx}
-                  className={`transition-all duration-500 ${
-                    currentFeature === idx
-                      ? 'opacity-100 transform translate-y-0'
-                      : 'opacity-0 transform -translate-y-4 absolute'
-                  }`}
-                >
-                  <div className="flex items-center justify-center space-x-4">
-                    <span className="text-5xl">{feature.icon}</span>
-                    <span className={`text-2xl font-bold bg-gradient-to-r ${feature.color} bg-clip-text text-transparent`}>
-                      {feature.text}
-                    </span>
+                {/* Background Decorative Elements */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-[400px] h-[400px] bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-full blur-3xl"></div>
+                </div>
+
+                {/* Floating Image Grid */}
+                <div className="relative z-10 grid grid-cols-2 gap-4 max-w-lg mx-auto">
+                  {/* Large Featured Card - Top Left */}
+                  <div className="col-span-2 glass rounded-3xl p-6 border border-white/10 backdrop-blur-xl transform hover:scale-105 transition-all duration-500 animate-float">
+                    <div className="aspect-[4/3] rounded-xl overflow-hidden relative bg-gradient-to-br from-purple-500/20 to-pink-500/20 mb-4">
+                      <Image
+                        src="/images/categories/artwork.svg"
+                        alt="Visual Artwork"
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <h3 className="font-bold text-lg text-white mb-1">Visual Artwork</h3>
+                    <p className="text-sm text-zinc-400">Illustrations & digital art</p>
+                  </div>
+
+                  {/* Logo Card - Bottom Left */}
+                  <div className="glass rounded-2xl p-4 border border-white/10 backdrop-blur-xl transform hover:scale-105 transition-all duration-500 animate-float animation-delay-2000">
+                    <div className="aspect-square rounded-xl overflow-hidden relative bg-gradient-to-br from-blue-500/20 to-cyan-500/20 mb-3">
+                      <Image
+                        src="/images/categories/logos.svg"
+                        alt="Logo Design"
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <h3 className="font-bold text-sm text-white mb-1">Logo Design</h3>
+                    <p className="text-xs text-zinc-400">Brand identities</p>
+                  </div>
+
+                  {/* Social Media Card - Bottom Right */}
+                  <div className="glass rounded-2xl p-4 border border-white/10 backdrop-blur-xl transform hover:scale-105 transition-all duration-500 animate-float animation-delay-4000">
+                    <div className="aspect-square rounded-xl overflow-hidden relative bg-gradient-to-br from-green-500/20 to-emerald-500/20 mb-3">
+                      <Image
+                        src="/images/categories/reels.svg"
+                        alt="Social Media"
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <h3 className="font-bold text-sm text-white mb-1">Social Media</h3>
+                    <p className="text-xs text-zinc-400">Reels & videos</p>
                   </div>
                 </div>
-              ))}
-            </div>
 
-            {/* Description */}
-            <p className="text-xl sm:text-2xl text-zinc-300 mb-12 max-w-4xl mx-auto leading-relaxed">
-              We craft <span className="font-semibold text-white">breathtaking visual experiences</span> that captivate, engage, and convert.
-              From stunning artworks to viral social media content, we transform your brand vision into digital masterpieces.
-            </p>
-
-            {/* CTA Buttons with Hover Effects */}
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
-              <Link
-                href="/contact"
-                className="group relative px-10 py-5 rounded-2xl bg-gradient-to-r from-white to-zinc-300 text-black font-bold text-lg overflow-hidden hover:shadow-2xl hover:shadow-white/20 transition-all duration-300 hover:scale-105"
-              >
-                <span className="relative z-10 flex items-center space-x-2">
-                  <span>Start Your Project</span>
-                  <svg className="w-6 h-6 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                  </svg>
-                </span>
-              </Link>
-              <Link
-                href="/services"
-                className="group px-10 py-5 rounded-2xl glass border-2 border-white/20 text-white font-bold text-lg hover:bg-white/10 backdrop-blur-xl transition-all duration-300 hover:scale-105"
-              >
-                <span className="flex items-center space-x-2">
-                  <span>View Our Work</span>
-                  <svg className="w-6 h-6 group-hover:rotate-45 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                  </svg>
-                </span>
-              </Link>
-            </div>
-
-            {/* Floating 3D Cards Preview */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16">
-              {[
-                { title: 'Visual Artwork', desc: 'Illustrations, digital art & creative designs', image: '/images/categories/artwork.svg', gradient: 'from-purple-500/20 to-pink-500/20', delay: '0' },
-                { title: 'Logo Design', desc: 'Memorable brand identities that stand out', image: '/images/categories/logos.svg', gradient: 'from-blue-500/20 to-cyan-500/20', delay: '200' },
-                { title: 'Social Media', desc: 'Reels, videos & content for all platforms', image: '/images/categories/reels.svg', gradient: 'from-green-500/20 to-emerald-500/20', delay: '400' },
-              ].map((card, idx) => (
-                <div
-                  key={idx}
-                  className="glass rounded-2xl p-6 border border-white/10 hover:border-white/30 transition-all duration-300 hover:scale-105 hover:-translate-y-2 backdrop-blur-xl group"
-                  style={{ animationDelay: `${card.delay}ms` }}
-                >
-                  <div className={`w-full h-32 rounded-xl mb-4 overflow-hidden relative bg-gradient-to-br ${card.gradient}`}>
-                    <Image
-                      src={card.image}
-                      alt={card.title}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform"
-                    />
+                {/* Floating Stats Badge */}
+                <div className="absolute -bottom-4 -left-4 glass rounded-2xl p-4 border border-white/10 backdrop-blur-xl animate-float animation-delay-2000 hidden lg:block">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center">
+                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    <div>
+                      <div className="font-bold text-white">500+</div>
+                      <div className="text-xs text-zinc-400">Projects Done</div>
+                    </div>
                   </div>
-                  <h3 className="font-bold text-lg mb-2 text-white">{card.title}</h3>
-                  <p className="text-sm text-zinc-400">{card.desc}</p>
                 </div>
-              ))}
+
+                {/* Floating Rating Badge */}
+                <div className="absolute -top-4 -right-4 glass rounded-2xl p-4 border border-white/10 backdrop-blur-xl animate-float hidden lg:block">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center text-2xl">
+                      ⭐
+                    </div>
+                    <div>
+                      <div className="font-bold text-white">5.0</div>
+                      <div className="text-xs text-zinc-400">Client Rating</div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
             </div>
+
           </div>
         </div>
       </section>
