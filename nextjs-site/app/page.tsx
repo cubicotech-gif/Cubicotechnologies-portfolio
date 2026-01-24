@@ -97,13 +97,6 @@ export default function Home() {
     <>
       {/* Hero Section - Immersive Experience */}
       <section className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
-        {/* Animated Gradient Mesh Background */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-20 left-20 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-blob"></div>
-          <div className="absolute top-40 right-20 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl animate-blob animation-delay-2000"></div>
-          <div className="absolute bottom-20 left-1/2 w-96 h-96 bg-pink-500/20 rounded-full blur-3xl animate-blob animation-delay-4000"></div>
-        </div>
-
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
           <div className="text-center max-w-5xl mx-auto">
             {/* Floating Badge */}
@@ -800,14 +793,13 @@ export default function Home() {
       </section>
 
       <style jsx>{`
-        @keyframes blob {
-          0%, 100% { transform: translate(0, 0) scale(1); }
-          33% { transform: translate(30px, -50px) scale(1.1); }
-          66% { transform: translate(-20px, 20px) scale(0.9); }
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-10px); }
         }
 
-        .animate-blob {
-          animation: blob 7s infinite;
+        .animate-float {
+          animation: float 3s ease-in-out infinite;
         }
 
         .animation-delay-2000 {
@@ -816,15 +808,6 @@ export default function Home() {
 
         .animation-delay-4000 {
           animation-delay: 4s;
-        }
-
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-10px); }
-        }
-
-        .animate-float {
-          animation: float 3s ease-in-out infinite;
         }
 
         .fade-in-section {
