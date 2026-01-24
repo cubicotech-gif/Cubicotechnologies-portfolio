@@ -180,7 +180,7 @@ export default function Home() {
             {/* Floating 3D Cards Preview */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16">
               {[
-                { title: 'LMS Dashboard', desc: 'Track student progress in real-time', image: '/images/hero/dashboard-preview.svg', delay: '0' },
+                { title: 'LMS Dashboard', desc: 'Track student progress in real-time', image: 'https://images.unsplash.com/photo-1596524430615-b46475ddff6e?w=800&q=80', delay: '0' },
                 { title: 'Interactive Lessons', desc: 'Engaging content that captivates', image: '/images/hero/interactive-lessons.svg', delay: '200' },
                 { title: 'Analytics & Insights', desc: 'Data-driven decision making', image: '/images/hero/analytics-preview.svg', delay: '400' },
               ].map((card, idx) => (
