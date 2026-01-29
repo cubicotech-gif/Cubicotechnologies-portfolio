@@ -139,7 +139,7 @@ export default function HeroAdminPanel() {
   };
 
   // Delete image
-  const handleDelete = async (id: string, cloudinaryId: string) => {
+  const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this image?')) {
       return;
     }
@@ -361,7 +361,7 @@ export default function HeroAdminPanel() {
                       </label>
 
                       <button
-                        onClick={() => handleDelete(image.id, image.cloudinary_id)}
+                        onClick={() => handleDelete(image.id)}
                         className="px-3 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-400 text-sm rounded-lg transition-colors"
                       >
                         Delete

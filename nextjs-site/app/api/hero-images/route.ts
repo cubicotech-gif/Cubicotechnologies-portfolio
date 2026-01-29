@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
 
     // Create new image entry
     const newImage: HeroImage = {
-      id: `hero-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      id: `hero-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
       cloudinary_id: uploadResult.public_id,
       category,
       order: order || images.length + 1,

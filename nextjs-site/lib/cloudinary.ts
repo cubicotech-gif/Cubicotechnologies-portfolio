@@ -30,7 +30,7 @@ export async function uploadToCloudinary(
       folder,
       resource_type: 'auto',
       transformation: [
-        { width: 800, height: 1200, crop: 'fill', quality: 'auto', fetch_format: 'auto' },
+        { width: 800, height: 1200, crop: 'fill', quality: 'auto' },
       ],
     });
 
