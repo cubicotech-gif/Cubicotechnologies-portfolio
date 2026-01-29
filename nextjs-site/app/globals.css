@@ -25,7 +25,9 @@ body {
 
 @layer utilities {
   .gradient-text {
-    @apply bg-gradient-to-r from-purple-500 via-cyan-500 to-purple-500 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-purple-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent;
+    background-size: 200% auto;
+    animation: gradient-shift 3s ease infinite;
   }
 
   .glass {
@@ -44,6 +46,15 @@ body {
   }
   50% {
     background-position: 100% 50%;
+  }
+}
+
+@keyframes gradient-shift {
+  0%, 100% {
+    background-position: 0% center;
+  }
+  50% {
+    background-position: 100% center;
   }
 }
 

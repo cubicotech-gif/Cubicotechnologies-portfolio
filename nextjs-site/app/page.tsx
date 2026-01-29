@@ -4,6 +4,7 @@ import { motion, useInView } from 'framer-motion';
 import { useRef, useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import AnimatedCardsBackground from '@/components/AnimatedCardsBackground';
 
 // Animation variants
 const fadeInUp = {
@@ -129,58 +130,76 @@ export default function Home() {
   return (
     <div className="relative">
       {/* HERO SECTION */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
-        {/* Animated Background Gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-transparent to-cyan-900/20 animate-gradient" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(139,92,246,0.1),transparent_50%)]" />
+      <section className="relative h-screen flex items-center justify-center overflow-hidden">
+        {/* Animated Cards Background Layer */}
+        <AnimatedCardsBackground />
 
+        {/* Content Layer (Foreground) */}
         <motion.div
           initial="hidden"
           animate="visible"
           variants={staggerContainer}
-          className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 text-center"
+          className="relative z-20 max-w-3xl mx-auto px-8 lg:px-12 text-center"
         >
           <motion.h1
             variants={fadeInUp}
             className="text-6xl sm:text-7xl lg:text-8xl xl:text-9xl font-bold text-white mb-6 font-[family-name:var(--font-space-grotesk)]"
+            style={{
+              textShadow: '0 4px 24px rgba(0, 0, 0, 0.8), 0 2px 8px rgba(0, 0, 0, 0.9)',
+            }}
           >
-            WE ARE <span className="gradient-text">CUBICO</span>
+            WE ARE <span className="gradient-text drop-shadow-2xl">CUBICO</span>
           </motion.h1>
 
           <motion.p
             variants={fadeInUp}
-            className="text-xl sm:text-2xl lg:text-3xl text-gray-300 mb-8 max-w-4xl mx-auto"
+            className="text-xl sm:text-2xl lg:text-3xl text-white mb-8 font-medium"
+            style={{
+              textShadow: '0 2px 16px rgba(0, 0, 0, 0.8), 0 1px 4px rgba(0, 0, 0, 0.9)',
+            }}
           >
             Creating exceptional visual experiences for global brands
           </motion.p>
 
-          <motion.div variants={fadeInUp} className="mb-12">
-            <p className="text-sm sm:text-base lg:text-lg text-gray-400 mb-2">
+          <motion.div
+            variants={fadeInUp}
+            className="mb-10"
+            style={{
+              textShadow: '0 2px 12px rgba(0, 0, 0, 0.8)',
+            }}
+          >
+            <p className="text-base sm:text-lg lg:text-xl text-gray-200 font-medium">
               Digital Artwork | Brand Identity | Social Media Content | Videography
             </p>
           </motion.div>
 
           <motion.div
             variants={fadeInUp}
-            className="flex flex-wrap justify-center gap-4 sm:gap-8 mb-12 text-sm sm:text-base"
+            className="flex flex-wrap justify-center gap-4 sm:gap-6 lg:gap-8 mb-12 text-sm sm:text-base lg:text-lg"
+            style={{
+              textShadow: '0 2px 12px rgba(0, 0, 0, 0.9)',
+            }}
           >
-            <div className="text-gray-300">
-              <span className="font-bold text-white">100+</span> Projects
+            <div className="text-white font-semibold">
+              <span className="font-bold text-2xl gradient-text drop-shadow-lg">100+</span> Projects
             </div>
-            <div className="text-gray-400">•</div>
-            <div className="text-gray-300">
-              <span className="font-bold text-white">50+</span> Clients
+            <div className="text-gray-300 text-2xl">•</div>
+            <div className="text-white font-semibold">
+              <span className="font-bold text-2xl gradient-text drop-shadow-lg">50+</span> Clients
             </div>
-            <div className="text-gray-400">•</div>
-            <div className="text-gray-300">
-              <span className="font-bold text-white">5+</span> Years Excellence
+            <div className="text-gray-300 text-2xl">•</div>
+            <div className="text-white font-semibold">
+              <span className="font-bold text-2xl gradient-text drop-shadow-lg">5+</span> Years Excellence
             </div>
           </motion.div>
 
           <motion.div variants={fadeInUp}>
             <Link
               href="/portfolio"
-              className="inline-block px-8 py-4 bg-gradient-to-r from-purple-500 to-cyan-500 text-white font-semibold rounded-full hover:scale-105 transition-transform duration-300 shadow-lg shadow-purple-500/50"
+              className="inline-block px-10 py-5 bg-gradient-to-r from-purple-500 to-cyan-500 text-white text-lg font-bold rounded-full hover:scale-105 transition-all duration-300 shadow-2xl shadow-purple-500/50 hover:shadow-purple-500/70"
+              style={{
+                textShadow: '0 2px 8px rgba(0, 0, 0, 0.5)',
+              }}
             >
               View Our Work
             </Link>
@@ -191,14 +210,14 @@ export default function Home() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 1 }}
-          className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
+          transition={{ delay: 1.5 }}
+          className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20"
         >
-          <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center">
+          <div className="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center backdrop-blur-sm bg-black/20">
             <motion.div
               animate={{ y: [0, 12, 0] }}
               transition={{ duration: 1.5, repeat: Infinity }}
-              className="w-1.5 h-1.5 bg-white/60 rounded-full mt-2"
+              className="w-1.5 h-1.5 bg-white rounded-full mt-2 shadow-lg"
             />
           </div>
         </motion.div>
