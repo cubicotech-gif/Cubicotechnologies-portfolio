@@ -6,11 +6,10 @@ import Image from 'next/image';
 
 interface HeroImage {
   id: string;
-  cloudinary_id: string;
+  filename: string;
   category: string;
   order: number;
   active: boolean;
-  secure_url?: string;
 }
 
 interface Card {
@@ -72,12 +71,12 @@ export default function AnimatedCardsBackground() {
 
         for (let i = 0; i < count; i++) {
           if (hasImages) {
-            // Use real images - cycle through available images
+            // Use real images from /public/portfolio/hero/
             const imageIndex = (columnIndex * count + i) % heroImages.length;
             const image = heroImages[imageIndex];
             cards.push({
               type: 'image',
-              imageUrl: image.secure_url,
+              imageUrl: `/portfolio/hero/${image.filename}`,
               delay: i * 5,
               opacity: columnIndex === 2 ? 0.4 : 0.5, // Center column more transparent
             });

@@ -1,15 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs/promises';
 import path from 'path';
-import { uploadToCloudinary, deleteFromCloudinary } from '@/lib/cloudinary';
 
 export interface HeroImage {
   id: string;
-  cloudinary_id: string;
+  filename: string;
   category: string;
   order: number;
   active: boolean;
-  secure_url?: string;
 }
 
 const dataFilePath = path.join(process.cwd(), 'data', 'hero-images.json');
@@ -49,33 +47,29 @@ export async function GET() {
   }
 }
 
-// POST: Add new image
+// POST: Add new image entry
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { file, category, order } = body;
+    const { filename, category, order } = body;
 
-    if (!file || !category) {
+    if (!filename || !category) {
       return NextResponse.json(
-        { success: false, error: 'File and category are required' },
+        { success: false, error: 'Filename and category are required' },
         { status: 400 }
       );
     }
-
-    // Upload to Cloudinary
-    const uploadResult = await uploadToCloudinary(file);
 
     // Read current images
     const images = await readHeroImages();
 
     // Create new image entry
     const newImage: HeroImage = {
-      id: `hero-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
-      cloudinary_id: uploadResult.public_id,
+      id: `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
+      filename,
       category,
       order: order || images.length + 1,
       active: true,
-      secure_url: uploadResult.secure_url,
     };
 
     // Add to array and save
@@ -134,7 +128,7 @@ export async function PUT(request: NextRequest) {
   }
 }
 
-// DELETE: Remove image
+// DELETE: Remove image entry
 export async function DELETE(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -158,14 +152,14 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    // Delete from Cloudinary
-    await deleteFromCloudinary(imageToDelete.cloudinary_id);
-
-    // Remove from array
+    // Remove from array (file stays in /public/portfolio/hero/)
     const updatedImages = images.filter((img) => img.id !== id);
     await writeHeroImages(updatedImages);
 
-    return NextResponse.json({ success: true, message: 'Image deleted successfully' });
+    return NextResponse.json({
+      success: true,
+      message: 'Image removed from list. File remains in /public/portfolio/hero/'
+    });
   } catch (error) {
     console.error('DELETE Error:', error);
     return NextResponse.json(
