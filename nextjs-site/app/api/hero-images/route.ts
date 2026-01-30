@@ -1,20 +1,43 @@
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs/promises';
-import path from 'path';
 
 export interface HeroImage {
   id: string;
   filename: string;
+  url?: string; // Cloud storage URL (Cloudinary, etc.)
   category: string;
   order: number;
   active: boolean;
 }
 
-const dataFilePath = path.join(process.cwd(), 'data', 'hero-images.json');
+// In-memory storage for production (Vercel)
+let heroImagesCache: HeroImage[] = [];
+let cacheInitialized = false;
 
-// Helper: Read JSON file
+// Helper: Read hero images (with fallback for read-only filesystem)
 async function readHeroImages(): Promise<HeroImage[]> {
+  // On Vercel, use in-memory cache
+  if (process.env.VERCEL) {
+    if (!cacheInitialized) {
+      // Initialize with empty array on first load
+      cacheInitialized = true;
+      // Try to load from environment variable if set
+      const envData = process.env.HERO_IMAGES_DATA;
+      if (envData) {
+        try {
+          heroImagesCache = JSON.parse(envData);
+        } catch (e) {
+          console.error('Failed to parse HERO_IMAGES_DATA:', e);
+        }
+      }
+    }
+    return heroImagesCache;
+  }
+
+  // Local development: use JSON file
   try {
+    const fs = await import('fs/promises');
+    const path = await import('path');
+    const dataFilePath = path.join(process.cwd(), 'data', 'hero-images.json');
     const fileContent = await fs.readFile(dataFilePath, 'utf-8');
     return JSON.parse(fileContent);
   } catch (error) {
@@ -23,9 +46,25 @@ async function readHeroImages(): Promise<HeroImage[]> {
   }
 }
 
-// Helper: Write JSON file
+// Helper: Write hero images (with fallback for read-only filesystem)
 async function writeHeroImages(images: HeroImage[]): Promise<void> {
+  // On Vercel, use in-memory cache only
+  if (process.env.VERCEL) {
+    heroImagesCache = images;
+    console.log('Updated in-memory hero images cache (Vercel)');
+    return;
+  }
+
+  // Local development: write to JSON file
   try {
+    const fs = await import('fs/promises');
+    const path = await import('path');
+    const dataFilePath = path.join(process.cwd(), 'data', 'hero-images.json');
+
+    // Ensure data directory exists
+    const dataDir = path.join(process.cwd(), 'data');
+    await fs.mkdir(dataDir, { recursive: true });
+
     await fs.writeFile(dataFilePath, JSON.stringify(images, null, 2), 'utf-8');
   } catch (error) {
     console.error('Error writing hero-images.json:', error);
@@ -51,11 +90,11 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { filename, category, order } = body;
+    const { filename, url, category, order } = body;
 
-    if (!filename || !category) {
+    if ((!filename && !url) || !category) {
       return NextResponse.json(
-        { success: false, error: 'Filename and category are required' },
+        { success: false, error: 'Filename/URL and category are required' },
         { status: 400 }
       );
     }
@@ -66,7 +105,8 @@ export async function POST(request: NextRequest) {
     // Create new image entry
     const newImage: HeroImage = {
       id: `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
-      filename,
+      filename: filename || 'cloud-image',
+      url: url || undefined,
       category,
       order: order || images.length + 1,
       active: true,
@@ -152,13 +192,13 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    // Remove from array (file stays in /public/portfolio/hero/)
+    // Remove from array
     const updatedImages = images.filter((img) => img.id !== id);
     await writeHeroImages(updatedImages);
 
     return NextResponse.json({
       success: true,
-      message: 'Image removed from list. File remains in /public/portfolio/hero/'
+      message: 'Image removed from hero section'
     });
   } catch (error) {
     console.error('DELETE Error:', error);

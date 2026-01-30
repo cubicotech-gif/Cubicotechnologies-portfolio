@@ -6,6 +6,7 @@ import Image from 'next/image';
 interface HeroImage {
   id: string;
   filename: string;
+  url?: string; // Cloud storage URL
   category: string;
   order: number;
   active: boolean;
@@ -22,6 +23,7 @@ export default function AdminHeroPage() {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [filename, setFilename] = useState('');
+  const [imageUrl, setImageUrl] = useState(''); // Cloud URL
   const [category, setCategory] = useState('Logo Design');
   const [order, setOrder] = useState(1);
   const [message, setMessage] = useState('');
@@ -92,6 +94,7 @@ export default function AdminHeroPage() {
       if (data.success) {
         setMessage(`✅ File uploaded: ${data.filename}`);
         setFilename(data.filename);
+        setImageUrl(data.url || data.path); // Store cloud URL
         await fetchAvailableImages();
       } else {
         setMessage('❌ ' + (data.error || 'Upload failed'));
@@ -121,7 +124,7 @@ export default function AdminHeroPage() {
 
   // Add image to hero configuration
   const handleAdd = async () => {
-    if (!filename) {
+    if (!filename && !imageUrl) {
       setMessage('Please select or upload an image first');
       return;
     }
@@ -130,7 +133,12 @@ export default function AdminHeroPage() {
       const response = await fetch('/api/hero-images', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ filename, category, order }),
+        body: JSON.stringify({
+          filename,
+          url: imageUrl || undefined, // Include cloud URL if available
+          category,
+          order
+        }),
       });
 
       const data = await response.json();
@@ -138,6 +146,7 @@ export default function AdminHeroPage() {
       if (data.success) {
         setMessage('✅ Image added to hero section!');
         setFilename('');
+        setImageUrl('');
         setOrder(order + 1);
         await fetchImages();
       } else {
@@ -295,6 +304,7 @@ export default function AdminHeroPage() {
                     key={img.filename}
                     onClick={() => {
                       setFilename(img.filename);
+                      setImageUrl(img.path); // Set cloud URL
                       setMessage(`✅ Selected: ${img.filename}`);
                     }}
                     className={`cursor-pointer border-2 rounded-lg overflow-hidden transition-all hover:scale-105 ${
@@ -406,7 +416,7 @@ export default function AdminHeroPage() {
                   {/* Image Preview */}
                   <div className="aspect-[2/3] bg-black relative">
                     <Image
-                      src={`/images/hero/${image.filename}`}
+                      src={image.url || `/images/hero/${image.filename}`}
                       alt={image.category}
                       fill
                       className="object-cover"

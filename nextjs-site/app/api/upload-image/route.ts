@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFile, mkdir } from 'fs/promises';
-import { join } from 'path';
+import { v2 as cloudinary } from 'cloudinary';
 
-// Force Node.js runtime for file system operations
 export const runtime = 'nodejs';
+
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 export async function POST(request: NextRequest) {
   try {
@@ -43,40 +48,33 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create upload directory if it doesn't exist
-    const uploadDir = join(process.cwd(), 'public', 'images', 'hero');
-
-    try {
-      await mkdir(uploadDir, { recursive: true });
-    } catch (err: any) {
-      if (err.code !== 'EEXIST') {
-        console.error('Error creating directory:', err);
-        return NextResponse.json(
-          { success: false, error: 'Failed to create upload directory' },
-          { status: 500 }
-        );
-      }
-    }
+    // Convert file to base64 for Cloudinary upload
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+    const base64 = buffer.toString('base64');
+    const dataURI = `data:${file.type};base64,${base64}`;
 
     // Generate unique filename
     const timestamp = Date.now();
-    const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-    const filename = `${timestamp}-${sanitizedName}`;
-    const filepath = join(uploadDir, filename);
+    const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_').replace(/\.[^.]+$/, '');
+    const publicId = `hero/${timestamp}-${sanitizedName}`;
 
-    // Convert file to buffer and save
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
+    // Upload to Cloudinary
+    const result = await cloudinary.uploader.upload(dataURI, {
+      folder: 'hero',
+      public_id: `${timestamp}-${sanitizedName}`,
+      resource_type: 'auto',
+    });
 
-    await writeFile(filepath, buffer);
-
-    console.log(`File uploaded successfully: ${filename}`);
+    console.log(`File uploaded to Cloudinary: ${result.secure_url}`);
 
     return NextResponse.json({
       success: true,
-      filename: filename,
-      path: `/images/hero/${filename}`,
-      message: 'File uploaded successfully'
+      filename: `${timestamp}-${sanitizedName}${file.name.match(/\.[^.]+$/)?.[0] || ''}`,
+      url: result.secure_url,
+      path: result.secure_url,
+      publicId: result.public_id,
+      message: 'File uploaded successfully to Cloudinary'
     });
   } catch (error: any) {
     console.error('Upload error:', error);
@@ -87,38 +85,36 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET: List all images in the hero directory
+// GET: List all images from Cloudinary
 export async function GET() {
   try {
-    const { readdir, access } = await import('fs/promises');
-    const { extname } = await import('path');
-    const uploadDir = join(process.cwd(), 'public', 'images', 'hero');
+    const result = await cloudinary.api.resources({
+      type: 'upload',
+      prefix: 'hero/',
+      max_results: 100,
+    });
 
-    // Ensure directory exists
-    try {
-      await access(uploadDir);
-    } catch {
-      // Directory doesn't exist, return empty array
-      return NextResponse.json({ success: true, images: [] });
-    }
-
-    const files = await readdir(uploadDir);
-
-    // Filter out non-image files and README
-    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg'];
-    const images = files
-      .filter(file => {
-        const ext = extname(file).toLowerCase();
-        return imageExtensions.includes(ext) && file !== 'README.md';
-      })
-      .map(file => ({
-        filename: file,
-        path: `/images/hero/${file}`
-      }));
+    const images = result.resources.map((resource: any) => ({
+      filename: resource.public_id.replace('hero/', ''),
+      path: resource.secure_url,
+      url: resource.secure_url,
+      publicId: resource.public_id,
+      uploadedAt: resource.created_at,
+    }));
 
     return NextResponse.json({ success: true, images });
   } catch (error: any) {
     console.error('Error listing images:', error);
+
+    // If error is due to missing credentials, return empty array
+    if (error.message?.includes('Must supply api_key')) {
+      return NextResponse.json({
+        success: true,
+        images: [],
+        message: 'Cloudinary not configured. Please set environment variables.'
+      });
+    }
+
     return NextResponse.json(
       { success: false, error: `Failed to list images: ${error.message}` },
       { status: 500 }
