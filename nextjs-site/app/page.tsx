@@ -130,22 +130,18 @@ export default function Home() {
     {
       title: 'Artwork Designing',
       description: 'Digital products and custom illustrations crafted from scratch with meticulous attention to detail',
-      icon: '🎨',
     },
     {
       title: 'Branding & Graphics',
       description: 'Complete brand identities, logos, banners, and visual systems that tell your story',
-      icon: '✨',
     },
     {
       title: 'Social Media Graphics',
       description: 'Engaging posts, advertisements, and marketing content that captures attention',
-      icon: '📱',
     },
     {
       title: 'Videography',
       description: 'Reels, animations, and product videos that bring your vision to life',
-      icon: '🎬',
     },
   ];
 
@@ -367,51 +363,162 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SERVICES OVERVIEW SECTION */}
-      <section className="py-24 lg:py-32 relative bg-white/[0.02]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+      {/* SERVICES OVERVIEW SECTION - PREMIUM DESIGN */}
+      <section className="py-20 lg:py-32 relative bg-white/[0.02]">
+        <div className="max-w-7xl mx-auto px-8">
+          {/* Section Header */}
           <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
             variants={fadeInUp}
-            className="text-center mb-16"
+            className="text-center mb-20"
           >
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-4 font-[family-name:var(--font-space-grotesk)]">
+            <p className="text-xs uppercase tracking-widest text-gray-400 mb-4">
+              OUR SERVICES
+            </p>
+            <h2 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 bg-gradient-to-b from-white to-gray-500 bg-clip-text text-transparent font-[family-name:var(--font-space-grotesk)]">
               What We Create
             </h2>
-            <p className="text-gray-400 text-lg">
+            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
               Comprehensive creative solutions for your brand
             </p>
           </motion.div>
 
+          {/* Service Cards Grid */}
           <motion.div
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
+            viewport={{ once: true, margin: "-100px" }}
             variants={staggerContainer}
-            className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8"
+            className="grid grid-cols-1 md:grid-cols-2 gap-8"
           >
-            {services.map((service, index) => (
-              <motion.div
-                key={index}
-                variants={fadeInUp}
-                className="group relative p-8 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl hover:bg-white/10 transition-all duration-300 overflow-hidden"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-purple-500/0 via-cyan-500/0 to-purple-500/0 group-hover:from-purple-500/10 group-hover:via-cyan-500/10 group-hover:to-purple-500/10 transition-all duration-500" />
-                <div className="absolute inset-0 border-2 border-transparent group-hover:border-gradient-to-r group-hover:from-purple-500 group-hover:to-cyan-500 rounded-2xl transition-all duration-500 opacity-0 group-hover:opacity-100" />
+            {services.map((service, index) => {
+              const serviceNumber = String(index + 1).padStart(2, '0');
+              const gradients = [
+                'from-purple-600 via-purple-500 to-pink-500',
+                'from-blue-600 via-blue-500 to-cyan-500',
+                'from-orange-600 via-orange-500 to-yellow-500',
+                'from-pink-600 via-pink-500 to-purple-500',
+              ];
 
-                <div className="relative z-10">
-                  <div className="text-5xl mb-4">{service.icon}</div>
-                  <h3 className="text-2xl font-bold text-white mb-3 font-[family-name:var(--font-space-grotesk)]">
-                    {service.title}
-                  </h3>
-                  <p className="text-gray-400 leading-relaxed">
-                    {service.description}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
+              return (
+                <motion.article
+                  key={index}
+                  variants={fadeInUp}
+                  className="group relative bg-zinc-900/50 border border-white/5 rounded-3xl overflow-hidden backdrop-blur-sm hover:border-white/20 transition-all duration-500 hover:-translate-y-3 hover:scale-[1.02] hover:shadow-2xl hover:shadow-purple-500/20"
+                  style={{
+                    boxShadow: '0 4px 24px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.2)',
+                  }}
+                >
+                  {/* Image Area */}
+                  <div className="relative w-full overflow-hidden" style={{ aspectRatio: '16/9' }}>
+                    {/* Gradient Placeholder */}
+                    <div
+                      className={`absolute inset-0 bg-gradient-to-br ${gradients[index]} opacity-60 group-hover:opacity-80 transition-all duration-600`}
+                    />
+
+                    {/* Image will go here - For now, gradient with overlay */}
+                    <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-all duration-600" />
+
+                    {/* Zoom effect on hover */}
+                    <div
+                      className="absolute inset-0 bg-cover bg-center group-hover:scale-110 transition-transform duration-600 ease-out"
+                      style={{
+                        backgroundImage: `linear-gradient(135deg, ${gradients[index].split(' ').map(c => c.replace(/from-|via-|to-/, '')).join(', ')})`,
+                      }}
+                    />
+
+                    {/* Placeholder Text Overlay */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="text-center px-6">
+                        <p className="text-white/80 text-sm font-medium backdrop-blur-sm bg-black/30 px-4 py-2 rounded-lg">
+                          Service Image Placeholder
+                        </p>
+                        <p className="text-white/60 text-xs mt-2">
+                          Replace with real image
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Number Badge */}
+                    <div className="absolute top-6 left-6 z-10">
+                      <div
+                        className="w-12 h-12 rounded-full backdrop-blur-md bg-white/10 border border-white/20 flex items-center justify-center group-hover:scale-110 group-hover:bg-white/20 transition-all duration-400"
+                        style={{
+                          boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+                        }}
+                      >
+                        <span className="text-white font-bold text-base">
+                          {serviceNumber}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Hover Gradient Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  </div>
+
+                  {/* Content Area */}
+                  <div className="p-8">
+                    <h3 className="text-3xl lg:text-4xl font-bold text-white mb-3 tracking-tight group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-cyan-400 group-hover:bg-clip-text transition-all duration-400 font-[family-name:var(--font-space-grotesk)]">
+                      {service.title}
+                    </h3>
+
+                    <p className="text-gray-400 leading-relaxed mb-6 text-base">
+                      {service.description}
+                    </p>
+
+                    {/* Learn More Link */}
+                    <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide">
+                      <span className="bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
+                        Learn More
+                      </span>
+                      <svg
+                        className="w-4 h-4 text-purple-400 group-hover:translate-x-2 group-hover:-rotate-45 transition-all duration-300"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                      </svg>
+                    </div>
+                  </div>
+
+                  {/* Border Glow Effect on Hover */}
+                  <div className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
+                    <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-purple-500 via-cyan-500 to-purple-500 blur-xl opacity-30" />
+                  </div>
+                </motion.article>
+              );
+            })}
+          </motion.div>
+
+          {/* CTA Below Services */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.6, duration: 0.6 }}
+            className="text-center mt-20"
+          >
+            <h3 className="text-3xl lg:text-4xl font-bold text-white mb-6 font-[family-name:var(--font-space-grotesk)]">
+              Ready to Elevate Your Brand?
+            </h3>
+            <Link
+              href="/services"
+              className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-purple-500 to-cyan-500 text-white font-semibold rounded-full hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/50 transition-all duration-300 group"
+            >
+              <span>View All Services</span>
+              <svg
+                className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </Link>
           </motion.div>
         </div>
       </section>
