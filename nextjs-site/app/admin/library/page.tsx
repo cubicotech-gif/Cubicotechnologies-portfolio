@@ -241,35 +241,44 @@ export default function ImageLibraryPage() {
 
         {/* Usage Instructions */}
         <div className="mt-8 p-6 bg-blue-500/20 border border-blue-500/50 rounded-lg">
-          <h3 className="text-blue-400 font-semibold mb-3">How to Use</h3>
-          <ol className="text-blue-300 text-sm space-y-2 list-decimal list-inside">
-            <li>Upload all your images to this library</li>
-            <li>Go to the specific section admin page (Hero, Projects, or Logos)</li>
-            <li>Select an image from the library and assign it to that section</li>
-            <li>Each section will show you the required dimensions for best results</li>
-          </ol>
+          <h3 className="text-blue-400 font-semibold mb-3">✅ Next Step</h3>
+          <p className="text-blue-300 text-sm mb-4">
+            Images uploaded! Now assign them to different sections of your website.
+          </p>
+          <Link
+            href="/admin/assign"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-cyan-500 text-white font-bold rounded-lg hover:scale-105 transition-transform"
+          >
+            🎯 Assign Images to Sections
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </Link>
         </div>
 
-        {/* Quick Links */}
-        <div className="mt-6 flex flex-wrap gap-4">
-          <a
-            href="/admin/hero"
-            className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:scale-105 transition-transform"
-          >
-            🎨 Assign to Hero Section
-          </a>
-          <a
-            href="/admin/projects"
-            className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-lg hover:scale-105 transition-transform"
-          >
-            🚀 Assign to Projects
-          </a>
-          <a
-            href="/admin/logos"
-            className="px-6 py-3 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-lg hover:scale-105 transition-transform"
-          >
-            🏢 Assign to Client Logos
-          </a>
+        {/* Quick View Links */}
+        <div className="mt-6 p-4 bg-white/5 rounded-lg">
+          <p className="text-gray-400 text-sm mb-3">View assigned images:</p>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href="/admin/hero"
+              className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-sm rounded transition-colors"
+            >
+              🎨 Hero
+            </Link>
+            <Link
+              href="/admin/projects"
+              className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-sm rounded transition-colors"
+            >
+              🚀 Projects
+            </Link>
+            <Link
+              href="/admin/logos"
+              className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-sm rounded transition-colors"
+            >
+              🏢 Logos
+            </Link>
+          </div>
         </div>
       </div>
     </div>

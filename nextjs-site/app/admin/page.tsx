@@ -57,8 +57,16 @@ export default function AdminDashboard() {
       color: 'from-yellow-500 to-orange-500',
     },
     {
+      title: 'Assign Images',
+      description: 'Select images and assign them to website sections',
+      href: '/admin/assign',
+      icon: '🎯',
+      count: 0,
+      color: 'from-indigo-500 to-purple-500',
+    },
+    {
       title: 'Hero Images',
-      description: 'Manage animated background cards for the hero section',
+      description: 'View and manage hero section images',
       href: '/admin/hero',
       icon: '🎨',
       count: stats.heroImages,
@@ -66,7 +74,7 @@ export default function AdminDashboard() {
     },
     {
       title: 'Featured Projects',
-      description: 'Manage projects displayed in the homepage carousel',
+      description: 'View and manage featured projects',
       href: '/admin/projects',
       icon: '🚀',
       count: stats.featuredProjects,
@@ -74,7 +82,7 @@ export default function AdminDashboard() {
     },
     {
       title: 'Client Logos',
-      description: 'Manage client logos in the homepage marquee',
+      description: 'View and manage client logos',
       href: '/admin/logos',
       icon: '🏢',
       count: stats.clientLogos,
