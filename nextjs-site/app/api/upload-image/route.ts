@@ -3,33 +3,17 @@ import { supabaseAdmin } from '@/lib/supabase';
 
 export const runtime = 'nodejs';
 
-// Valid upload folders/categories
-const VALID_FOLDERS = [
-  'hero',        // Hero section animated background
-  'portfolio',   // Portfolio showcase items
-  'projects',    // Featured projects
-  'logos',       // Logo designs
-  'team',        // Team member photos
-  'general',     // Miscellaneous images
-] as const;
+// All images go to a single library folder
+const LIBRARY_FOLDER = 'library';
 
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const file = formData.get('file') as File;
-    const folder = (formData.get('folder') as string) || 'general';
 
     if (!file) {
       return NextResponse.json(
         { success: false, error: 'No file provided' },
-        { status: 400 }
-      );
-    }
-
-    // Validate folder
-    if (!VALID_FOLDERS.includes(folder as any)) {
-      return NextResponse.json(
-        { success: false, error: `Invalid folder. Must be one of: ${VALID_FOLDERS.join(', ')}` },
         { status: 400 }
       );
     }
@@ -64,13 +48,13 @@ export async function POST(request: NextRequest) {
     const timestamp = Date.now();
     const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
     const filename = `${timestamp}-${sanitizedName}`;
-    const filePath = `${folder}/${filename}`;
+    const filePath = `${LIBRARY_FOLDER}/${filename}`;
 
     // Convert file to buffer
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Upload to Supabase Storage (all images go to 'images' bucket)
+    // Upload to Supabase Storage (all images go to 'images' bucket, 'library' folder)
     const { data, error } = await supabaseAdmin.storage
       .from('images')
       .upload(filePath, buffer, {
@@ -93,15 +77,14 @@ export async function POST(request: NextRequest) {
 
     const publicUrl = publicUrlData.publicUrl;
 
-    console.log(`File uploaded to Supabase Storage: ${publicUrl}`);
+    console.log(`File uploaded to image library: ${publicUrl}`);
 
     return NextResponse.json({
       success: true,
       filename: filename,
-      folder: folder,
       url: publicUrl,
       path: publicUrl,
-      message: `File uploaded successfully to ${folder} folder`
+      message: 'File uploaded successfully to image library'
     });
   } catch (error: any) {
     console.error('Upload error:', error);
@@ -112,25 +95,15 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET: List all images from Supabase Storage
+// GET: List all images from the library
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    const folder = searchParams.get('folder') || '';
-
-    // Validate folder if provided
-    if (folder && !VALID_FOLDERS.includes(folder as any)) {
-      return NextResponse.json(
-        { success: false, error: `Invalid folder. Must be one of: ${VALID_FOLDERS.join(', ')}` },
-        { status: 400 }
-      );
-    }
-
     const { data: files, error } = await supabaseAdmin.storage
       .from('images')
-      .list(folder, {
-        limit: 100,
+      .list(LIBRARY_FOLDER, {
+        limit: 1000,
         offset: 0,
+        sortBy: { column: 'created_at', order: 'desc' }
       });
 
     if (error) {
@@ -147,20 +120,21 @@ export async function GET(request: NextRequest) {
         return file.name && /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(file.name);
       })
       .map(file => {
-        const filePath = folder ? `${folder}/${file.name}` : file.name;
+        const filePath = `${LIBRARY_FOLDER}/${file.name}`;
         const { data: publicUrlData } = supabaseAdmin.storage
           .from('images')
           .getPublicUrl(filePath);
 
         return {
           filename: file.name,
-          folder: folder,
           path: publicUrlData.publicUrl,
           url: publicUrlData.publicUrl,
+          created_at: file.created_at,
+          size: file.metadata?.size || 0,
         };
       });
 
-    return NextResponse.json({ success: true, images, folder });
+    return NextResponse.json({ success: true, images, total: images.length });
   } catch (error: any) {
     console.error('Error listing images:', error);
 

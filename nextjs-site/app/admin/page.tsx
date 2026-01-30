@@ -49,6 +49,14 @@ export default function AdminDashboard() {
 
   const adminSections = [
     {
+      title: 'Image Library',
+      description: 'Upload and manage all your images in one place',
+      href: '/admin/library',
+      icon: '📚',
+      count: 0,
+      color: 'from-yellow-500 to-orange-500',
+    },
+    {
       title: 'Hero Images',
       description: 'Manage animated background cards for the hero section',
       href: '/admin/hero',

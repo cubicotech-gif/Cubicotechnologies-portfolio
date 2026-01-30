@@ -1,35 +1,34 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 interface HeroImage {
   id: string;
   filename: string;
-  url?: string; // Cloud storage URL
+  url?: string;
   category: string;
   order: number;
   active: boolean;
 }
 
-interface AvailableImage {
+interface LibraryImage {
   filename: string;
+  url: string;
   path: string;
 }
 
 export default function AdminHeroPage() {
   const [images, setImages] = useState<HeroImage[]>([]);
-  const [availableImages, setAvailableImages] = useState<AvailableImage[]>([]);
+  const [libraryImages, setLibraryImages] = useState<LibraryImage[]>([]);
   const [loading, setLoading] = useState(false);
-  const [uploading, setUploading] = useState(false);
+  const [imageUrl, setImageUrl] = useState('');
   const [filename, setFilename] = useState('');
-  const [imageUrl, setImageUrl] = useState(''); // Cloud URL
   const [category, setCategory] = useState('Logo Design');
-  const [uploadFolder, setUploadFolder] = useState('hero'); // Which folder to upload to
   const [order, setOrder] = useState(1);
   const [message, setMessage] = useState('');
   const [showImageBrowser, setShowImageBrowser] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const categories = [
     'Logo Design',
@@ -39,14 +38,13 @@ export default function AdminHeroPage() {
     'Branding',
   ];
 
-  const uploadFolders = [
-    { value: 'hero', label: 'Hero Background', description: 'Animated background cards' },
-    { value: 'portfolio', label: 'Portfolio Items', description: 'Portfolio showcase' },
-    { value: 'projects', label: 'Featured Projects', description: 'Main project images' },
-    { value: 'logos', label: 'Logo Designs', description: 'Logo showcase' },
-    { value: 'team', label: 'Team Members', description: 'Team photos' },
-    { value: 'general', label: 'General', description: 'Miscellaneous images' },
-  ];
+  // Required dimensions for hero section
+  const REQUIRED_DIMENSIONS = {
+    width: 200,
+    height: 280,
+    aspectRatio: '2:3',
+    description: 'Vertical portrait images work best for animated background cards'
+  };
 
   // Fetch hero images configuration
   const fetchImages = async () => {
@@ -65,78 +63,28 @@ export default function AdminHeroPage() {
     }
   };
 
-  // Fetch available images from directory
-  const fetchAvailableImages = async () => {
+  // Fetch library images
+  const fetchLibraryImages = async () => {
     try {
-      const response = await fetch(`/api/upload-image?folder=${uploadFolder}`);
+      const response = await fetch('/api/upload-image');
       const data = await response.json();
       if (data.success) {
-        setAvailableImages(data.images);
+        setLibraryImages(data.images);
       }
     } catch (error) {
-      console.error('Error fetching available images:', error);
+      console.error('Error fetching library images:', error);
     }
   };
 
   useEffect(() => {
     fetchImages();
-    fetchAvailableImages();
-  }, [uploadFolder]); // Re-fetch when folder changes
-
-  // Handle file upload
-  const handleFileUpload = async (file: File) => {
-    if (!file) return;
-
-    setUploading(true);
-    setMessage('Uploading...');
-
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('folder', uploadFolder); // Include folder selection
-
-      const response = await fetch('/api/upload-image', {
-        method: 'POST',
-        body: formData,
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        setMessage(`✅ File uploaded to ${data.folder}: ${data.filename}`);
-        setFilename(data.filename);
-        setImageUrl(data.url || data.path); // Store cloud URL
-        await fetchAvailableImages();
-      } else {
-        setMessage('❌ ' + (data.error || 'Upload failed'));
-      }
-    } catch (error) {
-      console.error('Upload error:', error);
-      setMessage('❌ Failed to upload file');
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  // Handle drag and drop
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    const file = e.dataTransfer.files[0];
-    if (file && file.type.startsWith('image/')) {
-      handleFileUpload(file);
-    } else {
-      setMessage('❌ Please drop an image file');
-    }
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-  };
+    fetchLibraryImages();
+  }, []);
 
   // Add image to hero configuration
   const handleAdd = async () => {
     if (!filename && !imageUrl) {
-      setMessage('Please select or upload an image first');
+      setMessage('Please select an image from the library first');
       return;
     }
 
@@ -146,7 +94,7 @@ export default function AdminHeroPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           filename,
-          url: imageUrl || undefined, // Include cloud URL if available
+          url: imageUrl,
           category,
           order
         }),
@@ -248,7 +196,7 @@ export default function AdminHeroPage() {
           Hero Images Manager
         </h1>
         <p className="text-gray-400 mb-8">
-          Upload and manage images for the hero section animated background
+          Select images from your library for the hero section animated background
         </p>
 
         {/* Message */}
@@ -258,101 +206,82 @@ export default function AdminHeroPage() {
           </div>
         )}
 
-        {/* Upload Section */}
+        {/* Dimension Requirements */}
+        <div className="glass rounded-2xl p-6 mb-8 border-l-4 border-purple-500">
+          <h2 className="text-xl font-bold text-white mb-3">📐 Recommended Image Dimensions</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="text-center p-3 bg-white/5 rounded-lg">
+              <p className="text-gray-400 text-sm">Width</p>
+              <p className="text-white font-bold text-lg">{REQUIRED_DIMENSIONS.width}px</p>
+            </div>
+            <div className="text-center p-3 bg-white/5 rounded-lg">
+              <p className="text-gray-400 text-sm">Height</p>
+              <p className="text-white font-bold text-lg">{REQUIRED_DIMENSIONS.height}px</p>
+            </div>
+            <div className="text-center p-3 bg-white/5 rounded-lg">
+              <p className="text-gray-400 text-sm">Aspect Ratio</p>
+              <p className="text-white font-bold text-lg">{REQUIRED_DIMENSIONS.aspectRatio}</p>
+            </div>
+            <div className="text-center p-3 bg-white/5 rounded-lg">
+              <p className="text-gray-400 text-sm">Orientation</p>
+              <p className="text-white font-bold text-lg">Portrait</p>
+            </div>
+          </div>
+          <p className="text-gray-400 text-sm mt-4">💡 {REQUIRED_DIMENSIONS.description}</p>
+        </div>
+
+        {/* Select from Library */}
         <div className="glass rounded-2xl p-6 mb-8">
-          <h2 className="text-2xl font-bold text-white mb-4">Step 1: Upload Image</h2>
-
-          {/* Folder Selector */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Upload To Folder:
-            </label>
-            <select
-              value={uploadFolder}
-              onChange={(e) => setUploadFolder(e.target.value)}
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-              style={{ colorScheme: 'dark' }}
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl font-bold text-white">Step 1: Select Image from Library</h2>
+            <Link
+              href="/admin/library"
+              className="px-4 py-2 bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 rounded-lg transition-colors"
             >
-              {uploadFolders.map((folder) => (
-                <option
-                  key={folder.value}
-                  value={folder.value}
-                  className="bg-gray-900 text-white"
-                >
-                  {folder.label} - {folder.description}
-                </option>
-              ))}
-            </select>
-            <p className="text-xs text-gray-500 mt-2">
-              Select where this image will be used. Different folders for different purposes.
-            </p>
+              📚 Go to Library
+            </Link>
           </div>
 
-          {/* Drag and Drop Zone */}
-          <div
-            onDrop={handleDrop}
-            onDragOver={handleDragOver}
-            className="border-2 border-dashed border-purple-500/50 rounded-xl p-12 text-center hover:border-purple-500 transition-colors cursor-pointer"
-            onClick={() => fileInputRef.current?.click()}
+          <button
+            onClick={() => {
+              setShowImageBrowser(!showImageBrowser);
+              if (!showImageBrowser) fetchLibraryImages();
+            }}
+            className="w-full px-4 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors mb-4"
           >
-            <div className="space-y-4">
-              <div className="text-6xl">📤</div>
-              <div>
-                <p className="text-xl text-white font-semibold mb-2">
-                  Drag & Drop or Click to Upload
-                </p>
-                <p className="text-gray-400 text-sm">
-                  Supports: JPG, PNG, GIF, WebP, SVG
-                </p>
-              </div>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) handleFileUpload(file);
-                }}
-                className="hidden"
-              />
-            </div>
-          </div>
+            {showImageBrowser ? '▼ Hide' : '▶ Show'} Image Library ({libraryImages.length} images)
+          </button>
 
-          {uploading && (
-            <div className="mt-4 text-center">
-              <div className="inline-block w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
-              <p className="text-gray-400 mt-2">Uploading...</p>
-            </div>
-          )}
-
-          {/* Available Images Browser */}
-          <div className="mt-6">
-            <button
-              onClick={() => setShowImageBrowser(!showImageBrowser)}
-              className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors"
-            >
-              {showImageBrowser ? '▼ Hide' : '▶ Show'} Available Images ({availableImages.length})
-            </button>
-
-            {showImageBrowser && (
-              <div className="mt-4 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 max-h-96 overflow-y-auto p-4 bg-black/20 rounded-lg">
-                {availableImages.map((img) => (
+          {showImageBrowser && (
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 max-h-96 overflow-y-auto p-4 bg-black/20 rounded-lg">
+              {libraryImages.length === 0 ? (
+                <div className="col-span-full text-center py-8">
+                  <p className="text-gray-400 mb-4">No images in library yet</p>
+                  <Link
+                    href="/admin/library"
+                    className="px-6 py-3 bg-purple-500 hover:bg-purple-600 text-white rounded-lg inline-block"
+                  >
+                    Upload Images to Library
+                  </Link>
+                </div>
+              ) : (
+                libraryImages.map((img) => (
                   <div
                     key={img.filename}
                     onClick={() => {
                       setFilename(img.filename);
-                      setImageUrl(img.path); // Set cloud URL
+                      setImageUrl(img.url);
                       setMessage(`✅ Selected: ${img.filename}`);
                     }}
                     className={`cursor-pointer border-2 rounded-lg overflow-hidden transition-all hover:scale-105 ${
-                      filename === img.filename
+                      imageUrl === img.url
                         ? 'border-purple-500 shadow-lg shadow-purple-500/50'
                         : 'border-white/10 hover:border-white/30'
                     }`}
                   >
                     <div className="aspect-square relative bg-black">
                       <Image
-                        src={img.path}
+                        src={img.url}
                         alt={img.filename}
                         fill
                         className="object-cover"
@@ -362,15 +291,15 @@ export default function AdminHeroPage() {
                       {img.filename}
                     </p>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
+                ))
+              )}
+            </div>
+          )}
         </div>
 
         {/* Add to Hero Section */}
         <div className="glass rounded-2xl p-6 mb-8">
-          <h2 className="text-2xl font-bold text-white mb-4">Step 2: Add to Hero Section</h2>
+          <h2 className="text-2xl font-bold text-white mb-4">Step 2: Configure & Add to Hero</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
@@ -381,7 +310,7 @@ export default function AdminHeroPage() {
                 type="text"
                 value={filename}
                 readOnly
-                placeholder="Upload or select an image above"
+                placeholder="Select an image above"
                 className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none"
               />
             </div>
@@ -394,9 +323,10 @@ export default function AdminHeroPage() {
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
                 className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                style={{ colorScheme: 'dark' }}
               >
                 {categories.map((cat) => (
-                  <option key={cat} value={cat}>
+                  <option key={cat} value={cat} className="bg-gray-900 text-white">
                     {cat}
                   </option>
                 ))}
@@ -405,7 +335,7 @@ export default function AdminHeroPage() {
 
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                Order
+                Display Order
               </label>
               <input
                 type="number"
