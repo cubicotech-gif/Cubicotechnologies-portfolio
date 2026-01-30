@@ -144,7 +144,10 @@ export default function ImageLibraryPage() {
                   Drag & Drop or Click to Upload
                 </p>
                 <p className="text-gray-400 text-sm">
-                  Supports: JPG, PNG, GIF, WebP, SVG (Max 10MB)
+                  Supports: JPG, PNG, GIF, WebP, SVG (Max 50MB)
+                </p>
+                <p className="text-gray-500 text-xs mt-1">
+                  Upload HD/high-resolution images - quality is preserved
                 </p>
               </div>
               <input

@@ -66,15 +66,47 @@ export default function AnimatedCardsBackground() {
     const generateColumns = () => {
       const hasImages = heroImages.length > 0;
 
-      // Distribute images across columns or use gradients
+      // Shuffle array helper
+      const shuffleArray = (array: any[], seed: number) => {
+        const shuffled = [...array];
+        let currentIndex = shuffled.length;
+        let randomIndex;
+
+        // Use seed for deterministic but varied shuffling per column
+        const random = (max: number) => {
+          seed = (seed * 9301 + 49297) % 233280;
+          return (seed / 233280) * max;
+        };
+
+        while (currentIndex !== 0) {
+          randomIndex = Math.floor(random(currentIndex));
+          currentIndex--;
+          [shuffled[currentIndex], shuffled[randomIndex]] = [shuffled[randomIndex], shuffled[currentIndex]];
+        }
+
+        return shuffled;
+      };
+
+      // Distribute images across columns with better variety
       const getCardsForColumn = (columnIndex: number, count: number): Card[] => {
         const cards: Card[] = [];
 
-        for (let i = 0; i < count; i++) {
-          if (hasImages) {
-            // Use real images (cloud URLs or local paths)
-            const imageIndex = (columnIndex * count + i) % heroImages.length;
-            const image = heroImages[imageIndex];
+        if (hasImages) {
+          // Create a shuffled array of images for this column
+          // Each column gets a different shuffle using columnIndex as seed
+          const shuffledImages = shuffleArray(heroImages, columnIndex * 1000);
+
+          // Create enough cards by repeating the shuffled array
+          const repeatsNeeded = Math.ceil(count / shuffledImages.length);
+          const extendedImages = [];
+          for (let r = 0; r < repeatsNeeded; r++) {
+            // Re-shuffle for each repeat with different seed
+            const reshuffled = shuffleArray(shuffledImages, (columnIndex + r) * 1000);
+            extendedImages.push(...reshuffled);
+          }
+
+          for (let i = 0; i < count; i++) {
+            const image = extendedImages[i];
             const imageUrl = image.url || `/images/hero/${image.filename}`;
             cards.push({
               type: 'image',
@@ -82,8 +114,10 @@ export default function AnimatedCardsBackground() {
               delay: i * 5,
               opacity: columnIndex === 2 ? 0.4 : 0.5, // Center column more transparent
             });
-          } else {
-            // Use gradient fallbacks
+          }
+        } else {
+          // Use gradient fallbacks
+          for (let i = 0; i < count; i++) {
             const gradientIndex = (columnIndex * count + i) % fallbackGradients.length;
             cards.push({
               type: 'gradient',
@@ -98,40 +132,40 @@ export default function AnimatedCardsBackground() {
       };
 
       const newColumns: CardColumn[] = [
-        // Column 1 - Far Left (Moves UP)
+        // Column 1 - Far Left (Moves UP) - More cards
         {
           position: '5%',
           direction: 'up',
-          duration: 40,
-          cards: getCardsForColumn(0, 5),
+          duration: 50,
+          cards: getCardsForColumn(0, 8),
         },
-        // Column 2 - Left Center (Moves DOWN)
+        // Column 2 - Left Center (Moves DOWN) - More cards
         {
           position: '25%',
           direction: 'down',
-          duration: 35,
-          cards: getCardsForColumn(1, 5),
+          duration: 45,
+          cards: getCardsForColumn(1, 8),
         },
-        // Column 3 - Center (Moves UP - Sparse/Fewer cards)
+        // Column 3 - Center (Moves UP - Still sparse)
         {
           position: '50%',
           direction: 'up',
-          duration: 45,
-          cards: getCardsForColumn(2, 3),
+          duration: 55,
+          cards: getCardsForColumn(2, 5),
         },
-        // Column 4 - Right Center (Moves DOWN)
+        // Column 4 - Right Center (Moves DOWN) - More cards
         {
           position: '75%',
           direction: 'down',
-          duration: 38,
-          cards: getCardsForColumn(3, 5),
+          duration: 48,
+          cards: getCardsForColumn(3, 8),
         },
-        // Column 5 - Far Right (Moves UP)
+        // Column 5 - Far Right (Moves UP) - More cards
         {
           position: '95%',
           direction: 'up',
-          duration: 42,
-          cards: getCardsForColumn(4, 5),
+          duration: 52,
+          cards: getCardsForColumn(4, 8),
         },
       ];
 
@@ -161,23 +195,24 @@ export default function AnimatedCardsBackground() {
           >
             <motion.div
               animate={{
-                y: column.direction === 'up' ? [0, -2000] : [0, 2000],
+                y: column.direction === 'up' ? ['0%', '-50%'] : ['0%', '50%'],
               }}
               transition={{
                 duration: column.duration,
                 repeat: Infinity,
                 ease: 'linear',
+                repeatType: 'loop',
               }}
               className="flex flex-col gap-5"
             >
-              {/* Duplicate cards for seamless loop */}
-              {[...column.cards, ...column.cards, ...column.cards].map((card, cardIndex) => (
+              {/* Duplicate cards 4 times for seamless infinite scroll */}
+              {[...column.cards, ...column.cards, ...column.cards, ...column.cards].map((card, cardIndex) => (
                 <motion.div
                   key={cardIndex}
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: card.opacity, scale: 1 }}
                   transition={{ delay: card.delay * 0.1, duration: 0.8 }}
-                  className="w-[200px] h-[280px] rounded-2xl backdrop-blur-sm overflow-hidden relative"
+                  className="w-[200px] h-[280px] rounded-2xl backdrop-blur-sm overflow-hidden relative flex-shrink-0"
                   style={{
                     backdropFilter: 'blur(4px)',
                     boxShadow: '0 8px 32px 0 rgba(139, 92, 246, 0.2)',
@@ -190,6 +225,15 @@ export default function AnimatedCardsBackground() {
                       fill
                       className="object-cover"
                       sizes="200px"
+                      quality={100}
+                      priority={cardIndex < column.cards.length}
+                      onError={(e) => {
+                        // Hide broken images
+                        const target = e.target as HTMLElement;
+                        if (target.parentElement) {
+                          target.parentElement.style.display = 'none';
+                        }
+                      }}
                     />
                   ) : (
                     <div className={`w-full h-full bg-gradient-to-br ${card.gradient}`} />
@@ -216,22 +260,24 @@ export default function AnimatedCardsBackground() {
             >
               <motion.div
                 animate={{
-                  y: column.direction === 'up' ? [0, -2000] : [0, 2000],
+                  y: column.direction === 'up' ? ['0%', '-50%'] : ['0%', '50%'],
                 }}
                 transition={{
                   duration: column.duration,
                   repeat: Infinity,
                   ease: 'linear',
+                  repeatType: 'loop',
                 }}
                 className="flex flex-col gap-4"
               >
-                {[...column.cards, ...column.cards, ...column.cards].map((card, cardIndex) => (
+                {/* Duplicate cards 4 times for seamless infinite scroll */}
+                {[...column.cards, ...column.cards, ...column.cards, ...column.cards].map((card, cardIndex) => (
                   <motion.div
                     key={cardIndex}
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: card.opacity * 0.7, scale: 1 }}
                     transition={{ delay: card.delay * 0.1, duration: 0.8 }}
-                    className="w-[140px] h-[200px] rounded-xl backdrop-blur-sm overflow-hidden relative"
+                    className="w-[140px] h-[200px] rounded-xl backdrop-blur-sm overflow-hidden relative flex-shrink-0"
                     style={{
                       backdropFilter: 'blur(3px)',
                       boxShadow: '0 4px 24px 0 rgba(139, 92, 246, 0.15)',
@@ -244,6 +290,14 @@ export default function AnimatedCardsBackground() {
                         fill
                         className="object-cover"
                         sizes="140px"
+                        quality={100}
+                        onError={(e) => {
+                          // Hide broken images
+                          const target = e.target as HTMLElement;
+                          if (target.parentElement) {
+                            target.parentElement.style.display = 'none';
+                          }
+                        }}
                       />
                     ) : (
                       <div className={`w-full h-full bg-gradient-to-br ${card.gradient}`} />

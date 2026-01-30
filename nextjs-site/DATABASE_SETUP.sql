@@ -101,7 +101,36 @@ CREATE POLICY "Service role full access" ON client_logos
   FOR ALL USING (auth.role() = 'service_role');
 
 -- ===================================================================
--- STORAGE POLICIES (Run only if not already created)
+-- 4. SITE SETTINGS TABLE (Logo, Favicon, etc.)
+-- ===================================================================
+CREATE TABLE IF NOT EXISTS site_settings (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  key TEXT UNIQUE NOT NULL,
+  value TEXT NOT NULL,
+  type TEXT DEFAULT 'Main Logo',
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Index for performance
+CREATE INDEX IF NOT EXISTS idx_site_settings_key ON site_settings(key);
+
+-- Enable Row Level Security
+ALTER TABLE site_settings ENABLE ROW LEVEL SECURITY;
+
+-- Drop existing policies if they exist
+DROP POLICY IF EXISTS "Public read access" ON site_settings;
+DROP POLICY IF EXISTS "Service role full access" ON site_settings;
+
+-- Policies
+CREATE POLICY "Public read access" ON site_settings
+  FOR SELECT USING (true);
+
+CREATE POLICY "Service role full access" ON site_settings
+  FOR ALL USING (auth.role() = 'service_role');
+
+-- ===================================================================
+-- 5. STORAGE POLICIES (Run only if not already created)
 -- ===================================================================
 
 -- Allow public to read all images
@@ -163,7 +192,7 @@ END $$;
 SELECT 'Tables Created:' as status;
 SELECT table_name FROM information_schema.tables
 WHERE table_schema = 'public'
-AND table_name IN ('hero_images', 'featured_projects', 'client_logos');
+AND table_name IN ('hero_images', 'featured_projects', 'client_logos', 'site_settings');
 
 -- Check storage policies
 SELECT 'Storage Policies:' as status;
@@ -177,6 +206,6 @@ ORDER BY policyname;
 -- ===================================================================
 SELECT
   '✅ Database setup complete!' as message,
-  'Tables: hero_images, featured_projects, client_logos' as tables,
+  'Tables: hero_images, featured_projects, client_logos, site_settings' as tables,
   'Storage: images bucket with read/write/delete policies' as storage,
   'Security: RLS enabled on all tables' as security;

@@ -49,6 +49,22 @@ interface ImageSection {
 
 // Define all image sections/placements on the website
 const IMAGE_SECTIONS: Record<string, ImageSection> = {
+  logo: {
+    id: 'logo',
+    name: 'Site Logo',
+    description: 'Main Cubico logo for navigation header',
+    icon: '🏷️',
+    dimensions: {
+      width: 200,
+      height: 60,
+      aspectRatio: '3:1 (Landscape)',
+      note: 'PNG or SVG with transparent background. Shows in navbar. Recommended: White/light colored logo for dark background.'
+    },
+    apiEndpoint: '/api/site-settings',
+    extraFields: [
+      { name: 'type', label: 'Logo Type', type: 'select', options: ['Main Logo', 'Alternate Logo', 'Favicon'], required: true }
+    ]
+  },
   hero: {
     id: 'hero',
     name: 'Hero Background',
@@ -162,7 +178,12 @@ export default function UnifiedImageManager() {
       };
 
       // Add section-specific fields
-      if (currentSection.id === 'hero') {
+      if (currentSection.id === 'logo') {
+        requestBody = {
+          url: selectedImage.url,
+          type: extraFieldValues.type || 'Main Logo',
+        };
+      } else if (currentSection.id === 'hero') {
         requestBody.category = extraFieldValues.category;
       } else if (currentSection.id === 'projects') {
         requestBody.title = extraFieldValues.title;
