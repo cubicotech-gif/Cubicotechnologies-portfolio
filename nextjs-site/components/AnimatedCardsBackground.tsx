@@ -71,12 +71,12 @@ export default function AnimatedCardsBackground() {
 
         for (let i = 0; i < count; i++) {
           if (hasImages) {
-            // Use real images from /public/portfolio/hero/
+            // Use real images from /public/images/hero/
             const imageIndex = (columnIndex * count + i) % heroImages.length;
             const image = heroImages[imageIndex];
             cards.push({
               type: 'image',
-              imageUrl: `/portfolio/hero/${image.filename}`,
+              imageUrl: `/images/hero/${image.filename}`,
               delay: i * 5,
               opacity: columnIndex === 2 ? 0.4 : 0.5, // Center column more transparent
             });
