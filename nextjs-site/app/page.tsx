@@ -79,6 +79,7 @@ export default function Home() {
   const [clientLogos, setClientLogos] = useState<ClientLogo[]>([]);
   const [loadingProjects, setLoadingProjects] = useState(true);
   const [loadingLogos, setLoadingLogos] = useState(true);
+  const [expandedCard, setExpandedCard] = useState<number | null>(null);
 
   // Fetch featured projects from API
   useEffect(() => {
@@ -126,27 +127,75 @@ export default function Home() {
     fetchLogos();
   }, []);
 
-  const services = [
+  const servicesData = [
     {
+      id: 1,
+      number: '01',
       title: 'Artwork Designing',
-      description: 'Digital products and custom illustrations crafted from scratch with meticulous attention to detail',
-      icon: '🎨',
+      category: 'Digital Art',
+      shortDesc: 'Digital products and custom illustrations crafted from scratch',
+      fullDesc: 'Digital products and custom illustrations crafted from scratch with meticulous attention to detail. We transform ideas into stunning visual assets.',
+      gradient: 'from-purple-600 via-purple-500 to-pink-500',
+      features: [
+        'Custom digital illustrations',
+        'Print-ready artwork files',
+        'Unique visual concepts',
+        'Scalable vector graphics',
+        'Unlimited revisions',
+        'Fast turnaround time'
+      ]
     },
     {
+      id: 2,
+      number: '02',
       title: 'Branding & Graphics',
-      description: 'Complete brand identities, logos, banners, and visual systems that tell your story',
-      icon: '✨',
+      category: 'Brand Identity',
+      shortDesc: 'Complete brand identities and visual systems',
+      fullDesc: 'Complete brand identities, logos, banners, and visual systems that tell your story and differentiate you from competitors.',
+      gradient: 'from-blue-600 via-blue-500 to-cyan-500',
+      features: [
+        'Logo design & variations',
+        'Brand style guides',
+        'Marketing collateral',
+        'Print & digital assets',
+        'Brand strategy consultation',
+        'Social media templates'
+      ]
     },
     {
+      id: 3,
+      number: '03',
       title: 'Social Media Graphics',
-      description: 'Engaging posts, advertisements, and marketing content that captures attention',
-      icon: '📱',
+      category: 'Social Media',
+      shortDesc: 'Engaging content for all platforms',
+      fullDesc: 'Engaging posts, advertisements, and marketing content designed to capture attention and drive engagement across all platforms.',
+      gradient: 'from-orange-600 via-orange-500 to-yellow-500',
+      features: [
+        'Instagram & Facebook posts',
+        'Story & reel templates',
+        'Ad creative design',
+        'Carousel posts',
+        'Content calendar support',
+        'Platform optimization'
+      ]
     },
     {
+      id: 4,
+      number: '04',
       title: 'Videography',
-      description: 'Reels, animations, and product videos that bring your vision to life',
-      icon: '🎬',
-    },
+      category: 'Motion Design',
+      shortDesc: 'Professional videos and animations',
+      fullDesc: 'Reels, animations, and product videos that bring your vision to life with professional motion graphics and editing.',
+      gradient: 'from-pink-600 via-pink-500 to-purple-500',
+      features: [
+        'Social media reels',
+        'Product demo videos',
+        'Motion graphics',
+        'Video editing & color grading',
+        'Animation & effects',
+        'Multi-format export'
+      ]
+    }
   ];
 
   const stats = [
@@ -367,53 +416,226 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SERVICES OVERVIEW SECTION */}
-      <section className="py-24 lg:py-32 relative bg-white/[0.02]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+      {/* EXPANDABLE SPLIT CARDS SERVICES SECTION */}
+      <section className="relative bg-black py-32">
+        {/* Section Header */}
+        <div className="max-w-7xl mx-auto px-8 pb-16">
           <motion.div
-            initial="hidden"
-            whileInView="visible"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            variants={fadeInUp}
-            className="text-center mb-16"
+            transition={{ duration: 0.8 }}
+            className="text-center"
           >
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-4 font-[family-name:var(--font-space-grotesk)]">
+            <p className="text-xs uppercase tracking-widest text-gray-400 mb-4">
+              OUR SERVICES
+            </p>
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 text-white font-[family-name:var(--font-space-grotesk)]">
               What We Create
             </h2>
-            <p className="text-gray-400 text-lg">
-              Comprehensive creative solutions for your brand
+            <p className="text-xl text-gray-400 mt-4">
+              Click to explore each service in detail
             </p>
           </motion.div>
-
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={staggerContainer}
-            className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8"
-          >
-            {services.map((service, index) => (
-              <motion.div
-                key={index}
-                variants={fadeInUp}
-                className="group relative p-8 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl hover:bg-white/10 transition-all duration-300 overflow-hidden"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-purple-500/0 via-cyan-500/0 to-purple-500/0 group-hover:from-purple-500/10 group-hover:via-cyan-500/10 group-hover:to-purple-500/10 transition-all duration-500" />
-                <div className="absolute inset-0 border-2 border-transparent group-hover:border-gradient-to-r group-hover:from-purple-500 group-hover:to-cyan-500 rounded-2xl transition-all duration-500 opacity-0 group-hover:opacity-100" />
-
-                <div className="relative z-10">
-                  <div className="text-5xl mb-4">{service.icon}</div>
-                  <h3 className="text-2xl font-bold text-white mb-3 font-[family-name:var(--font-space-grotesk)]">
-                    {service.title}
-                  </h3>
-                  <p className="text-gray-400 leading-relaxed">
-                    {service.description}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
         </div>
+
+        {/* Services Grid with Perspective */}
+        <div className="max-w-7xl mx-auto px-8" style={{ perspective: '2000px' }}>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {servicesData.map((service) => {
+              const isExpanded = expandedCard === service.id;
+              const otherCardExpanded = expandedCard !== null && !isExpanded;
+
+              return (
+                <motion.div
+                  key={service.id}
+                  layout
+                  className={`relative ${
+                    isExpanded ? 'lg:col-span-2 z-50' : ''
+                  } ${otherCardExpanded ? 'opacity-40' : 'opacity-100'}`}
+                  style={{ transformStyle: 'preserve-3d' }}
+                  animate={{
+                    opacity: otherCardExpanded ? 0.4 : 1,
+                  }}
+                  transition={{ duration: 0.3 }}
+                >
+                  {!isExpanded ? (
+                    // COLLAPSED CARD
+                    <motion.div
+                      onClick={() => setExpandedCard(service.id)}
+                      className="relative h-[400px] lg:h-[500px] rounded-3xl overflow-hidden cursor-pointer group bg-gradient-to-br from-zinc-900 to-zinc-950 border border-white/5"
+                      whileHover={{ scale: 1.02 }}
+                      transition={{ duration: 0.3 }}
+                      style={{
+                        boxShadow: '0 4px 24px rgba(0,0,0,0.4)',
+                      }}
+                    >
+                      {/* Background Image Placeholder */}
+                      <div className={`absolute inset-0 bg-gradient-to-br ${service.gradient} opacity-70 group-hover:scale-110 transition-transform duration-500`} />
+                      <div className="absolute inset-0 bg-black/40" />
+
+                      {/* Number Badge */}
+                      <div className="absolute top-6 left-6 w-14 h-14 rounded-full backdrop-blur-md bg-white/10 border border-white/20 flex items-center justify-center z-10">
+                        <span className="text-white font-bold text-xl">{service.number}</span>
+                      </div>
+
+                      {/* Content */}
+                      <div className="absolute inset-0 flex flex-col justify-end p-8 z-10">
+                        <h3 className="text-4xl lg:text-5xl font-bold text-white mb-3 font-[family-name:var(--font-space-grotesk)]">
+                          {service.title}
+                        </h3>
+                        <p className="text-gray-300 text-lg mb-4">{service.shortDesc}</p>
+
+                        {/* Hover Indicator */}
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                          <p className="text-sm text-white/60 uppercase tracking-wide">Click to explore →</p>
+                        </div>
+                      </div>
+
+                      {/* Gradient Border Glow on Hover */}
+                      <div className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
+                        <div className={`absolute inset-0 rounded-3xl bg-gradient-to-r ${service.gradient} blur-xl opacity-20`} />
+                      </div>
+                    </motion.div>
+                  ) : (
+                    // EXPANDED SPLIT CARD
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
+                      className="relative h-auto lg:h-[600px] rounded-3xl overflow-hidden"
+                    >
+                      <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 h-full">
+                        {/* LEFT HALF - Image Gallery */}
+                        <motion.div
+                          initial={{ x: -50, rotateY: 5 }}
+                          animate={{ x: 0, rotateY: 0 }}
+                          transition={{ duration: 0.6, ease: "easeOut" }}
+                          className={`w-full lg:w-[48%] h-[300px] lg:h-full rounded-3xl overflow-hidden bg-gradient-to-br ${service.gradient} relative`}
+                          style={{
+                            transformStyle: 'preserve-3d',
+                            boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
+                          }}
+                        >
+                          {/* Placeholder Grid */}
+                          <div className="absolute inset-0 p-6 grid grid-cols-2 gap-4">
+                            {[1, 2, 3, 4].map((i) => (
+                              <motion.div
+                                key={i}
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ delay: i * 0.1, duration: 0.4 }}
+                                className="bg-black/20 backdrop-blur-sm rounded-xl border border-white/10 flex items-center justify-center"
+                              >
+                                <p className="text-white/50 text-xs">Image {i}</p>
+                              </motion.div>
+                            ))}
+                          </div>
+
+                          {/* Number Badge */}
+                          <div className="absolute top-6 left-6 w-14 h-14 rounded-full backdrop-blur-md bg-white/10 border border-white/20 flex items-center justify-center">
+                            <span className="text-white font-bold text-xl">{service.number}</span>
+                          </div>
+                        </motion.div>
+
+                        {/* RIGHT HALF - Detailed Content */}
+                        <motion.div
+                          initial={{ x: 50, rotateY: -5 }}
+                          animate={{ x: 0, rotateY: 0 }}
+                          transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
+                          className="w-full lg:w-[48%] bg-zinc-900 rounded-3xl p-8 lg:p-10 flex flex-col justify-between relative"
+                          style={{
+                            transformStyle: 'preserve-3d',
+                            boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
+                          }}
+                        >
+                          {/* Close Button */}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setExpandedCard(null);
+                            }}
+                            className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 flex items-center justify-center transition-all duration-300 group"
+                          >
+                            <svg className="w-5 h-5 text-white group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+
+                          {/* Top Section */}
+                          <div>
+                            <div className="inline-block px-3 py-1 bg-white/5 backdrop-blur-sm rounded-full border border-white/10 text-xs uppercase tracking-wide text-gray-400 mb-4">
+                              {service.category}
+                            </div>
+                            <h3 className="text-3xl lg:text-4xl font-bold text-white mb-4 font-[family-name:var(--font-space-grotesk)]">
+                              {service.title}
+                            </h3>
+                            <p className="text-base text-gray-300 leading-relaxed mb-8">
+                              {service.fullDesc}
+                            </p>
+
+                            {/* Features List */}
+                            <div className="mb-8">
+                              <p className="text-xs uppercase tracking-wide text-gray-500 mb-4">What's Included</p>
+                              <ul className="space-y-3">
+                                {service.features.map((feature, i) => (
+                                  <motion.li
+                                    key={i}
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: 0.3 + i * 0.05, duration: 0.3 }}
+                                    className="flex items-center gap-3 text-gray-300"
+                                  >
+                                    <div className={`w-1.5 h-1.5 rounded-full bg-gradient-to-r ${service.gradient}`} />
+                                    <span className="text-sm">{feature}</span>
+                                  </motion.li>
+                                ))}
+                              </ul>
+                            </div>
+                          </div>
+
+                          {/* Bottom Section - CTA */}
+                          <div>
+                            <Link
+                              href="/contact"
+                              className={`w-full py-4 px-6 bg-gradient-to-r ${service.gradient} text-white font-semibold rounded-xl hover:scale-105 hover:brightness-110 transition-all duration-300 shadow-lg inline-block text-center`}
+                            >
+                              Get Started
+                            </Link>
+                          </div>
+                        </motion.div>
+                      </div>
+                    </motion.div>
+                  )}
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Final CTA Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="relative w-full pt-32"
+        >
+          <div className="max-w-4xl mx-auto px-8 text-center">
+            <h3 className="text-4xl lg:text-5xl font-bold text-white mb-6 font-[family-name:var(--font-space-grotesk)]">
+              Ready to Start Your Project?
+            </h3>
+            <p className="text-xl text-gray-400 mb-10">
+              Let's create something exceptional together
+            </p>
+            <Link
+              href="/contact"
+              className="inline-block px-10 py-5 bg-gradient-to-r from-purple-500 to-cyan-500 text-white text-lg font-bold rounded-full hover:scale-105 transition-all duration-300 shadow-2xl shadow-purple-500/50 hover:shadow-purple-500/70"
+            >
+              Get Started
+            </Link>
+          </div>
+        </motion.div>
       </section>
 
       {/* CLIENT LOGOS MARQUEE */}
