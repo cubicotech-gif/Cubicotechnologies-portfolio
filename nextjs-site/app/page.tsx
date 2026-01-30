@@ -80,6 +80,7 @@ export default function Home() {
   const [loadingProjects, setLoadingProjects] = useState(true);
   const [loadingLogos, setLoadingLogos] = useState(true);
   const [expandedCard, setExpandedCard] = useState<number | null>(null);
+  const [serviceImages, setServiceImages] = useState<Record<string, string[]>>({});
 
   // Fetch featured projects from API
   useEffect(() => {
@@ -125,6 +126,32 @@ export default function Home() {
     };
 
     fetchLogos();
+  }, []);
+
+  // Fetch service images from API
+  useEffect(() => {
+    const fetchServiceImages = async () => {
+      try {
+        const response = await fetch('/api/service-images?active=true');
+        const data = await response.json();
+        if (data.success && data.images.length > 0) {
+          // Organize images by service type
+          const imagesByService: Record<string, string[]> = {};
+          data.images.forEach((img: any) => {
+            if (!imagesByService[img.service_type]) {
+              imagesByService[img.service_type] = [];
+            }
+            // Store images in order by slot (1-4)
+            imagesByService[img.service_type][img.image_slot - 1] = img.image_url;
+          });
+          setServiceImages(imagesByService);
+        }
+      } catch (error) {
+        console.error('Error fetching service images:', error);
+      }
+    };
+
+    fetchServiceImages();
   }, []);
 
   const servicesData = [
@@ -517,19 +544,37 @@ export default function Home() {
                             boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
                           }}
                         >
-                          {/* Placeholder Grid */}
+                          {/* Image Grid */}
                           <div className="absolute inset-0 p-6 grid grid-cols-2 gap-4">
-                            {[1, 2, 3, 4].map((i) => (
-                              <motion.div
-                                key={i}
-                                initial={{ opacity: 0, scale: 0.8 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ delay: i * 0.1, duration: 0.4 }}
-                                className="bg-black/20 backdrop-blur-sm rounded-xl border border-white/10 flex items-center justify-center"
-                              >
-                                <p className="text-white/50 text-xs">Image {i}</p>
-                              </motion.div>
-                            ))}
+                            {[1, 2, 3, 4].map((i) => {
+                              const serviceImgs = serviceImages[service.title] || [];
+                              const imageUrl = serviceImgs[i - 1];
+
+                              return (
+                                <motion.div
+                                  key={i}
+                                  initial={{ opacity: 0, scale: 0.8 }}
+                                  animate={{ opacity: 1, scale: 1 }}
+                                  transition={{ delay: i * 0.1, duration: 0.4 }}
+                                  className="relative bg-black/20 backdrop-blur-sm rounded-xl border border-white/10 overflow-hidden"
+                                >
+                                  {imageUrl ? (
+                                    <Image
+                                      src={imageUrl}
+                                      alt={`${service.title} example ${i}`}
+                                      fill
+                                      className="object-cover"
+                                      sizes="(max-width: 768px) 50vw, 25vw"
+                                      quality={100}
+                                    />
+                                  ) : (
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                      <p className="text-white/50 text-xs">Image {i}</p>
+                                    </div>
+                                  )}
+                                </motion.div>
+                              );
+                            })}
                           </div>
 
                           {/* Number Badge */}
