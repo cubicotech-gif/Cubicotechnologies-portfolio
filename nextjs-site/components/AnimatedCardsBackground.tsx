@@ -7,6 +7,7 @@ import Image from 'next/image';
 interface HeroImage {
   id: string;
   filename: string;
+  url?: string; // URL for cloud-hosted images
   category: string;
   order: number;
   active: boolean;
@@ -71,12 +72,13 @@ export default function AnimatedCardsBackground() {
 
         for (let i = 0; i < count; i++) {
           if (hasImages) {
-            // Use real images from /public/portfolio/hero/
+            // Use real images (cloud URLs or local paths)
             const imageIndex = (columnIndex * count + i) % heroImages.length;
             const image = heroImages[imageIndex];
+            const imageUrl = image.url || `/images/hero/${image.filename}`;
             cards.push({
               type: 'image',
-              imageUrl: `/portfolio/hero/${image.filename}`,
+              imageUrl,
               delay: i * 5,
               opacity: columnIndex === 2 ? 0.4 : 0.5, // Center column more transparent
             });

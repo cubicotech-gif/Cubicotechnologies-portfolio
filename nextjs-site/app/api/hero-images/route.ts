@@ -1,44 +1,34 @@
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs/promises';
-import path from 'path';
+import { supabaseAdmin } from '@/lib/supabase';
 
 export interface HeroImage {
   id: string;
   filename: string;
+  url?: string; // Cloud storage URL
   category: string;
   order: number;
   active: boolean;
+  created_at?: string;
 }
 
-const dataFilePath = path.join(process.cwd(), 'data', 'hero-images.json');
-
-// Helper: Read JSON file
-async function readHeroImages(): Promise<HeroImage[]> {
-  try {
-    const fileContent = await fs.readFile(dataFilePath, 'utf-8');
-    return JSON.parse(fileContent);
-  } catch (error) {
-    console.error('Error reading hero-images.json:', error);
-    return [];
-  }
-}
-
-// Helper: Write JSON file
-async function writeHeroImages(images: HeroImage[]): Promise<void> {
-  try {
-    await fs.writeFile(dataFilePath, JSON.stringify(images, null, 2), 'utf-8');
-  } catch (error) {
-    console.error('Error writing hero-images.json:', error);
-    throw new Error('Failed to save hero images');
-  }
-}
-
-// GET: Read all hero images
+// GET: Read all hero images from Supabase Database
 export async function GET() {
   try {
-    const images = await readHeroImages();
-    return NextResponse.json({ success: true, images });
-  } catch (error) {
+    const { data, error } = await supabaseAdmin
+      .from('hero_images')
+      .select('*')
+      .order('order', { ascending: true });
+
+    if (error) {
+      console.error('Supabase GET error:', error);
+      return NextResponse.json(
+        { success: false, error: `Failed to fetch hero images: ${error.message}` },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ success: true, images: data || [] });
+  } catch (error: any) {
     console.error('GET Error:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to fetch hero images' },
@@ -47,37 +37,43 @@ export async function GET() {
   }
 }
 
-// POST: Add new image entry
+// POST: Add new image entry to Supabase Database
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { filename, category, order } = body;
+    const { filename, url, category, order } = body;
 
-    if (!filename || !category) {
+    if ((!filename && !url) || !category) {
       return NextResponse.json(
-        { success: false, error: 'Filename and category are required' },
+        { success: false, error: 'Filename/URL and category are required' },
         { status: 400 }
       );
     }
 
-    // Read current images
-    const images = await readHeroImages();
-
-    // Create new image entry
-    const newImage: HeroImage = {
-      id: `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
-      filename,
+    const newImage = {
+      filename: filename || 'cloud-image',
+      url: url || null,
       category,
-      order: order || images.length + 1,
+      order: order || 1,
       active: true,
     };
 
-    // Add to array and save
-    images.push(newImage);
-    await writeHeroImages(images);
+    const { data, error } = await supabaseAdmin
+      .from('hero_images')
+      .insert([newImage])
+      .select()
+      .single();
 
-    return NextResponse.json({ success: true, image: newImage });
-  } catch (error) {
+    if (error) {
+      console.error('Supabase POST error:', error);
+      return NextResponse.json(
+        { success: false, error: `Failed to add image: ${error.message}` },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ success: true, image: data });
+  } catch (error: any) {
     console.error('POST Error:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to add image' },
@@ -86,7 +82,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// PUT: Update image
+// PUT: Update image in Supabase Database
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
@@ -99,27 +95,35 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // Read current images
-    const images = await readHeroImages();
-    const imageIndex = images.findIndex((img) => img.id === id);
+    const updates: any = {};
+    if (category !== undefined) updates.category = category;
+    if (order !== undefined) updates.order = order;
+    if (active !== undefined) updates.active = active;
 
-    if (imageIndex === -1) {
+    const { data, error } = await supabaseAdmin
+      .from('hero_images')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Supabase PUT error:', error);
+      return NextResponse.json(
+        { success: false, error: `Failed to update image: ${error.message}` },
+        { status: 500 }
+      );
+    }
+
+    if (!data) {
       return NextResponse.json(
         { success: false, error: 'Image not found' },
         { status: 404 }
       );
     }
 
-    // Update image
-    if (category !== undefined) images[imageIndex].category = category;
-    if (order !== undefined) images[imageIndex].order = order;
-    if (active !== undefined) images[imageIndex].active = active;
-
-    // Save changes
-    await writeHeroImages(images);
-
-    return NextResponse.json({ success: true, image: images[imageIndex] });
-  } catch (error) {
+    return NextResponse.json({ success: true, image: data });
+  } catch (error: any) {
     console.error('PUT Error:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to update image' },
@@ -128,7 +132,7 @@ export async function PUT(request: NextRequest) {
   }
 }
 
-// DELETE: Remove image entry
+// DELETE: Remove image entry from Supabase Database
 export async function DELETE(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -141,26 +145,24 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    // Read current images
-    const images = await readHeroImages();
-    const imageToDelete = images.find((img) => img.id === id);
+    const { error } = await supabaseAdmin
+      .from('hero_images')
+      .delete()
+      .eq('id', id);
 
-    if (!imageToDelete) {
+    if (error) {
+      console.error('Supabase DELETE error:', error);
       return NextResponse.json(
-        { success: false, error: 'Image not found' },
-        { status: 404 }
+        { success: false, error: `Failed to delete image: ${error.message}` },
+        { status: 500 }
       );
     }
 
-    // Remove from array (file stays in /public/portfolio/hero/)
-    const updatedImages = images.filter((img) => img.id !== id);
-    await writeHeroImages(updatedImages);
-
     return NextResponse.json({
       success: true,
-      message: 'Image removed from list. File remains in /public/portfolio/hero/'
+      message: 'Image removed from hero section'
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('DELETE Error:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to delete image' },

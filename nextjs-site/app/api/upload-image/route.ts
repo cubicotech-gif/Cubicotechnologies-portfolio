@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs/promises';
-import path from 'path';
+import { supabaseAdmin } from '@/lib/supabase';
+
+export const runtime = 'nodejs';
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,75 +16,132 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate file type
-    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
+    const validTypes = [
+      'image/jpeg',
+      'image/jpg',
+      'image/png',
+      'image/gif',
+      'image/webp',
+      'image/svg+xml'
+    ];
+
     if (!validTypes.includes(file.type)) {
       return NextResponse.json(
-        { success: false, error: 'Invalid file type. Only images are allowed.' },
+        { success: false, error: `Invalid file type: ${file.type}. Only images are allowed.` },
         { status: 400 }
       );
     }
 
-    // Create upload directory if it doesn't exist
-    const uploadDir = path.join(process.cwd(), 'public', 'images', 'hero');
-    await fs.mkdir(uploadDir, { recursive: true });
+    // Validate file size (max 10MB)
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (file.size > maxSize) {
+      return NextResponse.json(
+        { success: false, error: 'File too large. Maximum size is 10MB.' },
+        { status: 400 }
+      );
+    }
 
     // Generate unique filename
     const timestamp = Date.now();
-    const originalName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-    const filename = `${timestamp}-${originalName}`;
-    const filepath = path.join(uploadDir, filename);
+    const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+    const filename = `${timestamp}-${sanitizedName}`;
+    const filePath = `hero/${filename}`;
 
-    // Convert file to buffer and save
+    // Convert file to buffer
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-    await fs.writeFile(filepath, buffer);
+
+    // Upload to Supabase Storage
+    const { data, error } = await supabaseAdmin.storage
+      .from('hero-images')
+      .upload(filePath, buffer, {
+        contentType: file.type,
+        upsert: false,
+      });
+
+    if (error) {
+      console.error('Supabase upload error:', error);
+      return NextResponse.json(
+        { success: false, error: `Upload failed: ${error.message}` },
+        { status: 500 }
+      );
+    }
+
+    // Get public URL
+    const { data: publicUrlData } = supabaseAdmin.storage
+      .from('hero-images')
+      .getPublicUrl(filePath);
+
+    const publicUrl = publicUrlData.publicUrl;
+
+    console.log(`File uploaded to Supabase Storage: ${publicUrl}`);
 
     return NextResponse.json({
       success: true,
       filename: filename,
-      path: `/images/hero/${filename}`,
-      message: 'File uploaded successfully'
+      url: publicUrl,
+      path: publicUrl,
+      message: 'File uploaded successfully to Supabase Storage'
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Upload error:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to upload file' },
+      { success: false, error: `Upload failed: ${error.message}` },
       { status: 500 }
     );
   }
 }
 
-// GET: List all images in the hero directory
+// GET: List all images from Supabase Storage
 export async function GET() {
   try {
-    const uploadDir = path.join(process.cwd(), 'public', 'images', 'hero');
+    const { data: files, error } = await supabaseAdmin.storage
+      .from('hero-images')
+      .list('hero', {
+        limit: 100,
+        offset: 0,
+      });
 
-    // Ensure directory exists
-    try {
-      await fs.access(uploadDir);
-    } catch {
-      return NextResponse.json({ success: true, images: [] });
+    if (error) {
+      console.error('Error listing images:', error);
+      return NextResponse.json(
+        { success: false, error: `Failed to list images: ${error.message}` },
+        { status: 500 }
+      );
     }
 
-    const files = await fs.readdir(uploadDir);
-
-    // Filter out non-image files and README
-    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg'];
     const images = files
       .filter(file => {
-        const ext = path.extname(file).toLowerCase();
-        return imageExtensions.includes(ext) && file !== 'README.md';
+        // Filter out directories and non-image files
+        return file.name && /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(file.name);
       })
-      .map(file => ({
-        filename: file,
-        path: `/images/hero/${file}`
-      }));
+      .map(file => {
+        const { data: publicUrlData } = supabaseAdmin.storage
+          .from('hero-images')
+          .getPublicUrl(`hero/${file.name}`);
+
+        return {
+          filename: file.name,
+          path: publicUrlData.publicUrl,
+          url: publicUrlData.publicUrl,
+        };
+      });
 
     return NextResponse.json({ success: true, images });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error listing images:', error);
+
+    // If error is due to missing credentials, return empty array
+    if (error.message?.includes('SUPABASE_URL') || error.message?.includes('Invalid URL')) {
+      return NextResponse.json({
+        success: true,
+        images: [],
+        message: 'Supabase not configured. Please set environment variables.'
+      });
+    }
+
     return NextResponse.json(
-      { success: false, error: 'Failed to list images' },
+      { success: false, error: `Failed to list images: ${error.message}` },
       { status: 500 }
     );
   }
