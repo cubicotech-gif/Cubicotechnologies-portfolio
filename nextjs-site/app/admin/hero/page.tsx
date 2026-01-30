@@ -25,6 +25,7 @@ export default function AdminHeroPage() {
   const [filename, setFilename] = useState('');
   const [imageUrl, setImageUrl] = useState(''); // Cloud URL
   const [category, setCategory] = useState('Logo Design');
+  const [uploadFolder, setUploadFolder] = useState('hero'); // Which folder to upload to
   const [order, setOrder] = useState(1);
   const [message, setMessage] = useState('');
   const [showImageBrowser, setShowImageBrowser] = useState(false);
@@ -36,6 +37,15 @@ export default function AdminHeroPage() {
     'Artwork',
     'Video',
     'Branding',
+  ];
+
+  const uploadFolders = [
+    { value: 'hero', label: 'Hero Background', description: 'Animated background cards' },
+    { value: 'portfolio', label: 'Portfolio Items', description: 'Portfolio showcase' },
+    { value: 'projects', label: 'Featured Projects', description: 'Main project images' },
+    { value: 'logos', label: 'Logo Designs', description: 'Logo showcase' },
+    { value: 'team', label: 'Team Members', description: 'Team photos' },
+    { value: 'general', label: 'General', description: 'Miscellaneous images' },
   ];
 
   // Fetch hero images configuration
@@ -58,7 +68,7 @@ export default function AdminHeroPage() {
   // Fetch available images from directory
   const fetchAvailableImages = async () => {
     try {
-      const response = await fetch('/api/upload-image');
+      const response = await fetch(`/api/upload-image?folder=${uploadFolder}`);
       const data = await response.json();
       if (data.success) {
         setAvailableImages(data.images);
@@ -71,7 +81,7 @@ export default function AdminHeroPage() {
   useEffect(() => {
     fetchImages();
     fetchAvailableImages();
-  }, []);
+  }, [uploadFolder]); // Re-fetch when folder changes
 
   // Handle file upload
   const handleFileUpload = async (file: File) => {
@@ -83,6 +93,7 @@ export default function AdminHeroPage() {
     try {
       const formData = new FormData();
       formData.append('file', file);
+      formData.append('folder', uploadFolder); // Include folder selection
 
       const response = await fetch('/api/upload-image', {
         method: 'POST',
@@ -92,7 +103,7 @@ export default function AdminHeroPage() {
       const data = await response.json();
 
       if (data.success) {
-        setMessage(`✅ File uploaded: ${data.filename}`);
+        setMessage(`✅ File uploaded to ${data.folder}: ${data.filename}`);
         setFilename(data.filename);
         setImageUrl(data.url || data.path); // Store cloud URL
         await fetchAvailableImages();
@@ -250,6 +261,32 @@ export default function AdminHeroPage() {
         {/* Upload Section */}
         <div className="glass rounded-2xl p-6 mb-8">
           <h2 className="text-2xl font-bold text-white mb-4">Step 1: Upload Image</h2>
+
+          {/* Folder Selector */}
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Upload To Folder:
+            </label>
+            <select
+              value={uploadFolder}
+              onChange={(e) => setUploadFolder(e.target.value)}
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+              style={{ colorScheme: 'dark' }}
+            >
+              {uploadFolders.map((folder) => (
+                <option
+                  key={folder.value}
+                  value={folder.value}
+                  className="bg-gray-900 text-white"
+                >
+                  {folder.label} - {folder.description}
+                </option>
+              ))}
+            </select>
+            <p className="text-xs text-gray-500 mt-2">
+              Select where this image will be used. Different folders for different purposes.
+            </p>
+          </div>
 
           {/* Drag and Drop Zone */}
           <div
@@ -415,12 +452,26 @@ export default function AdminHeroPage() {
                 >
                   {/* Image Preview */}
                   <div className="aspect-[2/3] bg-black relative">
-                    <Image
-                      src={image.url || `/images/hero/${image.filename}`}
-                      alt={image.category}
-                      fill
-                      className="object-cover"
-                    />
+                    {image.url ? (
+                      <>
+                        <Image
+                          src={image.url}
+                          alt={image.category}
+                          fill
+                          className="object-cover"
+                          unoptimized
+                          onError={() => console.error('Failed to load image:', image.url)}
+                        />
+                        {/* Debug URL */}
+                        <div className="absolute bottom-2 left-2 right-2 bg-black/80 p-2 text-xs text-white truncate">
+                          {image.url}
+                        </div>
+                      </>
+                    ) : (
+                      <div className="flex items-center justify-center h-full text-gray-500">
+                        No URL
+                      </div>
+                    )}
                   </div>
 
                   {/* Info */}
