@@ -1,14 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { v2 as cloudinary } from 'cloudinary';
+import { bucket } from '@/lib/firebase-admin';
 
 export const runtime = 'nodejs';
-
-// Configure Cloudinary
-cloudinary.config({
-  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
 
 export async function POST(request: NextRequest) {
   try {
@@ -48,33 +41,43 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Convert file to base64 for Cloudinary upload
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-    const base64 = buffer.toString('base64');
-    const dataURI = `data:${file.type};base64,${base64}`;
-
     // Generate unique filename
     const timestamp = Date.now();
-    const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_').replace(/\.[^.]+$/, '');
-    const publicId = `hero/${timestamp}-${sanitizedName}`;
+    const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+    const filename = `${timestamp}-${sanitizedName}`;
+    const filePath = `hero/${filename}`;
 
-    // Upload to Cloudinary
-    const result = await cloudinary.uploader.upload(dataURI, {
-      folder: 'hero',
-      public_id: `${timestamp}-${sanitizedName}`,
-      resource_type: 'auto',
+    // Convert file to buffer
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+
+    // Upload to Firebase Storage
+    const fileUpload = bucket.file(filePath);
+
+    await fileUpload.save(buffer, {
+      metadata: {
+        contentType: file.type,
+        metadata: {
+          firebaseStorageDownloadTokens: timestamp.toString(),
+        }
+      },
+      public: true,
     });
 
-    console.log(`File uploaded to Cloudinary: ${result.secure_url}`);
+    // Make file publicly accessible
+    await fileUpload.makePublic();
+
+    // Get public URL
+    const publicUrl = `https://storage.googleapis.com/${bucket.name}/${filePath}`;
+
+    console.log(`File uploaded to Firebase Storage: ${publicUrl}`);
 
     return NextResponse.json({
       success: true,
-      filename: `${timestamp}-${sanitizedName}${file.name.match(/\.[^.]+$/)?.[0] || ''}`,
-      url: result.secure_url,
-      path: result.secure_url,
-      publicId: result.public_id,
-      message: 'File uploaded successfully to Cloudinary'
+      filename: filename,
+      url: publicUrl,
+      path: publicUrl,
+      message: 'File uploaded successfully to Firebase Storage'
     });
   } catch (error: any) {
     console.error('Upload error:', error);
@@ -85,33 +88,40 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET: List all images from Cloudinary
+// GET: List all images from Firebase Storage
 export async function GET() {
   try {
-    const result = await cloudinary.api.resources({
-      type: 'upload',
+    const [files] = await bucket.getFiles({
       prefix: 'hero/',
-      max_results: 100,
     });
 
-    const images = result.resources.map((resource: any) => ({
-      filename: resource.public_id.replace('hero/', ''),
-      path: resource.secure_url,
-      url: resource.secure_url,
-      publicId: resource.public_id,
-      uploadedAt: resource.created_at,
-    }));
+    const images = files
+      .filter(file => {
+        // Filter out directories and non-image files
+        const name = file.name;
+        return name !== 'hero/' && /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(name);
+      })
+      .map(file => {
+        const filename = file.name.replace('hero/', '');
+        const publicUrl = `https://storage.googleapis.com/${bucket.name}/${file.name}`;
+
+        return {
+          filename,
+          path: publicUrl,
+          url: publicUrl,
+        };
+      });
 
     return NextResponse.json({ success: true, images });
   } catch (error: any) {
     console.error('Error listing images:', error);
 
     // If error is due to missing credentials, return empty array
-    if (error.message?.includes('Must supply api_key')) {
+    if (error.message?.includes('Could not load the default credentials')) {
       return NextResponse.json({
         success: true,
         images: [],
-        message: 'Cloudinary not configured. Please set environment variables.'
+        message: 'Firebase not configured. Please set environment variables.'
       });
     }
 
