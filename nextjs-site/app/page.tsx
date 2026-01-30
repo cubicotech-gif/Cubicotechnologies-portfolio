@@ -363,164 +363,348 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SERVICES OVERVIEW SECTION - PREMIUM DESIGN */}
-      <section className="py-20 lg:py-32 relative bg-white/[0.02]">
-        <div className="max-w-7xl mx-auto px-8">
-          {/* Section Header */}
+      {/* SERVICES DIAGONAL SPLIT REVEAL SECTION */}
+      <section className="relative bg-black">
+        {/* Section Header */}
+        <div className="max-w-7xl mx-auto px-8 pt-32 pb-16">
           <motion.div
-            initial="hidden"
-            whileInView="visible"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            variants={fadeInUp}
-            className="text-center mb-20"
+            transition={{ duration: 0.8 }}
+            className="text-center"
           >
             <p className="text-xs uppercase tracking-widest text-gray-400 mb-4">
               OUR SERVICES
             </p>
-            <h2 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 bg-gradient-to-b from-white to-gray-500 bg-clip-text text-transparent font-[family-name:var(--font-space-grotesk)]">
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 bg-gradient-to-b from-white to-gray-300 bg-clip-text text-transparent font-[family-name:var(--font-space-grotesk)]">
               What We Create
             </h2>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-              Comprehensive creative solutions for your brand
+            <p className="text-xl text-gray-400 mt-4">
+              Comprehensive creative solutions for global brands
             </p>
           </motion.div>
-
-          {/* Service Cards Grid */}
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-            className="grid grid-cols-1 md:grid-cols-2 gap-8"
-          >
-            {services.map((service, index) => {
-              const serviceNumber = String(index + 1).padStart(2, '0');
-              const gradients = [
-                'from-purple-600 via-purple-500 to-pink-500',
-                'from-blue-600 via-blue-500 to-cyan-500',
-                'from-orange-600 via-orange-500 to-yellow-500',
-                'from-pink-600 via-pink-500 to-purple-500',
-              ];
-
-              return (
-                <motion.article
-                  key={index}
-                  variants={fadeInUp}
-                  className="group relative bg-zinc-900/50 border border-white/5 rounded-3xl overflow-hidden backdrop-blur-sm hover:border-white/20 transition-all duration-500 hover:-translate-y-3 hover:scale-[1.02] hover:shadow-2xl hover:shadow-purple-500/20"
-                  style={{
-                    boxShadow: '0 4px 24px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.2)',
-                  }}
-                >
-                  {/* Image Area */}
-                  <div className="relative w-full overflow-hidden" style={{ aspectRatio: '16/9' }}>
-                    {/* Gradient Placeholder */}
-                    <div
-                      className={`absolute inset-0 bg-gradient-to-br ${gradients[index]} opacity-60 group-hover:opacity-80 transition-all duration-600`}
-                    />
-
-                    {/* Image will go here - For now, gradient with overlay */}
-                    <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-all duration-600" />
-
-                    {/* Zoom effect on hover */}
-                    <div
-                      className="absolute inset-0 bg-cover bg-center group-hover:scale-110 transition-transform duration-600 ease-out"
-                      style={{
-                        backgroundImage: `linear-gradient(135deg, ${gradients[index].split(' ').map(c => c.replace(/from-|via-|to-/, '')).join(', ')})`,
-                      }}
-                    />
-
-                    {/* Placeholder Text Overlay */}
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="text-center px-6">
-                        <p className="text-white/80 text-sm font-medium backdrop-blur-sm bg-black/30 px-4 py-2 rounded-lg">
-                          Service Image Placeholder
-                        </p>
-                        <p className="text-white/60 text-xs mt-2">
-                          Replace with real image
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Number Badge */}
-                    <div className="absolute top-6 left-6 z-10">
-                      <div
-                        className="w-12 h-12 rounded-full backdrop-blur-md bg-white/10 border border-white/20 flex items-center justify-center group-hover:scale-110 group-hover:bg-white/20 transition-all duration-400"
-                        style={{
-                          boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
-                        }}
-                      >
-                        <span className="text-white font-bold text-base">
-                          {serviceNumber}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Hover Gradient Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  </div>
-
-                  {/* Content Area */}
-                  <div className="p-8">
-                    <h3 className="text-3xl lg:text-4xl font-bold text-white mb-3 tracking-tight group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-cyan-400 group-hover:bg-clip-text transition-all duration-400 font-[family-name:var(--font-space-grotesk)]">
-                      {service.title}
-                    </h3>
-
-                    <p className="text-gray-400 leading-relaxed mb-6 text-base">
-                      {service.description}
-                    </p>
-
-                    {/* Learn More Link */}
-                    <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide">
-                      <span className="bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
-                        Learn More
-                      </span>
-                      <svg
-                        className="w-4 h-4 text-purple-400 group-hover:translate-x-2 group-hover:-rotate-45 transition-all duration-300"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                      </svg>
-                    </div>
-                  </div>
-
-                  {/* Border Glow Effect on Hover */}
-                  <div className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
-                    <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-purple-500 via-cyan-500 to-purple-500 blur-xl opacity-30" />
-                  </div>
-                </motion.article>
-              );
-            })}
-          </motion.div>
-
-          {/* CTA Below Services */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.6, duration: 0.6 }}
-            className="text-center mt-20"
-          >
-            <h3 className="text-3xl lg:text-4xl font-bold text-white mb-6 font-[family-name:var(--font-space-grotesk)]">
-              Ready to Elevate Your Brand?
-            </h3>
-            <Link
-              href="/services"
-              className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-purple-500 to-cyan-500 text-white font-semibold rounded-full hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/50 transition-all duration-300 group"
-            >
-              <span>View All Services</span>
-              <svg
-                className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
-            </Link>
-          </motion.div>
         </div>
+
+        {/* Service 1 - Image LEFT, Content RIGHT */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true, margin: "-20%" }}
+          transition={{ duration: 0.6 }}
+          className="relative w-full h-screen lg:h-screen overflow-hidden flex flex-col lg:flex-row"
+        >
+          {/* Image Side */}
+          <motion.div
+            initial={{ x: -100, opacity: 0 }}
+            whileInView={{ x: 0, opacity: 1 }}
+            viewport={{ once: true, margin: "-20%" }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="relative w-full lg:w-1/2 h-64 lg:h-full overflow-hidden"
+            style={{
+              clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
+            }}
+          >
+            {/* Gradient Placeholder */}
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-600 via-purple-500 to-pink-500" />
+            <div className="absolute inset-0 bg-black/30" />
+
+            {/* Placeholder Text */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="text-center px-6">
+                <p className="text-white/70 text-sm font-medium">Service Image Placeholder</p>
+                <p className="text-white/50 text-xs mt-1">Replace with artwork image</p>
+              </div>
+            </div>
+
+            {/* Number Badge */}
+            <div className="absolute top-8 left-8 w-16 h-16 rounded-full backdrop-blur-md bg-white/10 border border-white/20 flex items-center justify-center shadow-2xl">
+              <span className="text-white font-bold text-2xl">01</span>
+            </div>
+          </motion.div>
+
+          {/* Content Side */}
+          <motion.div
+            initial={{ x: 100, opacity: 0 }}
+            whileInView={{ x: 0, opacity: 1 }}
+            viewport={{ once: true, margin: "-20%" }}
+            transition={{ duration: 0.8, ease: "easeOut", delay: 0.1 }}
+            className="relative w-full lg:w-1/2 h-auto lg:h-full bg-zinc-950 flex items-center px-8 lg:px-20 py-20 lg:py-0"
+          >
+            <div className="max-w-lg">
+              <h3 className="text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-6 leading-tight tracking-tight font-[family-name:var(--font-space-grotesk)]">
+                Artwork Designing
+              </h3>
+              <p className="text-lg text-gray-300 leading-relaxed mb-10">
+                Digital products and custom illustrations crafted from scratch with meticulous attention to detail
+              </p>
+
+              {/* Features */}
+              <ul className="space-y-3 mb-10">
+                {['Custom digital illustrations', 'Print-ready artwork files', 'Unique visual concepts', 'Scalable vector graphics'].map((feature, i) => (
+                  <li key={i} className="flex items-center gap-3 text-gray-400">
+                    <div className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-purple-400 to-cyan-400" />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+
+              {/* CTA */}
+              <Link href="/services" className="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-wide bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent group">
+                <span>Explore Service</span>
+                <svg className="w-4 h-4 text-purple-400 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              </Link>
+            </div>
+          </motion.div>
+        </motion.div>
+
+        {/* Service 2 - Content LEFT, Image RIGHT */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true, margin: "-20%" }}
+          transition={{ duration: 0.6 }}
+          className="relative w-full h-screen lg:h-screen overflow-hidden flex flex-col-reverse lg:flex-row"
+        >
+          {/* Content Side */}
+          <motion.div
+            initial={{ x: -100, opacity: 0 }}
+            whileInView={{ x: 0, opacity: 1 }}
+            viewport={{ once: true, margin: "-20%" }}
+            transition={{ duration: 0.8, ease: "easeOut", delay: 0.1 }}
+            className="relative w-full lg:w-1/2 h-auto lg:h-full bg-zinc-950 flex items-center px-8 lg:px-20 py-20 lg:py-0"
+          >
+            <div className="max-w-lg lg:ml-auto">
+              <h3 className="text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-6 leading-tight tracking-tight font-[family-name:var(--font-space-grotesk)]">
+                Branding & Graphics
+              </h3>
+              <p className="text-lg text-gray-300 leading-relaxed mb-10">
+                Complete brand identities, logos, banners, and visual systems that tell your story
+              </p>
+
+              {/* Features */}
+              <ul className="space-y-3 mb-10">
+                {['Logo design & brand identity', 'Marketing collateral', 'Brand guidelines', 'Print & digital assets'].map((feature, i) => (
+                  <li key={i} className="flex items-center gap-3 text-gray-400">
+                    <div className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-blue-400 to-cyan-400" />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+
+              {/* CTA */}
+              <Link href="/services" className="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-wide bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent group">
+                <span>Explore Service</span>
+                <svg className="w-4 h-4 text-blue-400 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              </Link>
+            </div>
+          </motion.div>
+
+          {/* Image Side */}
+          <motion.div
+            initial={{ x: 100, opacity: 0 }}
+            whileInView={{ x: 0, opacity: 1 }}
+            viewport={{ once: true, margin: "-20%" }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="relative w-full lg:w-1/2 h-64 lg:h-full overflow-hidden"
+            style={{
+              clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
+            }}
+          >
+            {/* Gradient Placeholder */}
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500" />
+            <div className="absolute inset-0 bg-black/30" />
+
+            {/* Placeholder Text */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="text-center px-6">
+                <p className="text-white/70 text-sm font-medium">Service Image Placeholder</p>
+                <p className="text-white/50 text-xs mt-1">Replace with branding image</p>
+              </div>
+            </div>
+
+            {/* Number Badge */}
+            <div className="absolute top-8 left-8 w-16 h-16 rounded-full backdrop-blur-md bg-white/10 border border-white/20 flex items-center justify-center shadow-2xl">
+              <span className="text-white font-bold text-2xl">02</span>
+            </div>
+          </motion.div>
+        </motion.div>
+
+        {/* Service 3 - Image LEFT, Content RIGHT */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true, margin: "-20%" }}
+          transition={{ duration: 0.6 }}
+          className="relative w-full h-screen lg:h-screen overflow-hidden flex flex-col lg:flex-row"
+        >
+          {/* Image Side */}
+          <motion.div
+            initial={{ x: -100, opacity: 0 }}
+            whileInView={{ x: 0, opacity: 1 }}
+            viewport={{ once: true, margin: "-20%" }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="relative w-full lg:w-1/2 h-64 lg:h-full overflow-hidden"
+            style={{
+              clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
+            }}
+          >
+            {/* Gradient Placeholder */}
+            <div className="absolute inset-0 bg-gradient-to-br from-orange-600 via-orange-500 to-yellow-500" />
+            <div className="absolute inset-0 bg-black/30" />
+
+            {/* Placeholder Text */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="text-center px-6">
+                <p className="text-white/70 text-sm font-medium">Service Image Placeholder</p>
+                <p className="text-white/50 text-xs mt-1">Replace with social media image</p>
+              </div>
+            </div>
+
+            {/* Number Badge */}
+            <div className="absolute top-8 left-8 w-16 h-16 rounded-full backdrop-blur-md bg-white/10 border border-white/20 flex items-center justify-center shadow-2xl">
+              <span className="text-white font-bold text-2xl">03</span>
+            </div>
+          </motion.div>
+
+          {/* Content Side */}
+          <motion.div
+            initial={{ x: 100, opacity: 0 }}
+            whileInView={{ x: 0, opacity: 1 }}
+            viewport={{ once: true, margin: "-20%" }}
+            transition={{ duration: 0.8, ease: "easeOut", delay: 0.1 }}
+            className="relative w-full lg:w-1/2 h-auto lg:h-full bg-zinc-950 flex items-center px-8 lg:px-20 py-20 lg:py-0"
+          >
+            <div className="max-w-lg">
+              <h3 className="text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-6 leading-tight tracking-tight font-[family-name:var(--font-space-grotesk)]">
+                Social Media Graphics
+              </h3>
+              <p className="text-lg text-gray-300 leading-relaxed mb-10">
+                Engaging posts, advertisements, and marketing content that captures attention
+              </p>
+
+              {/* Features */}
+              <ul className="space-y-3 mb-10">
+                {['Instagram & Facebook posts', 'Story templates', 'Ad creatives', 'Content calendars'].map((feature, i) => (
+                  <li key={i} className="flex items-center gap-3 text-gray-400">
+                    <div className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-orange-400 to-yellow-400" />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+
+              {/* CTA */}
+              <Link href="/services" className="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-wide bg-gradient-to-r from-orange-400 to-yellow-400 bg-clip-text text-transparent group">
+                <span>Explore Service</span>
+                <svg className="w-4 h-4 text-orange-400 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              </Link>
+            </div>
+          </motion.div>
+        </motion.div>
+
+        {/* Service 4 - Content LEFT, Image RIGHT */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true, margin: "-20%" }}
+          transition={{ duration: 0.6 }}
+          className="relative w-full h-screen lg:h-screen overflow-hidden flex flex-col-reverse lg:flex-row"
+        >
+          {/* Content Side */}
+          <motion.div
+            initial={{ x: -100, opacity: 0 }}
+            whileInView={{ x: 0, opacity: 1 }}
+            viewport={{ once: true, margin: "-20%" }}
+            transition={{ duration: 0.8, ease: "easeOut", delay: 0.1 }}
+            className="relative w-full lg:w-1/2 h-auto lg:h-full bg-zinc-950 flex items-center px-8 lg:px-20 py-20 lg:py-0"
+          >
+            <div className="max-w-lg lg:ml-auto">
+              <h3 className="text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-6 leading-tight tracking-tight font-[family-name:var(--font-space-grotesk)]">
+                Videography
+              </h3>
+              <p className="text-lg text-gray-300 leading-relaxed mb-10">
+                Reels, animations, and product videos that bring your vision to life
+              </p>
+
+              {/* Features */}
+              <ul className="space-y-3 mb-10">
+                {['Social media reels', 'Product videos', 'Motion graphics', 'Video editing'].map((feature, i) => (
+                  <li key={i} className="flex items-center gap-3 text-gray-400">
+                    <div className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-pink-400 to-purple-400" />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+
+              {/* CTA */}
+              <Link href="/services" className="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-wide bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent group">
+                <span>Explore Service</span>
+                <svg className="w-4 h-4 text-pink-400 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              </Link>
+            </div>
+          </motion.div>
+
+          {/* Image Side */}
+          <motion.div
+            initial={{ x: 100, opacity: 0 }}
+            whileInView={{ x: 0, opacity: 1 }}
+            viewport={{ once: true, margin: "-20%" }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="relative w-full lg:w-1/2 h-64 lg:h-full overflow-hidden"
+            style={{
+              clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
+            }}
+          >
+            {/* Gradient Placeholder */}
+            <div className="absolute inset-0 bg-gradient-to-br from-pink-600 via-pink-500 to-purple-500" />
+            <div className="absolute inset-0 bg-black/30" />
+
+            {/* Placeholder Text */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="text-center px-6">
+                <p className="text-white/70 text-sm font-medium">Service Image Placeholder</p>
+                <p className="text-white/50 text-xs mt-1">Replace with videography image</p>
+              </div>
+            </div>
+
+            {/* Number Badge */}
+            <div className="absolute top-8 left-8 w-16 h-16 rounded-full backdrop-blur-md bg-white/10 border border-white/20 flex items-center justify-center shadow-2xl">
+              <span className="text-white font-bold text-2xl">04</span>
+            </div>
+          </motion.div>
+        </motion.div>
+
+        {/* Final CTA Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="relative w-full py-32 bg-gradient-to-b from-black to-zinc-950"
+        >
+          <div className="max-w-4xl mx-auto px-8 text-center">
+            <h3 className="text-4xl lg:text-5xl font-bold text-white mb-6 font-[family-name:var(--font-space-grotesk)]">
+              Ready to Start Your Project?
+            </h3>
+            <p className="text-xl text-gray-400 mb-10">
+              Let's create something exceptional together
+            </p>
+            <Link
+              href="/contact"
+              className="inline-block px-10 py-5 bg-gradient-to-r from-purple-500 to-cyan-500 text-white text-lg font-bold rounded-full hover:scale-105 transition-all duration-300 shadow-2xl shadow-purple-500/50 hover:shadow-purple-500/70"
+            >
+              Get Started
+            </Link>
+          </div>
+        </motion.div>
       </section>
 
       {/* CLIENT LOGOS MARQUEE */}
