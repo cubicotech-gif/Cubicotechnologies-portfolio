@@ -81,6 +81,24 @@ const IMAGE_SECTIONS: Record<string, ImageSection> = {
       { name: 'category', label: 'Design Category', type: 'select', options: ['Logo Design', 'Social Media', 'Artwork', 'Video', 'Branding'], required: true }
     ]
   },
+  services: {
+    id: 'services',
+    name: 'Service Images',
+    description: 'Images for expandable service cards (4 images per service)',
+    icon: '💼',
+    dimensions: {
+      width: 600,
+      height: 600,
+      aspectRatio: '1:1 (Square)',
+      note: 'Square images for service gallery grid. Each service displays 4 images in 2x2 grid when expanded.'
+    },
+    apiEndpoint: '/api/service-images',
+    extraFields: [
+      { name: 'service_type', label: 'Service Type', type: 'select', options: ['Artwork Designing', 'Branding & Graphics', 'Social Media Graphics', 'Videography'], required: true },
+      { name: 'image_slot', label: 'Image Slot (1-4)', type: 'select', options: ['1', '2', '3', '4'], required: true },
+      { name: 'alt_text', label: 'Alt Text', type: 'text', required: false }
+    ]
+  },
   projects: {
     id: 'projects',
     name: 'Featured Projects',

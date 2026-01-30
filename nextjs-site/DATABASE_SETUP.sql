@@ -130,6 +130,41 @@ CREATE POLICY "Service role full access" ON site_settings
   FOR ALL USING (auth.role() = 'service_role');
 
 -- ===================================================================
+-- 5. SERVICE IMAGES TABLE
+-- ===================================================================
+CREATE TABLE IF NOT EXISTS service_images (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  service_type TEXT NOT NULL,
+  image_slot INTEGER NOT NULL CHECK (image_slot >= 1 AND image_slot <= 4),
+  image_url TEXT NOT NULL,
+  alt_text TEXT,
+  "order" INTEGER NOT NULL DEFAULT 1,
+  active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(service_type, image_slot)
+);
+
+-- Indexes for performance
+CREATE INDEX IF NOT EXISTS idx_service_images_service_type ON service_images(service_type);
+CREATE INDEX IF NOT EXISTS idx_service_images_active ON service_images(active);
+CREATE INDEX IF NOT EXISTS idx_service_images_order ON service_images("order");
+
+-- Enable Row Level Security
+ALTER TABLE service_images ENABLE ROW LEVEL SECURITY;
+
+-- Drop existing policies if they exist
+DROP POLICY IF EXISTS "Public read access" ON service_images;
+DROP POLICY IF EXISTS "Service role full access" ON service_images;
+
+-- Policies
+CREATE POLICY "Public read access" ON service_images
+  FOR SELECT USING (true);
+
+CREATE POLICY "Service role full access" ON service_images
+  FOR ALL USING (auth.role() = 'service_role');
+
+-- ===================================================================
 -- 5. STORAGE POLICIES (Run only if not already created)
 -- ===================================================================
 
@@ -192,7 +227,7 @@ END $$;
 SELECT 'Tables Created:' as status;
 SELECT table_name FROM information_schema.tables
 WHERE table_schema = 'public'
-AND table_name IN ('hero_images', 'featured_projects', 'client_logos', 'site_settings');
+AND table_name IN ('hero_images', 'featured_projects', 'client_logos', 'site_settings', 'service_images');
 
 -- Check storage policies
 SELECT 'Storage Policies:' as status;
@@ -206,6 +241,6 @@ ORDER BY policyname;
 -- ===================================================================
 SELECT
   '✅ Database setup complete!' as message,
-  'Tables: hero_images, featured_projects, client_logos, site_settings' as tables,
+  'Tables: hero_images, featured_projects, client_logos, site_settings, service_images' as tables,
   'Storage: images bucket with read/write/delete policies' as storage,
   'Security: RLS enabled on all tables' as security;
