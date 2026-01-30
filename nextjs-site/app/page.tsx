@@ -336,111 +336,146 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* FEATURED WORK SECTION */}
-      <section className="py-24 lg:py-32 relative">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+      {/* BOLD STATEMENT + TRUST GRID SECTION */}
+      <section className="relative py-24 lg:py-32 bg-gradient-to-b from-black via-zinc-950 to-black">
+        {/* Decorative top line */}
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-purple-500/20 to-transparent" />
+
+        {/* Statement Section */}
+        <div className="max-w-5xl mx-auto px-8 mb-16 lg:mb-24">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-center"
+          >
+            <p className="text-xs uppercase tracking-widest text-gray-400 mb-6">
+              WHY CUBICO
+            </p>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight tracking-tight bg-gradient-to-b from-white to-gray-300 bg-clip-text text-transparent font-[family-name:var(--font-space-grotesk)]">
+              Global standards. Local expertise. International-quality creative work that sets you apart.
+            </h2>
+          </motion.div>
+        </div>
+
+        {/* Trust Grid */}
+        <div className="max-w-7xl mx-auto px-8">
           <motion.div
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeInUp}
-            className="text-center mb-16"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8"
           >
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-4 font-[family-name:var(--font-space-grotesk)]">
-              Featured Projects
-            </h2>
-            <p className="text-gray-400 text-lg">
-              Showcasing our best creative work
-            </p>
+            {/* Indicator 1 - Years */}
+            <motion.div
+              variants={fadeInUp}
+              className="relative p-8 bg-zinc-900/30 backdrop-blur-sm border border-white/5 rounded-2xl hover:border-white/10 hover:-translate-y-1 transition-all duration-300 group"
+            >
+              {/* Icon Badge */}
+              <div className="w-12 h-12 rounded-full bg-gradient-to-r from-purple-600 to-pink-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+
+              {/* Number */}
+              <div className="mb-2">
+                <Counter end={5} suffix="+" />
+              </div>
+
+              {/* Label */}
+              <p className="text-base text-gray-400 leading-relaxed">
+                Years of Excellence
+              </p>
+              <p className="text-sm text-gray-500 mt-1 italic">
+                Delivering quality since 2020
+              </p>
+            </motion.div>
+
+            {/* Indicator 2 - Projects */}
+            <motion.div
+              variants={fadeInUp}
+              className="relative p-8 bg-zinc-900/30 backdrop-blur-sm border border-white/5 rounded-2xl hover:border-white/10 hover:-translate-y-1 transition-all duration-300 group"
+            >
+              {/* Icon Badge */}
+              <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+
+              {/* Number */}
+              <div className="mb-2">
+                <Counter end={100} suffix="+" />
+              </div>
+
+              {/* Label */}
+              <p className="text-base text-gray-400 leading-relaxed">
+                Projects Completed
+              </p>
+              <p className="text-sm text-gray-500 mt-1 italic">
+                Across multiple industries
+              </p>
+            </motion.div>
+
+            {/* Indicator 3 - Clients */}
+            <motion.div
+              variants={fadeInUp}
+              className="relative p-8 bg-zinc-900/30 backdrop-blur-sm border border-white/5 rounded-2xl hover:border-white/10 hover:-translate-y-1 transition-all duration-300 group"
+            >
+              {/* Icon Badge */}
+              <div className="w-12 h-12 rounded-full bg-gradient-to-r from-orange-600 to-yellow-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                </svg>
+              </div>
+
+              {/* Number */}
+              <div className="mb-2">
+                <Counter end={50} suffix="+" />
+              </div>
+
+              {/* Label */}
+              <p className="text-base text-gray-400 leading-relaxed">
+                Happy Clients
+              </p>
+              <p className="text-sm text-gray-500 mt-1 italic">
+                Worldwide partnerships
+              </p>
+            </motion.div>
+
+            {/* Indicator 4 - Satisfaction */}
+            <motion.div
+              variants={fadeInUp}
+              className="relative p-8 bg-zinc-900/30 backdrop-blur-sm border border-white/5 rounded-2xl hover:border-white/10 hover:-translate-y-1 transition-all duration-300 group"
+            >
+              {/* Icon Badge */}
+              <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-600 to-purple-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+                </svg>
+              </div>
+
+              {/* Number */}
+              <div className="mb-2">
+                <Counter end={98} suffix="%" />
+              </div>
+
+              {/* Label */}
+              <p className="text-base text-gray-400 leading-relaxed">
+                Client Satisfaction
+              </p>
+              <p className="text-sm text-gray-500 mt-1 italic">
+                Exceptional service guaranteed
+              </p>
+            </motion.div>
           </motion.div>
-
-          {/* Carousel */}
-          <div className="relative">
-            {loadingProjects ? (
-              <div className="aspect-video bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl flex items-center justify-center">
-                <div className="text-center">
-                  <div className="inline-block w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mb-4" />
-                  <p className="text-gray-400">Loading projects...</p>
-                </div>
-              </div>
-            ) : featuredProjects.length === 0 ? (
-              <div className="aspect-video bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl flex items-center justify-center">
-                <p className="text-gray-400">No featured projects available yet</p>
-              </div>
-            ) : (
-              <>
-                <div className="overflow-hidden rounded-2xl">
-                  <motion.div
-                    key={currentSlide}
-                    initial={{ opacity: 0, x: 100 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -100 }}
-                    transition={{ duration: 0.5 }}
-                    className="relative aspect-video bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden group"
-                  >
-                    <div className="relative w-full h-full flex items-center justify-center p-8 sm:p-12">
-                      <div className="relative w-full h-full max-w-4xl">
-                        <Image
-                          src={featuredProjects[currentSlide].image_url}
-                          alt={featuredProjects[currentSlide].title}
-                          fill
-                          className="object-contain transition-transform duration-500 group-hover:scale-105"
-                        />
-                      </div>
-                    </div>
-                    <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-black/80 to-transparent">
-                      <span className="inline-block px-4 py-1 bg-gradient-to-r from-purple-500 to-cyan-500 text-white text-sm font-semibold rounded-full mb-3">
-                        {featuredProjects[currentSlide].category}
-                      </span>
-                      <h3 className="text-2xl sm:text-3xl font-bold text-white mb-2">
-                        {featuredProjects[currentSlide].title}
-                      </h3>
-                      <p className="text-gray-300">
-                        {featuredProjects[currentSlide].description}
-                      </p>
-                    </div>
-                  </motion.div>
-                </div>
-
-                {/* Navigation Arrows */}
-                <button
-                  onClick={prevSlide}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-white/10 backdrop-blur-xl border border-white/20 rounded-full hover:bg-white/20 transition-all duration-300"
-                  aria-label="Previous slide"
-                >
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                </button>
-                <button
-                  onClick={nextSlide}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-white/10 backdrop-blur-xl border border-white/20 rounded-full hover:bg-white/20 transition-all duration-300"
-                  aria-label="Next slide"
-                >
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-
-                {/* Slide Indicators */}
-                <div className="flex justify-center gap-2 mt-8">
-                  {featuredProjects.map((_, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setCurrentSlide(index)}
-                      className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                        index === currentSlide
-                          ? 'w-8 bg-gradient-to-r from-purple-500 to-cyan-500'
-                          : 'bg-white/30 hover:bg-white/50'
-                      }`}
-                      aria-label={`Go to slide ${index + 1}`}
-                    />
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
         </div>
+
+        {/* Decorative bottom line */}
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-500/20 to-transparent" />
       </section>
 
       {/* EXPANDABLE SPLIT CARDS SERVICES SECTION */}
