@@ -79,6 +79,7 @@ export default function Home() {
   const [clientLogos, setClientLogos] = useState<ClientLogo[]>([]);
   const [loadingProjects, setLoadingProjects] = useState(true);
   const [loadingLogos, setLoadingLogos] = useState(true);
+  const [expandedCard, setExpandedCard] = useState<number | null>(null);
 
   // Fetch featured projects from API
   useEffect(() => {
@@ -126,23 +127,75 @@ export default function Home() {
     fetchLogos();
   }, []);
 
-  const services = [
+  const servicesData = [
     {
+      id: 1,
+      number: '01',
       title: 'Artwork Designing',
-      description: 'Digital products and custom illustrations crafted from scratch with meticulous attention to detail',
+      category: 'Digital Art',
+      shortDesc: 'Digital products and custom illustrations crafted from scratch',
+      fullDesc: 'Digital products and custom illustrations crafted from scratch with meticulous attention to detail. We transform ideas into stunning visual assets.',
+      gradient: 'from-purple-600 via-purple-500 to-pink-500',
+      features: [
+        'Custom digital illustrations',
+        'Print-ready artwork files',
+        'Unique visual concepts',
+        'Scalable vector graphics',
+        'Unlimited revisions',
+        'Fast turnaround time'
+      ]
     },
     {
+      id: 2,
+      number: '02',
       title: 'Branding & Graphics',
-      description: 'Complete brand identities, logos, banners, and visual systems that tell your story',
+      category: 'Brand Identity',
+      shortDesc: 'Complete brand identities and visual systems',
+      fullDesc: 'Complete brand identities, logos, banners, and visual systems that tell your story and differentiate you from competitors.',
+      gradient: 'from-blue-600 via-blue-500 to-cyan-500',
+      features: [
+        'Logo design & variations',
+        'Brand style guides',
+        'Marketing collateral',
+        'Print & digital assets',
+        'Brand strategy consultation',
+        'Social media templates'
+      ]
     },
     {
+      id: 3,
+      number: '03',
       title: 'Social Media Graphics',
-      description: 'Engaging posts, advertisements, and marketing content that captures attention',
+      category: 'Social Media',
+      shortDesc: 'Engaging content for all platforms',
+      fullDesc: 'Engaging posts, advertisements, and marketing content designed to capture attention and drive engagement across all platforms.',
+      gradient: 'from-orange-600 via-orange-500 to-yellow-500',
+      features: [
+        'Instagram & Facebook posts',
+        'Story & reel templates',
+        'Ad creative design',
+        'Carousel posts',
+        'Content calendar support',
+        'Platform optimization'
+      ]
     },
     {
+      id: 4,
+      number: '04',
       title: 'Videography',
-      description: 'Reels, animations, and product videos that bring your vision to life',
-    },
+      category: 'Motion Design',
+      shortDesc: 'Professional videos and animations',
+      fullDesc: 'Reels, animations, and product videos that bring your vision to life with professional motion graphics and editing.',
+      gradient: 'from-pink-600 via-pink-500 to-purple-500',
+      features: [
+        'Social media reels',
+        'Product demo videos',
+        'Motion graphics',
+        'Video editing & color grading',
+        'Animation & effects',
+        'Multi-format export'
+      ]
+    }
   ];
 
   const stats = [
@@ -363,10 +416,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SERVICES DIAGONAL SPLIT REVEAL SECTION */}
-      <section className="relative bg-black">
+      {/* EXPANDABLE SPLIT CARDS SERVICES SECTION */}
+      <section className="relative bg-black py-32">
         {/* Section Header */}
-        <div className="max-w-7xl mx-auto px-8 pt-32 pb-16">
+        <div className="max-w-7xl mx-auto px-8 pb-16">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -377,310 +430,188 @@ export default function Home() {
             <p className="text-xs uppercase tracking-widest text-gray-400 mb-4">
               OUR SERVICES
             </p>
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 bg-gradient-to-b from-white to-gray-300 bg-clip-text text-transparent font-[family-name:var(--font-space-grotesk)]">
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 text-white font-[family-name:var(--font-space-grotesk)]">
               What We Create
             </h2>
             <p className="text-xl text-gray-400 mt-4">
-              Comprehensive creative solutions for global brands
+              Click to explore each service in detail
             </p>
           </motion.div>
         </div>
 
-        {/* Service 1 - Image LEFT, Content RIGHT */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true, margin: "-20%" }}
-          transition={{ duration: 0.6 }}
-          className="relative w-full h-screen lg:h-screen overflow-hidden flex flex-col lg:flex-row"
-        >
-          {/* Image Side */}
-          <motion.div
-            initial={{ x: -100, opacity: 0 }}
-            whileInView={{ x: 0, opacity: 1 }}
-            viewport={{ once: true, margin: "-20%" }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="relative w-full lg:w-1/2 h-64 lg:h-full overflow-hidden"
-            style={{
-              clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-            }}
-          >
-            {/* Gradient Placeholder */}
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-600 via-purple-500 to-pink-500" />
-            <div className="absolute inset-0 bg-black/30" />
+        {/* Services Grid with Perspective */}
+        <div className="max-w-7xl mx-auto px-8" style={{ perspective: '2000px' }}>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {servicesData.map((service) => {
+              const isExpanded = expandedCard === service.id;
+              const otherCardExpanded = expandedCard !== null && !isExpanded;
 
-            {/* Placeholder Text */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center px-6">
-                <p className="text-white/70 text-sm font-medium">Service Image Placeholder</p>
-                <p className="text-white/50 text-xs mt-1">Replace with artwork image</p>
-              </div>
-            </div>
+              return (
+                <motion.div
+                  key={service.id}
+                  layout
+                  className={`relative ${
+                    isExpanded ? 'lg:col-span-2 z-50' : ''
+                  } ${otherCardExpanded ? 'opacity-40' : 'opacity-100'}`}
+                  style={{ transformStyle: 'preserve-3d' }}
+                  animate={{
+                    opacity: otherCardExpanded ? 0.4 : 1,
+                  }}
+                  transition={{ duration: 0.3 }}
+                >
+                  {!isExpanded ? (
+                    // COLLAPSED CARD
+                    <motion.div
+                      onClick={() => setExpandedCard(service.id)}
+                      className="relative h-[400px] lg:h-[500px] rounded-3xl overflow-hidden cursor-pointer group bg-gradient-to-br from-zinc-900 to-zinc-950 border border-white/5"
+                      whileHover={{ scale: 1.02 }}
+                      transition={{ duration: 0.3 }}
+                      style={{
+                        boxShadow: '0 4px 24px rgba(0,0,0,0.4)',
+                      }}
+                    >
+                      {/* Background Image Placeholder */}
+                      <div className={`absolute inset-0 bg-gradient-to-br ${service.gradient} opacity-70 group-hover:scale-110 transition-transform duration-500`} />
+                      <div className="absolute inset-0 bg-black/40" />
 
-            {/* Number Badge */}
-            <div className="absolute top-8 left-8 w-16 h-16 rounded-full backdrop-blur-md bg-white/10 border border-white/20 flex items-center justify-center shadow-2xl">
-              <span className="text-white font-bold text-2xl">01</span>
-            </div>
-          </motion.div>
+                      {/* Number Badge */}
+                      <div className="absolute top-6 left-6 w-14 h-14 rounded-full backdrop-blur-md bg-white/10 border border-white/20 flex items-center justify-center z-10">
+                        <span className="text-white font-bold text-xl">{service.number}</span>
+                      </div>
 
-          {/* Content Side */}
-          <motion.div
-            initial={{ x: 100, opacity: 0 }}
-            whileInView={{ x: 0, opacity: 1 }}
-            viewport={{ once: true, margin: "-20%" }}
-            transition={{ duration: 0.8, ease: "easeOut", delay: 0.1 }}
-            className="relative w-full lg:w-1/2 h-auto lg:h-full bg-zinc-950 flex items-center px-8 lg:px-20 py-20 lg:py-0"
-          >
-            <div className="max-w-lg">
-              <h3 className="text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-6 leading-tight tracking-tight font-[family-name:var(--font-space-grotesk)]">
-                Artwork Designing
-              </h3>
-              <p className="text-lg text-gray-300 leading-relaxed mb-10">
-                Digital products and custom illustrations crafted from scratch with meticulous attention to detail
-              </p>
+                      {/* Content */}
+                      <div className="absolute inset-0 flex flex-col justify-end p-8 z-10">
+                        <h3 className="text-4xl lg:text-5xl font-bold text-white mb-3 font-[family-name:var(--font-space-grotesk)]">
+                          {service.title}
+                        </h3>
+                        <p className="text-gray-300 text-lg mb-4">{service.shortDesc}</p>
 
-              {/* Features */}
-              <ul className="space-y-3 mb-10">
-                {['Custom digital illustrations', 'Print-ready artwork files', 'Unique visual concepts', 'Scalable vector graphics'].map((feature, i) => (
-                  <li key={i} className="flex items-center gap-3 text-gray-400">
-                    <div className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-purple-400 to-cyan-400" />
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
+                        {/* Hover Indicator */}
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                          <p className="text-sm text-white/60 uppercase tracking-wide">Click to explore →</p>
+                        </div>
+                      </div>
 
-              {/* CTA */}
-              <Link href="/services" className="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-wide bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent group">
-                <span>Explore Service</span>
-                <svg className="w-4 h-4 text-purple-400 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-              </Link>
-            </div>
-          </motion.div>
-        </motion.div>
+                      {/* Gradient Border Glow on Hover */}
+                      <div className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
+                        <div className={`absolute inset-0 rounded-3xl bg-gradient-to-r ${service.gradient} blur-xl opacity-20`} />
+                      </div>
+                    </motion.div>
+                  ) : (
+                    // EXPANDED SPLIT CARD
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
+                      className="relative h-auto lg:h-[600px] rounded-3xl overflow-hidden"
+                    >
+                      <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 h-full">
+                        {/* LEFT HALF - Image Gallery */}
+                        <motion.div
+                          initial={{ x: -50, rotateY: 5 }}
+                          animate={{ x: 0, rotateY: 0 }}
+                          transition={{ duration: 0.6, ease: "easeOut" }}
+                          className={`w-full lg:w-[48%] h-[300px] lg:h-full rounded-3xl overflow-hidden bg-gradient-to-br ${service.gradient} relative`}
+                          style={{
+                            transformStyle: 'preserve-3d',
+                            boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
+                          }}
+                        >
+                          {/* Placeholder Grid */}
+                          <div className="absolute inset-0 p-6 grid grid-cols-2 gap-4">
+                            {[1, 2, 3, 4].map((i) => (
+                              <motion.div
+                                key={i}
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ delay: i * 0.1, duration: 0.4 }}
+                                className="bg-black/20 backdrop-blur-sm rounded-xl border border-white/10 flex items-center justify-center"
+                              >
+                                <p className="text-white/50 text-xs">Image {i}</p>
+                              </motion.div>
+                            ))}
+                          </div>
 
-        {/* Service 2 - Content LEFT, Image RIGHT */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true, margin: "-20%" }}
-          transition={{ duration: 0.6 }}
-          className="relative w-full h-screen lg:h-screen overflow-hidden flex flex-col-reverse lg:flex-row"
-        >
-          {/* Content Side */}
-          <motion.div
-            initial={{ x: -100, opacity: 0 }}
-            whileInView={{ x: 0, opacity: 1 }}
-            viewport={{ once: true, margin: "-20%" }}
-            transition={{ duration: 0.8, ease: "easeOut", delay: 0.1 }}
-            className="relative w-full lg:w-1/2 h-auto lg:h-full bg-zinc-950 flex items-center px-8 lg:px-20 py-20 lg:py-0"
-          >
-            <div className="max-w-lg lg:ml-auto">
-              <h3 className="text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-6 leading-tight tracking-tight font-[family-name:var(--font-space-grotesk)]">
-                Branding & Graphics
-              </h3>
-              <p className="text-lg text-gray-300 leading-relaxed mb-10">
-                Complete brand identities, logos, banners, and visual systems that tell your story
-              </p>
+                          {/* Number Badge */}
+                          <div className="absolute top-6 left-6 w-14 h-14 rounded-full backdrop-blur-md bg-white/10 border border-white/20 flex items-center justify-center">
+                            <span className="text-white font-bold text-xl">{service.number}</span>
+                          </div>
+                        </motion.div>
 
-              {/* Features */}
-              <ul className="space-y-3 mb-10">
-                {['Logo design & brand identity', 'Marketing collateral', 'Brand guidelines', 'Print & digital assets'].map((feature, i) => (
-                  <li key={i} className="flex items-center gap-3 text-gray-400">
-                    <div className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-blue-400 to-cyan-400" />
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
+                        {/* RIGHT HALF - Detailed Content */}
+                        <motion.div
+                          initial={{ x: 50, rotateY: -5 }}
+                          animate={{ x: 0, rotateY: 0 }}
+                          transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
+                          className="w-full lg:w-[48%] bg-zinc-900 rounded-3xl p-8 lg:p-10 flex flex-col justify-between relative"
+                          style={{
+                            transformStyle: 'preserve-3d',
+                            boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
+                          }}
+                        >
+                          {/* Close Button */}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setExpandedCard(null);
+                            }}
+                            className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 flex items-center justify-center transition-all duration-300 group"
+                          >
+                            <svg className="w-5 h-5 text-white group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
 
-              {/* CTA */}
-              <Link href="/services" className="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-wide bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent group">
-                <span>Explore Service</span>
-                <svg className="w-4 h-4 text-blue-400 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-              </Link>
-            </div>
-          </motion.div>
+                          {/* Top Section */}
+                          <div>
+                            <div className="inline-block px-3 py-1 bg-white/5 backdrop-blur-sm rounded-full border border-white/10 text-xs uppercase tracking-wide text-gray-400 mb-4">
+                              {service.category}
+                            </div>
+                            <h3 className="text-3xl lg:text-4xl font-bold text-white mb-4 font-[family-name:var(--font-space-grotesk)]">
+                              {service.title}
+                            </h3>
+                            <p className="text-base text-gray-300 leading-relaxed mb-8">
+                              {service.fullDesc}
+                            </p>
 
-          {/* Image Side */}
-          <motion.div
-            initial={{ x: 100, opacity: 0 }}
-            whileInView={{ x: 0, opacity: 1 }}
-            viewport={{ once: true, margin: "-20%" }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="relative w-full lg:w-1/2 h-64 lg:h-full overflow-hidden"
-            style={{
-              clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-            }}
-          >
-            {/* Gradient Placeholder */}
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500" />
-            <div className="absolute inset-0 bg-black/30" />
+                            {/* Features List */}
+                            <div className="mb-8">
+                              <p className="text-xs uppercase tracking-wide text-gray-500 mb-4">What's Included</p>
+                              <ul className="space-y-3">
+                                {service.features.map((feature, i) => (
+                                  <motion.li
+                                    key={i}
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: 0.3 + i * 0.05, duration: 0.3 }}
+                                    className="flex items-center gap-3 text-gray-300"
+                                  >
+                                    <div className={`w-1.5 h-1.5 rounded-full bg-gradient-to-r ${service.gradient}`} />
+                                    <span className="text-sm">{feature}</span>
+                                  </motion.li>
+                                ))}
+                              </ul>
+                            </div>
+                          </div>
 
-            {/* Placeholder Text */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center px-6">
-                <p className="text-white/70 text-sm font-medium">Service Image Placeholder</p>
-                <p className="text-white/50 text-xs mt-1">Replace with branding image</p>
-              </div>
-            </div>
-
-            {/* Number Badge */}
-            <div className="absolute top-8 left-8 w-16 h-16 rounded-full backdrop-blur-md bg-white/10 border border-white/20 flex items-center justify-center shadow-2xl">
-              <span className="text-white font-bold text-2xl">02</span>
-            </div>
-          </motion.div>
-        </motion.div>
-
-        {/* Service 3 - Image LEFT, Content RIGHT */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true, margin: "-20%" }}
-          transition={{ duration: 0.6 }}
-          className="relative w-full h-screen lg:h-screen overflow-hidden flex flex-col lg:flex-row"
-        >
-          {/* Image Side */}
-          <motion.div
-            initial={{ x: -100, opacity: 0 }}
-            whileInView={{ x: 0, opacity: 1 }}
-            viewport={{ once: true, margin: "-20%" }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="relative w-full lg:w-1/2 h-64 lg:h-full overflow-hidden"
-            style={{
-              clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-            }}
-          >
-            {/* Gradient Placeholder */}
-            <div className="absolute inset-0 bg-gradient-to-br from-orange-600 via-orange-500 to-yellow-500" />
-            <div className="absolute inset-0 bg-black/30" />
-
-            {/* Placeholder Text */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center px-6">
-                <p className="text-white/70 text-sm font-medium">Service Image Placeholder</p>
-                <p className="text-white/50 text-xs mt-1">Replace with social media image</p>
-              </div>
-            </div>
-
-            {/* Number Badge */}
-            <div className="absolute top-8 left-8 w-16 h-16 rounded-full backdrop-blur-md bg-white/10 border border-white/20 flex items-center justify-center shadow-2xl">
-              <span className="text-white font-bold text-2xl">03</span>
-            </div>
-          </motion.div>
-
-          {/* Content Side */}
-          <motion.div
-            initial={{ x: 100, opacity: 0 }}
-            whileInView={{ x: 0, opacity: 1 }}
-            viewport={{ once: true, margin: "-20%" }}
-            transition={{ duration: 0.8, ease: "easeOut", delay: 0.1 }}
-            className="relative w-full lg:w-1/2 h-auto lg:h-full bg-zinc-950 flex items-center px-8 lg:px-20 py-20 lg:py-0"
-          >
-            <div className="max-w-lg">
-              <h3 className="text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-6 leading-tight tracking-tight font-[family-name:var(--font-space-grotesk)]">
-                Social Media Graphics
-              </h3>
-              <p className="text-lg text-gray-300 leading-relaxed mb-10">
-                Engaging posts, advertisements, and marketing content that captures attention
-              </p>
-
-              {/* Features */}
-              <ul className="space-y-3 mb-10">
-                {['Instagram & Facebook posts', 'Story templates', 'Ad creatives', 'Content calendars'].map((feature, i) => (
-                  <li key={i} className="flex items-center gap-3 text-gray-400">
-                    <div className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-orange-400 to-yellow-400" />
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
-
-              {/* CTA */}
-              <Link href="/services" className="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-wide bg-gradient-to-r from-orange-400 to-yellow-400 bg-clip-text text-transparent group">
-                <span>Explore Service</span>
-                <svg className="w-4 h-4 text-orange-400 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-              </Link>
-            </div>
-          </motion.div>
-        </motion.div>
-
-        {/* Service 4 - Content LEFT, Image RIGHT */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true, margin: "-20%" }}
-          transition={{ duration: 0.6 }}
-          className="relative w-full h-screen lg:h-screen overflow-hidden flex flex-col-reverse lg:flex-row"
-        >
-          {/* Content Side */}
-          <motion.div
-            initial={{ x: -100, opacity: 0 }}
-            whileInView={{ x: 0, opacity: 1 }}
-            viewport={{ once: true, margin: "-20%" }}
-            transition={{ duration: 0.8, ease: "easeOut", delay: 0.1 }}
-            className="relative w-full lg:w-1/2 h-auto lg:h-full bg-zinc-950 flex items-center px-8 lg:px-20 py-20 lg:py-0"
-          >
-            <div className="max-w-lg lg:ml-auto">
-              <h3 className="text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-6 leading-tight tracking-tight font-[family-name:var(--font-space-grotesk)]">
-                Videography
-              </h3>
-              <p className="text-lg text-gray-300 leading-relaxed mb-10">
-                Reels, animations, and product videos that bring your vision to life
-              </p>
-
-              {/* Features */}
-              <ul className="space-y-3 mb-10">
-                {['Social media reels', 'Product videos', 'Motion graphics', 'Video editing'].map((feature, i) => (
-                  <li key={i} className="flex items-center gap-3 text-gray-400">
-                    <div className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-pink-400 to-purple-400" />
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
-
-              {/* CTA */}
-              <Link href="/services" className="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-wide bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent group">
-                <span>Explore Service</span>
-                <svg className="w-4 h-4 text-pink-400 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-              </Link>
-            </div>
-          </motion.div>
-
-          {/* Image Side */}
-          <motion.div
-            initial={{ x: 100, opacity: 0 }}
-            whileInView={{ x: 0, opacity: 1 }}
-            viewport={{ once: true, margin: "-20%" }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="relative w-full lg:w-1/2 h-64 lg:h-full overflow-hidden"
-            style={{
-              clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-            }}
-          >
-            {/* Gradient Placeholder */}
-            <div className="absolute inset-0 bg-gradient-to-br from-pink-600 via-pink-500 to-purple-500" />
-            <div className="absolute inset-0 bg-black/30" />
-
-            {/* Placeholder Text */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center px-6">
-                <p className="text-white/70 text-sm font-medium">Service Image Placeholder</p>
-                <p className="text-white/50 text-xs mt-1">Replace with videography image</p>
-              </div>
-            </div>
-
-            {/* Number Badge */}
-            <div className="absolute top-8 left-8 w-16 h-16 rounded-full backdrop-blur-md bg-white/10 border border-white/20 flex items-center justify-center shadow-2xl">
-              <span className="text-white font-bold text-2xl">04</span>
-            </div>
-          </motion.div>
-        </motion.div>
+                          {/* Bottom Section - CTA */}
+                          <div>
+                            <Link
+                              href="/contact"
+                              className={`w-full py-4 px-6 bg-gradient-to-r ${service.gradient} text-white font-semibold rounded-xl hover:scale-105 hover:brightness-110 transition-all duration-300 shadow-lg inline-block text-center`}
+                            >
+                              Get Started
+                            </Link>
+                          </div>
+                        </motion.div>
+                      </div>
+                    </motion.div>
+                  )}
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
 
         {/* Final CTA Section */}
         <motion.div
@@ -688,7 +619,7 @@ export default function Home() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="relative w-full py-32 bg-gradient-to-b from-black to-zinc-950"
+          className="relative w-full pt-32"
         >
           <div className="max-w-4xl mx-auto px-8 text-center">
             <h3 className="text-4xl lg:text-5xl font-bold text-white mb-6 font-[family-name:var(--font-space-grotesk)]">
