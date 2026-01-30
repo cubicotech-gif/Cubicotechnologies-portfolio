@@ -271,9 +271,14 @@ export default function AdminHeroPage() {
               value={uploadFolder}
               onChange={(e) => setUploadFolder(e.target.value)}
               className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+              style={{ colorScheme: 'dark' }}
             >
               {uploadFolders.map((folder) => (
-                <option key={folder.value} value={folder.value}>
+                <option
+                  key={folder.value}
+                  value={folder.value}
+                  className="bg-gray-900 text-white"
+                >
                   {folder.label} - {folder.description}
                 </option>
               ))}
