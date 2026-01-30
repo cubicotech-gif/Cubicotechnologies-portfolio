@@ -5,12 +5,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 
 interface PortfolioItem {
-  id: number;
+  id: string | number;
   title: string;
   category: string;
   client: string;
   description: string;
-  imageUrl: string;
+  imageUrl?: string;
+  image_url?: string;
   year: string;
   services: string[];
 }
@@ -178,10 +179,37 @@ const categories = [
 
 export default function PortfolioPage() {
   const [activeFilter, setActiveFilter] = useState('All');
+  const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>(portfolioData);
   const [filteredItems, setFilteredItems] = useState<PortfolioItem[]>(portfolioData);
   const [visibleCount, setVisibleCount] = useState(12);
   const [selectedProject, setSelectedProject] = useState<PortfolioItem | null>(null);
   const [isFilterSticky, setIsFilterSticky] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch portfolio items from database
+  useEffect(() => {
+    const fetchPortfolioItems = async () => {
+      try {
+        const response = await fetch('/api/portfolio?active=true');
+        const data = await response.json();
+        if (data.success && data.items && data.items.length > 0) {
+          // Use database items
+          setPortfolioItems(data.items);
+        } else {
+          // Fallback to sample data if no items in database
+          setPortfolioItems(portfolioData);
+        }
+      } catch (error) {
+        console.error('Error fetching portfolio items:', error);
+        // Fallback to sample data on error
+        setPortfolioItems(portfolioData);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPortfolioItems();
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -193,12 +221,12 @@ export default function PortfolioPage() {
 
   useEffect(() => {
     if (activeFilter === 'All') {
-      setFilteredItems(portfolioData);
+      setFilteredItems(portfolioItems);
     } else {
-      setFilteredItems(portfolioData.filter(item => item.category === activeFilter));
+      setFilteredItems(portfolioItems.filter(item => item.category === activeFilter));
     }
     setVisibleCount(12);
-  }, [activeFilter]);
+  }, [activeFilter, portfolioItems]);
 
   const visibleItems = filteredItems.slice(0, visibleCount);
   const hasMore = visibleCount < filteredItems.length;
@@ -310,7 +338,7 @@ export default function PortfolioPage() {
                     index % 7 === 0 ? 'aspect-[16/10]' : 'aspect-[4/5]'
                   }`}>
                     <Image
-                      src={item.imageUrl}
+                      src={item.image_url || item.imageUrl || ''}
                       alt={item.title}
                       fill
                       className="object-cover transition-transform duration-700 group-hover:scale-110"
@@ -432,7 +460,7 @@ export default function PortfolioPage() {
                 {/* Left: Image */}
                 <div className="relative aspect-[4/3] lg:aspect-auto lg:min-h-[600px]">
                   <Image
-                    src={selectedProject.imageUrl}
+                    src={selectedProject.image_url || selectedProject.imageUrl || ''}
                     alt={selectedProject.title}
                     fill
                     className="object-cover"
