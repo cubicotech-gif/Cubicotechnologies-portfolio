@@ -195,23 +195,24 @@ export default function AnimatedCardsBackground() {
           >
             <motion.div
               animate={{
-                y: column.direction === 'up' ? [0, -2000] : [0, 2000],
+                y: column.direction === 'up' ? ['0%', '-50%'] : ['0%', '50%'],
               }}
               transition={{
                 duration: column.duration,
                 repeat: Infinity,
                 ease: 'linear',
+                repeatType: 'loop',
               }}
               className="flex flex-col gap-5"
             >
-              {/* Duplicate cards for seamless loop */}
-              {[...column.cards, ...column.cards, ...column.cards].map((card, cardIndex) => (
+              {/* Duplicate cards 4 times for seamless infinite scroll */}
+              {[...column.cards, ...column.cards, ...column.cards, ...column.cards].map((card, cardIndex) => (
                 <motion.div
                   key={cardIndex}
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: card.opacity, scale: 1 }}
                   transition={{ delay: card.delay * 0.1, duration: 0.8 }}
-                  className="w-[200px] h-[280px] rounded-2xl backdrop-blur-sm overflow-hidden relative"
+                  className="w-[200px] h-[280px] rounded-2xl backdrop-blur-sm overflow-hidden relative flex-shrink-0"
                   style={{
                     backdropFilter: 'blur(4px)',
                     boxShadow: '0 8px 32px 0 rgba(139, 92, 246, 0.2)',
@@ -224,6 +225,15 @@ export default function AnimatedCardsBackground() {
                       fill
                       className="object-cover"
                       sizes="200px"
+                      quality={100}
+                      priority={cardIndex < column.cards.length}
+                      onError={(e) => {
+                        // Hide broken images
+                        const target = e.target as HTMLElement;
+                        if (target.parentElement) {
+                          target.parentElement.style.display = 'none';
+                        }
+                      }}
                     />
                   ) : (
                     <div className={`w-full h-full bg-gradient-to-br ${card.gradient}`} />
@@ -250,22 +260,24 @@ export default function AnimatedCardsBackground() {
             >
               <motion.div
                 animate={{
-                  y: column.direction === 'up' ? [0, -2000] : [0, 2000],
+                  y: column.direction === 'up' ? ['0%', '-50%'] : ['0%', '50%'],
                 }}
                 transition={{
                   duration: column.duration,
                   repeat: Infinity,
                   ease: 'linear',
+                  repeatType: 'loop',
                 }}
                 className="flex flex-col gap-4"
               >
-                {[...column.cards, ...column.cards, ...column.cards].map((card, cardIndex) => (
+                {/* Duplicate cards 4 times for seamless infinite scroll */}
+                {[...column.cards, ...column.cards, ...column.cards, ...column.cards].map((card, cardIndex) => (
                   <motion.div
                     key={cardIndex}
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: card.opacity * 0.7, scale: 1 }}
                     transition={{ delay: card.delay * 0.1, duration: 0.8 }}
-                    className="w-[140px] h-[200px] rounded-xl backdrop-blur-sm overflow-hidden relative"
+                    className="w-[140px] h-[200px] rounded-xl backdrop-blur-sm overflow-hidden relative flex-shrink-0"
                     style={{
                       backdropFilter: 'blur(3px)',
                       boxShadow: '0 4px 24px 0 rgba(139, 92, 246, 0.15)',
@@ -278,6 +290,14 @@ export default function AnimatedCardsBackground() {
                         fill
                         className="object-cover"
                         sizes="140px"
+                        quality={100}
+                        onError={(e) => {
+                          // Hide broken images
+                          const target = e.target as HTMLElement;
+                          if (target.parentElement) {
+                            target.parentElement.style.display = 'none';
+                          }
+                        }}
                       />
                     ) : (
                       <div className={`w-full h-full bg-gradient-to-br ${card.gradient}`} />
