@@ -59,13 +59,13 @@ export default function Navigation() {
           {/* Logo */}
           <Link href="/" className="relative group flex items-center">
             {logoUrl ? (
-              <div className="relative h-12 w-auto">
+              <div className="relative h-16 w-auto">
                 <Image
                   src={logoUrl}
                   alt="Cubico Technologies"
-                  width={200}
-                  height={60}
-                  className="h-12 w-auto object-contain"
+                  width={266}
+                  height={80}
+                  className="h-16 w-auto object-contain"
                   quality={100}
                   priority
                 />
