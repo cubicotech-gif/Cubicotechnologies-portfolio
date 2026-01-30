@@ -18,26 +18,45 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const key = searchParams.get('key');
 
-    let query = supabaseAdmin.from('site_settings').select('*');
-
     if (key) {
-      query = query.eq('key', key).single();
+      // Fetch single setting
+      const { data, error } = await supabaseAdmin
+        .from('site_settings')
+        .select('*')
+        .eq('key', key)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error fetching settings:', error);
+        return NextResponse.json(
+          { success: false, error: error.message },
+          { status: 500 }
+        );
+      }
+
+      return NextResponse.json({
+        success: true,
+        settings: data,
+      });
+    } else {
+      // Fetch all settings
+      const { data, error } = await supabaseAdmin
+        .from('site_settings')
+        .select('*');
+
+      if (error) {
+        console.error('Error fetching settings:', error);
+        return NextResponse.json(
+          { success: false, error: error.message },
+          { status: 500 }
+        );
+      }
+
+      return NextResponse.json({
+        success: true,
+        settings: data || [],
+      });
     }
-
-    const { data, error } = await query;
-
-    if (error && error.code !== 'PGRST116') {
-      console.error('Error fetching settings:', error);
-      return NextResponse.json(
-        { success: false, error: error.message },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json({
-      success: true,
-      settings: key ? data : (data || []),
-    });
   } catch (error: any) {
     console.error('Error:', error);
     return NextResponse.json(
@@ -142,19 +161,30 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    let query = supabaseAdmin.from('site_settings').update({
+    const updateData = {
       ...(value && { value }),
       ...(type && { type }),
       updated_at: new Date().toISOString(),
-    });
+    };
 
+    let result;
     if (id) {
-      query = query.eq('id', id);
+      result = await supabaseAdmin
+        .from('site_settings')
+        .update(updateData)
+        .eq('id', id)
+        .select()
+        .single();
     } else {
-      query = query.eq('key', key);
+      result = await supabaseAdmin
+        .from('site_settings')
+        .update(updateData)
+        .eq('key', key!)
+        .select()
+        .single();
     }
 
-    const { data, error } = await query.select().single();
+    const { data, error } = result;
 
     if (error) {
       return NextResponse.json(
@@ -191,15 +221,20 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    let query = supabaseAdmin.from('site_settings').delete();
-
+    let result;
     if (id) {
-      query = query.eq('id', id);
+      result = await supabaseAdmin
+        .from('site_settings')
+        .delete()
+        .eq('id', id);
     } else {
-      query = query.eq('key', key);
+      result = await supabaseAdmin
+        .from('site_settings')
+        .delete()
+        .eq('key', key!);
     }
 
-    const { error } = await query;
+    const { error } = result;
 
     if (error) {
       return NextResponse.json(
