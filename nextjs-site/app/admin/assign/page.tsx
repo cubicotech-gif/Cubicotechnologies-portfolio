@@ -203,6 +203,14 @@ export default function UnifiedImageManager() {
         };
       } else if (currentSection.id === 'hero') {
         requestBody.category = extraFieldValues.category;
+      } else if (currentSection.id === 'services') {
+        requestBody = {
+          image_url: selectedImage.url,
+          service_type: extraFieldValues.service_type,
+          image_slot: extraFieldValues.image_slot,
+          alt_text: extraFieldValues.alt_text || null,
+          order: order,
+        };
       } else if (currentSection.id === 'projects') {
         requestBody.title = extraFieldValues.title;
         requestBody.category = extraFieldValues.category;
