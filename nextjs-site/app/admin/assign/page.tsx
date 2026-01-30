@@ -119,6 +119,27 @@ const IMAGE_SECTIONS: Record<string, ImageSection> = {
       { name: 'project_url', label: 'Project URL', type: 'url', required: false }
     ]
   },
+  portfolio: {
+    id: 'portfolio',
+    name: 'Portfolio Gallery',
+    description: 'Portfolio page project showcase',
+    icon: '📁',
+    dimensions: {
+      width: 800,
+      height: 600,
+      aspectRatio: '4:3 (Landscape)',
+      note: 'High-quality project images. Displayed in masonry grid with filtering.'
+    },
+    apiEndpoint: '/api/portfolio',
+    extraFields: [
+      { name: 'title', label: 'Project Title', type: 'text', required: true },
+      { name: 'category', label: 'Category', type: 'select', options: ['Artwork Designing', 'Branding & Graphics', 'Social Media', 'Videography'], required: true },
+      { name: 'client', label: 'Client Name', type: 'text', required: true },
+      { name: 'description', label: 'Description', type: 'textarea', required: true },
+      { name: 'year', label: 'Year', type: 'select', options: ['2025', '2024', '2023', '2022', '2021', '2020'], required: true },
+      { name: 'services', label: 'Services (comma-separated)', type: 'text', required: false }
+    ]
+  },
   logos: {
     id: 'logos',
     name: 'Client Logos',
@@ -220,6 +241,17 @@ export default function UnifiedImageManager() {
         requestBody.project_url = extraFieldValues.project_url || null;
         delete requestBody.filename;
         delete requestBody.url;
+      } else if (currentSection.id === 'portfolio') {
+        requestBody = {
+          title: extraFieldValues.title,
+          category: extraFieldValues.category,
+          client: extraFieldValues.client,
+          description: extraFieldValues.description,
+          image_url: selectedImage.url,
+          year: extraFieldValues.year,
+          services: extraFieldValues.services ? extraFieldValues.services.split(',').map((s: string) => s.trim()) : [],
+          order: order,
+        };
       } else if (currentSection.id === 'logos') {
         requestBody.client_name = extraFieldValues.client_name;
         requestBody.logo_url = selectedImage.url;
