@@ -447,12 +447,26 @@ export default function AdminHeroPage() {
                 >
                   {/* Image Preview */}
                   <div className="aspect-[2/3] bg-black relative">
-                    <Image
-                      src={image.url || `/images/hero/${image.filename}`}
-                      alt={image.category}
-                      fill
-                      className="object-cover"
-                    />
+                    {image.url ? (
+                      <>
+                        <Image
+                          src={image.url}
+                          alt={image.category}
+                          fill
+                          className="object-cover"
+                          unoptimized
+                          onError={() => console.error('Failed to load image:', image.url)}
+                        />
+                        {/* Debug URL */}
+                        <div className="absolute bottom-2 left-2 right-2 bg-black/80 p-2 text-xs text-white truncate">
+                          {image.url}
+                        </div>
+                      </>
+                    ) : (
+                      <div className="flex items-center justify-center h-full text-gray-500">
+                        No URL
+                      </div>
+                    )}
                   </div>
 
                   {/* Info */}
