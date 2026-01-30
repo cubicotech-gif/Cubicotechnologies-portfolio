@@ -54,35 +54,77 @@ function Counter({ end, suffix = '' }: { end: number; suffix?: string }) {
   );
 }
 
+interface FeaturedProject {
+  id: string;
+  title: string;
+  category: string;
+  description: string;
+  image_url: string;
+  order: number;
+  active: boolean;
+}
+
+interface ClientLogo {
+  id: string;
+  client_name: string;
+  logo_url: string;
+  order: number;
+  active: boolean;
+  website_url?: string;
+}
+
 export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [featuredProjects, setFeaturedProjects] = useState<FeaturedProject[]>([]);
+  const [clientLogos, setClientLogos] = useState<ClientLogo[]>([]);
+  const [loadingProjects, setLoadingProjects] = useState(true);
+  const [loadingLogos, setLoadingLogos] = useState(true);
 
-  const featuredProjects = [
-    {
-      title: 'QuranPath LMS Dashboard',
-      category: 'Artwork',
-      description: 'Educational platform UI design with modern aesthetics',
-      image: '/images/projects/quranpath-lms.svg',
-    },
-    {
-      title: 'Virtual Hajj Experience',
-      category: 'Branding',
-      description: 'Immersive brand identity for virtual religious journey',
-      image: '/images/projects/virtual-hajj.svg',
-    },
-    {
-      title: 'Islamic History Series',
-      category: 'Video',
-      description: 'Engaging video content for educational series',
-      image: '/images/projects/islamic-history-series.svg',
-    },
-    {
-      title: 'Adhkar Mobile App',
-      category: 'Social',
-      description: 'Modern app design with beautiful typography',
-      image: '/images/projects/adhkar-app.svg',
-    },
-  ];
+  // Fetch featured projects from API
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const response = await fetch('/api/featured-projects');
+        const data = await response.json();
+        if (data.success && data.projects.length > 0) {
+          // Filter only active projects and sort by order
+          const activeProjects = data.projects
+            .filter((p: FeaturedProject) => p.active)
+            .sort((a: FeaturedProject, b: FeaturedProject) => a.order - b.order);
+          setFeaturedProjects(activeProjects);
+        }
+      } catch (error) {
+        console.error('Error fetching projects:', error);
+      } finally {
+        setLoadingProjects(false);
+      }
+    };
+
+    fetchProjects();
+  }, []);
+
+  // Fetch client logos from API
+  useEffect(() => {
+    const fetchLogos = async () => {
+      try {
+        const response = await fetch('/api/client-logos');
+        const data = await response.json();
+        if (data.success && data.logos.length > 0) {
+          // Filter only active logos and sort by order
+          const activeLogos = data.logos
+            .filter((l: ClientLogo) => l.active)
+            .sort((a: ClientLogo, b: ClientLogo) => a.order - b.order);
+          setClientLogos(activeLogos);
+        }
+      } catch (error) {
+        console.error('Error fetching logos:', error);
+      } finally {
+        setLoadingLogos(false);
+      }
+    };
+
+    fetchLogos();
+  }, []);
 
   const services = [
     {
@@ -112,11 +154,6 @@ export default function Home() {
     { label: 'Happy Clients', value: 50, suffix: '+' },
     { label: 'Years of Excellence', value: 5, suffix: '+' },
     { label: 'Creative Assets', value: 1000, suffix: '+' },
-  ];
-
-  const clientLogos = [
-    'Client 1', 'Client 2', 'Client 3', 'Client 4', 'Client 5',
-    'Client 6', 'Client 7', 'Client 8', 'Client 9', 'Client 10',
   ];
 
   const nextSlide = () => {
@@ -243,74 +280,89 @@ export default function Home() {
 
           {/* Carousel */}
           <div className="relative">
-            <div className="overflow-hidden rounded-2xl">
-              <motion.div
-                key={currentSlide}
-                initial={{ opacity: 0, x: 100 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -100 }}
-                transition={{ duration: 0.5 }}
-                className="relative aspect-video bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden group"
-              >
-                <div className="relative w-full h-full flex items-center justify-center p-8 sm:p-12">
-                  <div className="relative w-full h-full max-w-4xl">
-                    <Image
-                      src={featuredProjects[currentSlide].image}
-                      alt={featuredProjects[currentSlide].title}
-                      fill
-                      className="object-contain transition-transform duration-500 group-hover:scale-105"
-                    />
-                  </div>
+            {loadingProjects ? (
+              <div className="aspect-video bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl flex items-center justify-center">
+                <div className="text-center">
+                  <div className="inline-block w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mb-4" />
+                  <p className="text-gray-400">Loading projects...</p>
                 </div>
-                <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-black/80 to-transparent">
-                  <span className="inline-block px-4 py-1 bg-gradient-to-r from-purple-500 to-cyan-500 text-white text-sm font-semibold rounded-full mb-3">
-                    {featuredProjects[currentSlide].category}
-                  </span>
-                  <h3 className="text-2xl sm:text-3xl font-bold text-white mb-2">
-                    {featuredProjects[currentSlide].title}
-                  </h3>
-                  <p className="text-gray-300">
-                    {featuredProjects[currentSlide].description}
-                  </p>
+              </div>
+            ) : featuredProjects.length === 0 ? (
+              <div className="aspect-video bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl flex items-center justify-center">
+                <p className="text-gray-400">No featured projects available yet</p>
+              </div>
+            ) : (
+              <>
+                <div className="overflow-hidden rounded-2xl">
+                  <motion.div
+                    key={currentSlide}
+                    initial={{ opacity: 0, x: 100 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -100 }}
+                    transition={{ duration: 0.5 }}
+                    className="relative aspect-video bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden group"
+                  >
+                    <div className="relative w-full h-full flex items-center justify-center p-8 sm:p-12">
+                      <div className="relative w-full h-full max-w-4xl">
+                        <Image
+                          src={featuredProjects[currentSlide].image_url}
+                          alt={featuredProjects[currentSlide].title}
+                          fill
+                          className="object-contain transition-transform duration-500 group-hover:scale-105"
+                        />
+                      </div>
+                    </div>
+                    <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-black/80 to-transparent">
+                      <span className="inline-block px-4 py-1 bg-gradient-to-r from-purple-500 to-cyan-500 text-white text-sm font-semibold rounded-full mb-3">
+                        {featuredProjects[currentSlide].category}
+                      </span>
+                      <h3 className="text-2xl sm:text-3xl font-bold text-white mb-2">
+                        {featuredProjects[currentSlide].title}
+                      </h3>
+                      <p className="text-gray-300">
+                        {featuredProjects[currentSlide].description}
+                      </p>
+                    </div>
+                  </motion.div>
                 </div>
-              </motion.div>
-            </div>
 
-            {/* Navigation Arrows */}
-            <button
-              onClick={prevSlide}
-              className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-white/10 backdrop-blur-xl border border-white/20 rounded-full hover:bg-white/20 transition-all duration-300"
-              aria-label="Previous slide"
-            >
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-            <button
-              onClick={nextSlide}
-              className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-white/10 backdrop-blur-xl border border-white/20 rounded-full hover:bg-white/20 transition-all duration-300"
-              aria-label="Next slide"
-            >
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-
-            {/* Slide Indicators */}
-            <div className="flex justify-center gap-2 mt-8">
-              {featuredProjects.map((_, index) => (
+                {/* Navigation Arrows */}
                 <button
-                  key={index}
-                  onClick={() => setCurrentSlide(index)}
-                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                    index === currentSlide
-                      ? 'w-8 bg-gradient-to-r from-purple-500 to-cyan-500'
-                      : 'bg-white/30 hover:bg-white/50'
-                  }`}
-                  aria-label={`Go to slide ${index + 1}`}
-                />
-              ))}
-            </div>
+                  onClick={prevSlide}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-white/10 backdrop-blur-xl border border-white/20 rounded-full hover:bg-white/20 transition-all duration-300"
+                  aria-label="Previous slide"
+                >
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+                <button
+                  onClick={nextSlide}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-white/10 backdrop-blur-xl border border-white/20 rounded-full hover:bg-white/20 transition-all duration-300"
+                  aria-label="Next slide"
+                >
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+
+                {/* Slide Indicators */}
+                <div className="flex justify-center gap-2 mt-8">
+                  {featuredProjects.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentSlide(index)}
+                      className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                        index === currentSlide
+                          ? 'w-8 bg-gradient-to-r from-purple-500 to-cyan-500'
+                          : 'bg-white/30 hover:bg-white/50'
+                      }`}
+                      aria-label={`Go to slide ${index + 1}`}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         </div>
       </section>
@@ -372,20 +424,39 @@ export default function Home() {
           </h2>
         </div>
 
-        <div className="relative">
-          <div className="flex overflow-hidden">
-            <div className="flex animate-marquee whitespace-nowrap">
-              {[...clientLogos, ...clientLogos].map((client, index) => (
-                <div
-                  key={index}
-                  className="mx-8 flex items-center justify-center w-40 h-20 bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl"
-                >
-                  <span className="text-gray-400 font-semibold">{client}</span>
-                </div>
-              ))}
+        {loadingLogos ? (
+          <div className="flex justify-center py-12">
+            <div className="text-center">
+              <div className="inline-block w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mb-4" />
+              <p className="text-gray-400">Loading client logos...</p>
             </div>
           </div>
-        </div>
+        ) : clientLogos.length === 0 ? (
+          <div className="flex justify-center py-12">
+            <p className="text-gray-400">No client logos available yet</p>
+          </div>
+        ) : (
+          <div className="relative">
+            <div className="flex overflow-hidden">
+              <div className="flex animate-marquee whitespace-nowrap">
+                {[...clientLogos, ...clientLogos].map((logo, index) => (
+                  <div
+                    key={index}
+                    className="mx-8 flex items-center justify-center w-40 h-20 bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-4"
+                  >
+                    <Image
+                      src={logo.logo_url}
+                      alt={logo.client_name}
+                      width={160}
+                      height={80}
+                      className="object-contain max-w-full max-h-full"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
       </section>
 
       {/* STATS SECTION */}

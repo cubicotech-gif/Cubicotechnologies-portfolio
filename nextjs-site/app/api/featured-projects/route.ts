@@ -1,107 +1,118 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 
-export interface HeroImage {
+export interface FeaturedProject {
   id: string;
-  filename: string;
-  url?: string; // Cloud storage URL
+  title: string;
   category: string;
+  description: string;
+  image_url: string;
   order: number;
   active: boolean;
+  client_name?: string;
+  project_url?: string;
   created_at?: string;
 }
 
-// GET: Read all hero images from Supabase Database
+// GET: Read all featured projects
 export async function GET() {
   try {
     const { data, error } = await supabaseAdmin
-      .from('hero_images')
+      .from('featured_projects')
       .select('*')
       .order('order', { ascending: true });
 
     if (error) {
       console.error('Supabase GET error:', error);
       return NextResponse.json(
-        { success: false, error: `Failed to fetch hero images: ${error.message}` },
+        { success: false, error: `Failed to fetch projects: ${error.message}` },
         { status: 500 }
       );
     }
 
-    return NextResponse.json({ success: true, images: data || [] });
+    return NextResponse.json({ success: true, projects: data || [] });
   } catch (error: any) {
     console.error('GET Error:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to fetch hero images' },
+      { success: false, error: 'Failed to fetch projects' },
       { status: 500 }
     );
   }
 }
 
-// POST: Add new image entry to Supabase Database
+// POST: Add new project
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { filename, url, category, order } = body;
+    const { title, category, description, image_url, order, client_name, project_url } = body;
 
-    if ((!filename && !url) || !category) {
+    if (!title || !category || !description || !image_url) {
       return NextResponse.json(
-        { success: false, error: 'Filename/URL and category are required' },
+        { success: false, error: 'Title, category, description, and image are required' },
         { status: 400 }
       );
     }
 
-    const newImage = {
-      filename: filename || 'cloud-image',
-      url: url || null,
+    const newProject = {
+      title,
       category,
+      description,
+      image_url,
       order: order || 1,
       active: true,
+      client_name: client_name || null,
+      project_url: project_url || null,
     };
 
     const { data, error } = await supabaseAdmin
-      .from('hero_images')
-      .insert([newImage])
+      .from('featured_projects')
+      .insert([newProject])
       .select()
       .single();
 
     if (error) {
       console.error('Supabase POST error:', error);
       return NextResponse.json(
-        { success: false, error: `Failed to add image: ${error.message}` },
+        { success: false, error: `Failed to add project: ${error.message}` },
         { status: 500 }
       );
     }
 
-    return NextResponse.json({ success: true, image: data });
+    return NextResponse.json({ success: true, project: data });
   } catch (error: any) {
     console.error('POST Error:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to add image' },
+      { success: false, error: 'Failed to add project' },
       { status: 500 }
     );
   }
 }
 
-// PUT: Update image in Supabase Database
+// PUT: Update project
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
-    const { id, category, order, active } = body;
+    const { id, title, category, description, image_url, order, active, client_name, project_url } = body;
 
     if (!id) {
       return NextResponse.json(
-        { success: false, error: 'Image ID is required' },
+        { success: false, error: 'Project ID is required' },
         { status: 400 }
       );
     }
 
     const updates: any = {};
+    if (title !== undefined) updates.title = title;
     if (category !== undefined) updates.category = category;
+    if (description !== undefined) updates.description = description;
+    if (image_url !== undefined) updates.image_url = image_url;
     if (order !== undefined) updates.order = order;
     if (active !== undefined) updates.active = active;
+    if (client_name !== undefined) updates.client_name = client_name;
+    if (project_url !== undefined) updates.project_url = project_url;
 
     const { data, error } = await supabaseAdmin
-      .from('hero_images')
+      .from('featured_projects')
       .update(updates)
       .eq('id', id)
       .select()
@@ -110,29 +121,29 @@ export async function PUT(request: NextRequest) {
     if (error) {
       console.error('Supabase PUT error:', error);
       return NextResponse.json(
-        { success: false, error: `Failed to update image: ${error.message}` },
+        { success: false, error: `Failed to update project: ${error.message}` },
         { status: 500 }
       );
     }
 
     if (!data) {
       return NextResponse.json(
-        { success: false, error: 'Image not found' },
+        { success: false, error: 'Project not found' },
         { status: 404 }
       );
     }
 
-    return NextResponse.json({ success: true, image: data });
+    return NextResponse.json({ success: true, project: data });
   } catch (error: any) {
     console.error('PUT Error:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to update image' },
+      { success: false, error: 'Failed to update project' },
       { status: 500 }
     );
   }
 }
 
-// DELETE: Remove image entry from Supabase Database
+// DELETE: Remove project
 export async function DELETE(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -140,36 +151,36 @@ export async function DELETE(request: NextRequest) {
 
     if (!id) {
       return NextResponse.json(
-        { success: false, error: 'Image ID is required' },
+        { success: false, error: 'Project ID is required' },
         { status: 400 }
       );
     }
 
-    // Get image to find URL for storage deletion
-    const { data: image } = await supabaseAdmin
-      .from('hero_images')
-      .select('url')
+    // Get project to find image URL
+    const { data: project } = await supabaseAdmin
+      .from('featured_projects')
+      .select('image_url')
       .eq('id', id)
       .single();
 
     // Delete from database
     const { error } = await supabaseAdmin
-      .from('hero_images')
+      .from('featured_projects')
       .delete()
       .eq('id', id);
 
     if (error) {
       console.error('Supabase DELETE error:', error);
       return NextResponse.json(
-        { success: false, error: `Failed to delete image: ${error.message}` },
+        { success: false, error: `Failed to delete project: ${error.message}` },
         { status: 500 }
       );
     }
 
     // Delete image from storage if it exists
-    if (image?.url && image.url.includes('supabase.co')) {
+    if (project?.image_url && project.image_url.includes('supabase.co')) {
       try {
-        const urlParts = image.url.split('/storage/v1/object/public/');
+        const urlParts = project.image_url.split('/storage/v1/object/public/');
         if (urlParts[1]) {
           const [bucket, ...pathParts] = urlParts[1].split('/');
           const filePath = pathParts.join('/');
@@ -184,12 +195,12 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Image removed from hero section'
+      message: 'Project removed successfully'
     });
   } catch (error: any) {
     console.error('DELETE Error:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to delete image' },
+      { success: false, error: 'Failed to delete project' },
       { status: 500 }
     );
   }

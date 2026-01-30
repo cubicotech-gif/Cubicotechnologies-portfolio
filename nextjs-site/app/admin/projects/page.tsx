@@ -1,0 +1,549 @@
+'use client';
+
+import { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
+
+interface FeaturedProject {
+  id: string;
+  title: string;
+  category: string;
+  description: string;
+  image_url: string;
+  order: number;
+  active: boolean;
+  client_name?: string;
+  project_url?: string;
+  created_at?: string;
+}
+
+interface AvailableImage {
+  filename: string;
+  path: string;
+}
+
+export default function AdminProjectsPage() {
+  const [projects, setProjects] = useState<FeaturedProject[]>([]);
+  const [availableImages, setAvailableImages] = useState<AvailableImage[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [imageUrl, setImageUrl] = useState('');
+  const [title, setTitle] = useState('');
+  const [category, setCategory] = useState('Artwork');
+  const [description, setDescription] = useState('');
+  const [clientName, setClientName] = useState('');
+  const [projectUrl, setProjectUrl] = useState('');
+  const [uploadFolder] = useState('projects'); // Fixed to projects folder
+  const [order, setOrder] = useState(1);
+  const [message, setMessage] = useState('');
+  const [showImageBrowser, setShowImageBrowser] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const categories = [
+    'Artwork',
+    'Logo Design',
+    'Social Media',
+    'Video',
+    'Branding',
+    'UI/UX Design',
+    'Web Development',
+  ];
+
+  // Fetch featured projects
+  const fetchProjects = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('/api/featured-projects');
+      const data = await response.json();
+      if (data.success) {
+        setProjects(data.projects.sort((a: FeaturedProject, b: FeaturedProject) => a.order - b.order));
+      }
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+      setMessage('Failed to fetch projects');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch available images from projects folder
+  const fetchAvailableImages = async () => {
+    try {
+      const response = await fetch(`/api/upload-image?folder=${uploadFolder}`);
+      const data = await response.json();
+      if (data.success) {
+        setAvailableImages(data.images);
+      }
+    } catch (error) {
+      console.error('Error fetching available images:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchProjects();
+    fetchAvailableImages();
+  }, []);
+
+  // Handle file upload
+  const handleFileUpload = async (file: File) => {
+    if (!file) return;
+
+    setUploading(true);
+    setMessage('Uploading...');
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('folder', uploadFolder);
+
+      const response = await fetch('/api/upload-image', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setMessage(`✅ File uploaded: ${data.filename}`);
+        setImageUrl(data.url || data.path);
+        await fetchAvailableImages();
+      } else {
+        setMessage('❌ ' + (data.error || 'Upload failed'));
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      setMessage('❌ Failed to upload file');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  // Handle drag and drop
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) {
+      handleFileUpload(file);
+    } else {
+      setMessage('❌ Please drop an image file');
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  // Add project
+  const handleAdd = async () => {
+    if (!imageUrl || !title || !description) {
+      setMessage('Please fill in all required fields (image, title, description)');
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/featured-projects', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title,
+          category,
+          description,
+          image_url: imageUrl,
+          order,
+          client_name: clientName || null,
+          project_url: projectUrl || null,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setMessage('✅ Project added successfully!');
+        setTitle('');
+        setDescription('');
+        setClientName('');
+        setProjectUrl('');
+        setImageUrl('');
+        setOrder(order + 1);
+        await fetchProjects();
+      } else {
+        setMessage('❌ ' + (data.error || 'Failed to add project'));
+      }
+    } catch (error) {
+      console.error('Add error:', error);
+      setMessage('❌ Failed to add project');
+    }
+  };
+
+  // Toggle active status
+  const handleToggle = async (id: string, currentActive: boolean) => {
+    try {
+      const response = await fetch('/api/featured-projects', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, active: !currentActive }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setMessage('✅ Status updated');
+        await fetchProjects();
+      } else {
+        setMessage('❌ Update failed');
+      }
+    } catch (error) {
+      console.error('Toggle error:', error);
+      setMessage('❌ Failed to update');
+    }
+  };
+
+  // Delete project
+  const handleDelete = async (id: string) => {
+    if (!confirm('Delete this project? This will also remove the image from storage.')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/featured-projects?id=${id}`, {
+        method: 'DELETE',
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setMessage('✅ Project deleted');
+        await fetchProjects();
+        await fetchAvailableImages();
+      } else {
+        setMessage('❌ Delete failed');
+      }
+    } catch (error) {
+      console.error('Delete error:', error);
+      setMessage('❌ Failed to delete');
+    }
+  };
+
+  // Update order
+  const handleUpdateOrder = async (id: string, newOrder: number) => {
+    try {
+      const response = await fetch('/api/featured-projects', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, order: newOrder }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setMessage('✅ Order updated');
+        await fetchProjects();
+      } else {
+        setMessage('❌ Update failed');
+      }
+    } catch (error) {
+      console.error('Update order error:', error);
+      setMessage('❌ Failed to update order');
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a1a] to-[#0a0a0a] py-12 px-4">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <h1 className="text-4xl font-bold text-white mb-2">
+          Featured Projects Manager
+        </h1>
+        <p className="text-gray-400 mb-8">
+          Upload and manage featured projects for the homepage carousel
+        </p>
+
+        {/* Message */}
+        {message && (
+          <div className="mb-6 p-4 bg-blue-500/20 border border-blue-500/50 text-blue-400 rounded-lg">
+            {message}
+          </div>
+        )}
+
+        {/* Upload Section */}
+        <div className="glass rounded-2xl p-6 mb-8">
+          <h2 className="text-2xl font-bold text-white mb-4">Step 1: Upload Project Image</h2>
+
+          {/* Drag and Drop Zone */}
+          <div
+            onDrop={handleDrop}
+            onDragOver={handleDragOver}
+            className="border-2 border-dashed border-purple-500/50 rounded-xl p-12 text-center hover:border-purple-500 transition-colors cursor-pointer"
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <div className="space-y-4">
+              <div className="text-6xl">📤</div>
+              <div>
+                <p className="text-xl text-white font-semibold mb-2">
+                  Drag & Drop or Click to Upload
+                </p>
+                <p className="text-gray-400 text-sm">
+                  Supports: JPG, PNG, GIF, WebP, SVG (Max 10MB)
+                </p>
+              </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handleFileUpload(file);
+                }}
+                className="hidden"
+              />
+            </div>
+          </div>
+
+          {uploading && (
+            <div className="mt-4 text-center">
+              <div className="inline-block w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
+              <p className="text-gray-400 mt-2">Uploading...</p>
+            </div>
+          )}
+
+          {/* Available Images Browser */}
+          <div className="mt-6">
+            <button
+              onClick={() => setShowImageBrowser(!showImageBrowser)}
+              className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors"
+            >
+              {showImageBrowser ? '▼ Hide' : '▶ Show'} Available Images ({availableImages.length})
+            </button>
+
+            {showImageBrowser && (
+              <div className="mt-4 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 max-h-96 overflow-y-auto p-4 bg-black/20 rounded-lg">
+                {availableImages.map((img) => (
+                  <div
+                    key={img.filename}
+                    onClick={() => {
+                      setImageUrl(img.path);
+                      setMessage(`✅ Selected: ${img.filename}`);
+                    }}
+                    className={`cursor-pointer border-2 rounded-lg overflow-hidden transition-all hover:scale-105 ${
+                      imageUrl === img.path
+                        ? 'border-purple-500 shadow-lg shadow-purple-500/50'
+                        : 'border-white/10 hover:border-white/30'
+                    }`}
+                  >
+                    <div className="aspect-square relative bg-black">
+                      <Image
+                        src={img.path}
+                        alt={img.filename}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <p className="text-xs text-gray-400 p-2 truncate bg-black/50">
+                      {img.filename}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Add Project Form */}
+        <div className="glass rounded-2xl p-6 mb-8">
+          <h2 className="text-2xl font-bold text-white mb-4">Step 2: Project Details</h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Project Title <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="e.g., QuranPath LMS Dashboard"
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Category <span className="text-red-500">*</span>
+              </label>
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                style={{ colorScheme: 'dark' }}
+              >
+                {categories.map((cat) => (
+                  <option key={cat} value={cat} className="bg-gray-900 text-white">
+                    {cat}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Description <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Brief description of the project..."
+                rows={3}
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Client Name (Optional)
+              </label>
+              <input
+                type="text"
+                value={clientName}
+                onChange={(e) => setClientName(e.target.value)}
+                placeholder="e.g., Acme Corporation"
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Project URL (Optional)
+              </label>
+              <input
+                type="url"
+                value={projectUrl}
+                onChange={(e) => setProjectUrl(e.target.value)}
+                placeholder="https://example.com"
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Display Order
+              </label>
+              <input
+                type="number"
+                value={order}
+                onChange={(e) => setOrder(parseInt(e.target.value))}
+                min="1"
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
+            </div>
+
+            <div className="flex items-end">
+              <button
+                onClick={handleAdd}
+                disabled={!imageUrl || !title || !description}
+                className="w-full px-6 py-3 bg-gradient-to-r from-purple-500 to-cyan-500 text-white font-semibold rounded-lg hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Add Project
+              </button>
+            </div>
+          </div>
+
+          {imageUrl && (
+            <div className="mt-6 p-4 bg-green-500/20 border border-green-500/50 rounded-lg">
+              <p className="text-green-400 text-sm">✅ Image selected and ready</p>
+            </div>
+          )}
+        </div>
+
+        {/* Active Projects List */}
+        <div className="glass rounded-2xl p-6">
+          <h2 className="text-2xl font-bold text-white mb-4">
+            Featured Projects ({projects.length})
+          </h2>
+
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="inline-block w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
+              <p className="text-gray-400 mt-4">Loading...</p>
+            </div>
+          ) : projects.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-gray-400">No projects yet. Add your first project above!</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {projects.map((project) => (
+                <div
+                  key={project.id}
+                  className="bg-white/5 border border-white/10 rounded-lg overflow-hidden"
+                >
+                  {/* Image Preview */}
+                  <div className="aspect-video bg-black relative">
+                    <Image
+                      src={project.image_url}
+                      alt={project.title}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+
+                  {/* Info */}
+                  <div className="p-4 space-y-3">
+                    <h3 className="text-lg font-bold text-white truncate">
+                      {project.title}
+                    </h3>
+
+                    <div className="flex items-center justify-between">
+                      <span className="px-3 py-1 bg-gradient-to-r from-purple-500 to-cyan-500 text-white text-xs font-semibold rounded-full">
+                        {project.category}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-gray-400 text-sm">Order:</span>
+                        <input
+                          type="number"
+                          value={project.order}
+                          onChange={(e) =>
+                            handleUpdateOrder(project.id, parseInt(e.target.value))
+                          }
+                          className="w-16 px-2 py-1 bg-white/5 border border-white/10 rounded text-white text-sm text-center"
+                          min="1"
+                        />
+                      </div>
+                    </div>
+
+                    <p className="text-sm text-gray-400 line-clamp-2">
+                      {project.description}
+                    </p>
+
+                    {project.client_name && (
+                      <p className="text-xs text-gray-500">
+                        Client: {project.client_name}
+                      </p>
+                    )}
+
+                    <div className="flex items-center justify-between pt-2">
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={project.active}
+                          onChange={() => handleToggle(project.id, project.active)}
+                          className="w-4 h-4"
+                        />
+                        <span className="text-sm text-gray-300">Active</span>
+                      </label>
+
+                      <button
+                        onClick={() => handleDelete(project.id)}
+                        className="px-3 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-400 text-sm rounded-lg transition-colors"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
