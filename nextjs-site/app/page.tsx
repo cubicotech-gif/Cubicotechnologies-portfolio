@@ -80,6 +80,7 @@ export default function Home() {
   const [loadingProjects, setLoadingProjects] = useState(true);
   const [loadingLogos, setLoadingLogos] = useState(true);
   const [expandedCard, setExpandedCard] = useState<number | null>(null);
+  const [serviceImages, setServiceImages] = useState<Record<string, string[]>>({});
 
   // Fetch featured projects from API
   useEffect(() => {
@@ -125,6 +126,32 @@ export default function Home() {
     };
 
     fetchLogos();
+  }, []);
+
+  // Fetch service images from API
+  useEffect(() => {
+    const fetchServiceImages = async () => {
+      try {
+        const response = await fetch('/api/service-images?active=true');
+        const data = await response.json();
+        if (data.success && data.images.length > 0) {
+          // Organize images by service type
+          const imagesByService: Record<string, string[]> = {};
+          data.images.forEach((img: any) => {
+            if (!imagesByService[img.service_type]) {
+              imagesByService[img.service_type] = [];
+            }
+            // Store images in order by slot (1-4)
+            imagesByService[img.service_type][img.image_slot - 1] = img.image_url;
+          });
+          setServiceImages(imagesByService);
+        }
+      } catch (error) {
+        console.error('Error fetching service images:', error);
+      }
+    };
+
+    fetchServiceImages();
   }, []);
 
   const servicesData = [
@@ -470,17 +497,40 @@ export default function Home() {
                         boxShadow: '0 4px 24px rgba(0,0,0,0.4)',
                       }}
                     >
-                      {/* Background Image Placeholder */}
-                      <div className={`absolute inset-0 bg-gradient-to-br ${service.gradient} opacity-70 group-hover:scale-110 transition-transform duration-500`} />
-                      <div className="absolute inset-0 bg-black/40" />
+                      {/* Background Image - Use first slot image if available, otherwise gradient */}
+                      {serviceImages[service.title]?.[0] ? (
+                        <>
+                          <Image
+                            src={serviceImages[service.title][0]}
+                            alt={service.title}
+                            fill
+                            className="object-cover group-hover:scale-110 transition-transform duration-500"
+                            sizes="(max-width: 768px) 100vw, 50vw"
+                            quality={100}
+                          />
+                          {/* Dark overlay for text readability */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+                        </>
+                      ) : (
+                        <>
+                          {/* Fallback gradient if no image uploaded yet */}
+                          <div className={`absolute inset-0 bg-gradient-to-br ${service.gradient} opacity-70 group-hover:scale-110 transition-transform duration-500`} />
+                          <div className="absolute inset-0 bg-black/40" />
+                        </>
+                      )}
 
                       {/* Number Badge */}
                       <div className="absolute top-6 left-6 w-14 h-14 rounded-full backdrop-blur-md bg-white/10 border border-white/20 flex items-center justify-center z-10">
                         <span className="text-white font-bold text-xl">{service.number}</span>
                       </div>
 
-                      {/* Content */}
+                      {/* Content - Bottom left like featured projects */}
                       <div className="absolute inset-0 flex flex-col justify-end p-8 z-10">
+                        {/* Category badge */}
+                        <div className="inline-block w-fit px-3 py-1 bg-gradient-to-r from-purple-500 to-cyan-500 text-white text-xs font-semibold rounded-full mb-3">
+                          {service.category}
+                        </div>
+
                         <h3 className="text-4xl lg:text-5xl font-bold text-white mb-3 font-[family-name:var(--font-space-grotesk)]">
                           {service.title}
                         </h3>
@@ -517,19 +567,37 @@ export default function Home() {
                             boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
                           }}
                         >
-                          {/* Placeholder Grid */}
+                          {/* Image Grid */}
                           <div className="absolute inset-0 p-6 grid grid-cols-2 gap-4">
-                            {[1, 2, 3, 4].map((i) => (
-                              <motion.div
-                                key={i}
-                                initial={{ opacity: 0, scale: 0.8 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ delay: i * 0.1, duration: 0.4 }}
-                                className="bg-black/20 backdrop-blur-sm rounded-xl border border-white/10 flex items-center justify-center"
-                              >
-                                <p className="text-white/50 text-xs">Image {i}</p>
-                              </motion.div>
-                            ))}
+                            {[1, 2, 3, 4].map((i) => {
+                              const serviceImgs = serviceImages[service.title] || [];
+                              const imageUrl = serviceImgs[i - 1];
+
+                              return (
+                                <motion.div
+                                  key={i}
+                                  initial={{ opacity: 0, scale: 0.8 }}
+                                  animate={{ opacity: 1, scale: 1 }}
+                                  transition={{ delay: i * 0.1, duration: 0.4 }}
+                                  className="relative bg-black/20 backdrop-blur-sm rounded-xl border border-white/10 overflow-hidden"
+                                >
+                                  {imageUrl ? (
+                                    <Image
+                                      src={imageUrl}
+                                      alt={`${service.title} example ${i}`}
+                                      fill
+                                      className="object-cover"
+                                      sizes="(max-width: 768px) 50vw, 25vw"
+                                      quality={100}
+                                    />
+                                  ) : (
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                      <p className="text-white/50 text-xs">Image {i}</p>
+                                    </div>
+                                  )}
+                                </motion.div>
+                              );
+                            })}
                           </div>
 
                           {/* Number Badge */}
