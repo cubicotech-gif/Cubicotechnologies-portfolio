@@ -10,8 +10,45 @@ interface LibraryImage {
   path: string;
 }
 
+// Define field types for section configuration
+type FieldType = 'text' | 'textarea' | 'select' | 'url';
+
+interface BaseField {
+  name: string;
+  label: string;
+  type: FieldType;
+  required: boolean;
+}
+
+interface SelectField extends BaseField {
+  type: 'select';
+  options: string[];
+}
+
+interface TextField extends BaseField {
+  type: 'text' | 'textarea' | 'url';
+  options?: never;
+}
+
+type ExtraField = SelectField | TextField;
+
+interface ImageSection {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  dimensions: {
+    width: number;
+    height: number;
+    aspectRatio: string;
+    note: string;
+  };
+  apiEndpoint: string;
+  extraFields: ExtraField[];
+}
+
 // Define all image sections/placements on the website
-const IMAGE_SECTIONS = {
+const IMAGE_SECTIONS: Record<string, ImageSection> = {
   hero: {
     id: 'hero',
     name: 'Hero Background',
@@ -348,7 +385,7 @@ export default function UnifiedImageManager() {
                       style={{ colorScheme: 'dark' }}
                     >
                       <option value="">Select {field.label}</option>
-                      {field.options?.map((option) => (
+                      {(field as SelectField).options.map((option) => (
                         <option key={option} value={option} className="bg-gray-900 text-white">
                           {option}
                         </option>
