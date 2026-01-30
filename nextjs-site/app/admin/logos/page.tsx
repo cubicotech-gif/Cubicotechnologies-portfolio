@@ -3,13 +3,14 @@
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 
-interface HeroImage {
+interface ClientLogo {
   id: string;
-  filename: string;
-  url?: string; // Cloud storage URL
-  category: string;
+  client_name: string;
+  logo_url: string;
   order: number;
   active: boolean;
+  website_url?: string;
+  created_at?: string;
 }
 
 interface AvailableImage {
@@ -17,55 +18,38 @@ interface AvailableImage {
   path: string;
 }
 
-export default function AdminHeroPage() {
-  const [images, setImages] = useState<HeroImage[]>([]);
+export default function AdminLogosPage() {
+  const [logos, setLogos] = useState<ClientLogo[]>([]);
   const [availableImages, setAvailableImages] = useState<AvailableImage[]>([]);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [filename, setFilename] = useState('');
-  const [imageUrl, setImageUrl] = useState(''); // Cloud URL
-  const [category, setCategory] = useState('Logo Design');
-  const [uploadFolder, setUploadFolder] = useState('hero'); // Which folder to upload to
+  const [logoUrl, setLogoUrl] = useState('');
+  const [clientName, setClientName] = useState('');
+  const [websiteUrl, setWebsiteUrl] = useState('');
+  const [uploadFolder] = useState('logos'); // Fixed to logos folder
   const [order, setOrder] = useState(1);
   const [message, setMessage] = useState('');
   const [showImageBrowser, setShowImageBrowser] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const categories = [
-    'Logo Design',
-    'Social Media',
-    'Artwork',
-    'Video',
-    'Branding',
-  ];
-
-  const uploadFolders = [
-    { value: 'hero', label: 'Hero Background', description: 'Animated background cards' },
-    { value: 'portfolio', label: 'Portfolio Items', description: 'Portfolio showcase' },
-    { value: 'projects', label: 'Featured Projects', description: 'Main project images' },
-    { value: 'logos', label: 'Logo Designs', description: 'Logo showcase' },
-    { value: 'team', label: 'Team Members', description: 'Team photos' },
-    { value: 'general', label: 'General', description: 'Miscellaneous images' },
-  ];
-
-  // Fetch hero images configuration
-  const fetchImages = async () => {
+  // Fetch client logos
+  const fetchLogos = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/hero-images');
+      const response = await fetch('/api/client-logos');
       const data = await response.json();
       if (data.success) {
-        setImages(data.images.sort((a: HeroImage, b: HeroImage) => a.order - b.order));
+        setLogos(data.logos.sort((a: ClientLogo, b: ClientLogo) => a.order - b.order));
       }
     } catch (error) {
-      console.error('Error fetching images:', error);
-      setMessage('Failed to fetch images');
+      console.error('Error fetching logos:', error);
+      setMessage('Failed to fetch logos');
     } finally {
       setLoading(false);
     }
   };
 
-  // Fetch available images from directory
+  // Fetch available images from logos folder
   const fetchAvailableImages = async () => {
     try {
       const response = await fetch(`/api/upload-image?folder=${uploadFolder}`);
@@ -79,9 +63,9 @@ export default function AdminHeroPage() {
   };
 
   useEffect(() => {
-    fetchImages();
+    fetchLogos();
     fetchAvailableImages();
-  }, [uploadFolder]); // Re-fetch when folder changes
+  }, []);
 
   // Handle file upload
   const handleFileUpload = async (file: File) => {
@@ -93,7 +77,7 @@ export default function AdminHeroPage() {
     try {
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('folder', uploadFolder); // Include folder selection
+      formData.append('folder', uploadFolder);
 
       const response = await fetch('/api/upload-image', {
         method: 'POST',
@@ -103,9 +87,8 @@ export default function AdminHeroPage() {
       const data = await response.json();
 
       if (data.success) {
-        setMessage(`✅ File uploaded to ${data.folder}: ${data.filename}`);
-        setFilename(data.filename);
-        setImageUrl(data.url || data.path); // Store cloud URL
+        setMessage(`✅ File uploaded: ${data.filename}`);
+        setLogoUrl(data.url || data.path);
         await fetchAvailableImages();
       } else {
         setMessage('❌ ' + (data.error || 'Upload failed'));
@@ -133,46 +116,47 @@ export default function AdminHeroPage() {
     e.preventDefault();
   };
 
-  // Add image to hero configuration
+  // Add logo
   const handleAdd = async () => {
-    if (!filename && !imageUrl) {
-      setMessage('Please select or upload an image first');
+    if (!logoUrl || !clientName) {
+      setMessage('Please provide both logo image and client name');
       return;
     }
 
     try {
-      const response = await fetch('/api/hero-images', {
+      const response = await fetch('/api/client-logos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          filename,
-          url: imageUrl || undefined, // Include cloud URL if available
-          category,
-          order
+          client_name: clientName,
+          logo_url: logoUrl,
+          order,
+          website_url: websiteUrl || null,
         }),
       });
 
       const data = await response.json();
 
       if (data.success) {
-        setMessage('✅ Image added to hero section!');
-        setFilename('');
-        setImageUrl('');
+        setMessage('✅ Logo added successfully!');
+        setClientName('');
+        setWebsiteUrl('');
+        setLogoUrl('');
         setOrder(order + 1);
-        await fetchImages();
+        await fetchLogos();
       } else {
-        setMessage('❌ ' + (data.error || 'Failed to add image'));
+        setMessage('❌ ' + (data.error || 'Failed to add logo'));
       }
     } catch (error) {
       console.error('Add error:', error);
-      setMessage('❌ Failed to add image');
+      setMessage('❌ Failed to add logo');
     }
   };
 
   // Toggle active status
   const handleToggle = async (id: string, currentActive: boolean) => {
     try {
-      const response = await fetch('/api/hero-images', {
+      const response = await fetch('/api/client-logos', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, active: !currentActive }),
@@ -182,7 +166,7 @@ export default function AdminHeroPage() {
 
       if (data.success) {
         setMessage('✅ Status updated');
-        await fetchImages();
+        await fetchLogos();
       } else {
         setMessage('❌ Update failed');
       }
@@ -192,22 +176,23 @@ export default function AdminHeroPage() {
     }
   };
 
-  // Delete from configuration
+  // Delete logo
   const handleDelete = async (id: string) => {
-    if (!confirm('Remove this image from the hero section?')) {
+    if (!confirm('Delete this logo? This will also remove the image from storage.')) {
       return;
     }
 
     try {
-      const response = await fetch(`/api/hero-images?id=${id}`, {
+      const response = await fetch(`/api/client-logos?id=${id}`, {
         method: 'DELETE',
       });
 
       const data = await response.json();
 
       if (data.success) {
-        setMessage('✅ Image removed from hero section');
-        await fetchImages();
+        setMessage('✅ Logo deleted');
+        await fetchLogos();
+        await fetchAvailableImages();
       } else {
         setMessage('❌ Delete failed');
       }
@@ -220,7 +205,7 @@ export default function AdminHeroPage() {
   // Update order
   const handleUpdateOrder = async (id: string, newOrder: number) => {
     try {
-      const response = await fetch('/api/hero-images', {
+      const response = await fetch('/api/client-logos', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, order: newOrder }),
@@ -230,7 +215,7 @@ export default function AdminHeroPage() {
 
       if (data.success) {
         setMessage('✅ Order updated');
-        await fetchImages();
+        await fetchLogos();
       } else {
         setMessage('❌ Update failed');
       }
@@ -245,10 +230,10 @@ export default function AdminHeroPage() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <h1 className="text-4xl font-bold text-white mb-2">
-          Hero Images Manager
+          Client Logos Manager
         </h1>
         <p className="text-gray-400 mb-8">
-          Upload and manage images for the hero section animated background
+          Upload and manage client logos for the homepage marquee
         </p>
 
         {/* Message */}
@@ -260,33 +245,7 @@ export default function AdminHeroPage() {
 
         {/* Upload Section */}
         <div className="glass rounded-2xl p-6 mb-8">
-          <h2 className="text-2xl font-bold text-white mb-4">Step 1: Upload Image</h2>
-
-          {/* Folder Selector */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Upload To Folder:
-            </label>
-            <select
-              value={uploadFolder}
-              onChange={(e) => setUploadFolder(e.target.value)}
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-              style={{ colorScheme: 'dark' }}
-            >
-              {uploadFolders.map((folder) => (
-                <option
-                  key={folder.value}
-                  value={folder.value}
-                  className="bg-gray-900 text-white"
-                >
-                  {folder.label} - {folder.description}
-                </option>
-              ))}
-            </select>
-            <p className="text-xs text-gray-500 mt-2">
-              Select where this image will be used. Different folders for different purposes.
-            </p>
-          </div>
+          <h2 className="text-2xl font-bold text-white mb-4">Step 1: Upload Logo</h2>
 
           {/* Drag and Drop Zone */}
           <div
@@ -302,7 +261,10 @@ export default function AdminHeroPage() {
                   Drag & Drop or Click to Upload
                 </p>
                 <p className="text-gray-400 text-sm">
-                  Supports: JPG, PNG, GIF, WebP, SVG
+                  Supports: JPG, PNG, GIF, WebP, SVG (Max 10MB)
+                </p>
+                <p className="text-gray-500 text-xs mt-2">
+                  Recommended: PNG or SVG with transparent background
                 </p>
               </div>
               <input
@@ -331,31 +293,30 @@ export default function AdminHeroPage() {
               onClick={() => setShowImageBrowser(!showImageBrowser)}
               className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors"
             >
-              {showImageBrowser ? '▼ Hide' : '▶ Show'} Available Images ({availableImages.length})
+              {showImageBrowser ? '▼ Hide' : '▶ Show'} Available Logos ({availableImages.length})
             </button>
 
             {showImageBrowser && (
-              <div className="mt-4 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 max-h-96 overflow-y-auto p-4 bg-black/20 rounded-lg">
+              <div className="mt-4 grid grid-cols-3 md:grid-cols-6 lg:grid-cols-8 gap-4 max-h-96 overflow-y-auto p-4 bg-black/20 rounded-lg">
                 {availableImages.map((img) => (
                   <div
                     key={img.filename}
                     onClick={() => {
-                      setFilename(img.filename);
-                      setImageUrl(img.path); // Set cloud URL
+                      setLogoUrl(img.path);
                       setMessage(`✅ Selected: ${img.filename}`);
                     }}
                     className={`cursor-pointer border-2 rounded-lg overflow-hidden transition-all hover:scale-105 ${
-                      filename === img.filename
+                      logoUrl === img.path
                         ? 'border-purple-500 shadow-lg shadow-purple-500/50'
                         : 'border-white/10 hover:border-white/30'
                     }`}
                   >
-                    <div className="aspect-square relative bg-black">
+                    <div className="aspect-square relative bg-white p-2">
                       <Image
                         src={img.path}
                         alt={img.filename}
                         fill
-                        className="object-cover"
+                        className="object-contain p-2"
                       />
                     </div>
                     <p className="text-xs text-gray-400 p-2 truncate bg-black/50">
@@ -368,70 +329,72 @@ export default function AdminHeroPage() {
           </div>
         </div>
 
-        {/* Add to Hero Section */}
+        {/* Add Logo Form */}
         <div className="glass rounded-2xl p-6 mb-8">
-          <h2 className="text-2xl font-bold text-white mb-4">Step 2: Add to Hero Section</h2>
+          <h2 className="text-2xl font-bold text-white mb-4">Step 2: Client Details</h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                Selected Image
+                Client Name <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
-                value={filename}
-                readOnly
-                placeholder="Upload or select an image above"
-                className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none"
+                value={clientName}
+                onChange={(e) => setClientName(e.target.value)}
+                placeholder="e.g., Acme Corporation"
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                Category
+                Website URL (Optional)
               </label>
-              <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-              >
-                {categories.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat}
-                  </option>
-                ))}
-              </select>
+              <input
+                type="url"
+                value={websiteUrl}
+                onChange={(e) => setWebsiteUrl(e.target.value)}
+                placeholder="https://example.com"
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                Order
+                Display Order
               </label>
               <input
                 type="number"
                 value={order}
                 onChange={(e) => setOrder(parseInt(e.target.value))}
                 min="1"
-                className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
             </div>
-
-            <div className="flex items-end">
-              <button
-                onClick={handleAdd}
-                disabled={!filename}
-                className="w-full px-6 py-2 bg-gradient-to-r from-purple-500 to-cyan-500 text-white font-semibold rounded-lg hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Add to Hero
-              </button>
-            </div>
           </div>
+
+          <div className="mt-6">
+            <button
+              onClick={handleAdd}
+              disabled={!logoUrl || !clientName}
+              className="w-full px-6 py-3 bg-gradient-to-r from-purple-500 to-cyan-500 text-white font-semibold rounded-lg hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Add Logo
+            </button>
+          </div>
+
+          {logoUrl && (
+            <div className="mt-6 p-4 bg-green-500/20 border border-green-500/50 rounded-lg">
+              <p className="text-green-400 text-sm">✅ Logo selected and ready</p>
+            </div>
+          )}
         </div>
 
-        {/* Active Hero Images */}
+        {/* Active Logos List */}
         <div className="glass rounded-2xl p-6">
           <h2 className="text-2xl font-bold text-white mb-4">
-            Hero Section Images ({images.length})
+            Client Logos ({logos.length})
           </h2>
 
           {loading ? (
@@ -439,75 +402,75 @@ export default function AdminHeroPage() {
               <div className="inline-block w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
               <p className="text-gray-400 mt-4">Loading...</p>
             </div>
-          ) : images.length === 0 ? (
+          ) : logos.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-gray-400">No images in hero section yet. Add your first image above!</p>
+              <p className="text-gray-400">No logos yet. Add your first client logo above!</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {images.map((image) => (
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+              {logos.map((logo) => (
                 <div
-                  key={image.id}
+                  key={logo.id}
                   className="bg-white/5 border border-white/10 rounded-lg overflow-hidden"
                 >
-                  {/* Image Preview */}
-                  <div className="aspect-[2/3] bg-black relative">
-                    {image.url ? (
-                      <Image
-                        src={image.url}
-                        alt={image.category}
-                        fill
-                        className="object-cover"
-                      />
-                    ) : (
-                      <div className="flex items-center justify-center h-full text-gray-500">
-                        No URL
-                      </div>
-                    )}
+                  {/* Logo Preview */}
+                  <div className="aspect-square bg-white p-4 relative">
+                    <Image
+                      src={logo.logo_url}
+                      alt={logo.client_name}
+                      fill
+                      className="object-contain p-2"
+                    />
                   </div>
 
                   {/* Info */}
                   <div className="p-4 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="px-3 py-1 bg-gradient-to-r from-purple-500 to-cyan-500 text-white text-xs font-semibold rounded-full">
-                        {image.category}
-                      </span>
-                      <div className="flex items-center gap-2">
-                        <span className="text-gray-400 text-sm">Order:</span>
-                        <input
-                          type="number"
-                          value={image.order}
-                          onChange={(e) =>
-                            handleUpdateOrder(image.id, parseInt(e.target.value))
-                          }
-                          className="w-16 px-2 py-1 bg-white/5 border border-white/10 rounded text-white text-sm text-center"
-                          min="1"
-                        />
-                      </div>
+                    <h3 className="text-sm font-bold text-white truncate">
+                      {logo.client_name}
+                    </h3>
+
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-400 text-xs">Order:</span>
+                      <input
+                        type="number"
+                        value={logo.order}
+                        onChange={(e) =>
+                          handleUpdateOrder(logo.id, parseInt(e.target.value))
+                        }
+                        className="w-12 px-2 py-1 bg-white/5 border border-white/10 rounded text-white text-xs text-center"
+                        min="1"
+                      />
                     </div>
 
-                    <div className="flex items-center justify-between">
+                    {logo.website_url && (
+                      <a
+                        href={logo.website_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-cyan-400 hover:text-cyan-300 truncate block"
+                      >
+                        🔗 Website
+                      </a>
+                    )}
+
+                    <div className="flex items-center justify-between pt-2">
                       <label className="flex items-center gap-2 cursor-pointer">
                         <input
                           type="checkbox"
-                          checked={image.active}
-                          onChange={() => handleToggle(image.id, image.active)}
+                          checked={logo.active}
+                          onChange={() => handleToggle(logo.id, logo.active)}
                           className="w-4 h-4"
                         />
-                        <span className="text-sm text-gray-300">Active</span>
+                        <span className="text-xs text-gray-300">Active</span>
                       </label>
 
                       <button
-                        onClick={() => handleDelete(image.id)}
-                        className="px-3 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-400 text-sm rounded-lg transition-colors"
+                        onClick={() => handleDelete(logo.id)}
+                        className="px-2 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-400 text-xs rounded transition-colors"
                       >
-                        Remove
+                        Delete
                       </button>
                     </div>
-
-                    <p className="text-xs text-gray-500 truncate">
-                      {image.filename}
-                    </p>
                   </div>
                 </div>
               ))}

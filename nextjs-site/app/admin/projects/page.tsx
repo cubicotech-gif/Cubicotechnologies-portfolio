@@ -3,13 +3,17 @@
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 
-interface HeroImage {
+interface FeaturedProject {
   id: string;
-  filename: string;
-  url?: string; // Cloud storage URL
+  title: string;
   category: string;
+  description: string;
+  image_url: string;
   order: number;
   active: boolean;
+  client_name?: string;
+  project_url?: string;
+  created_at?: string;
 }
 
 interface AvailableImage {
@@ -17,55 +21,51 @@ interface AvailableImage {
   path: string;
 }
 
-export default function AdminHeroPage() {
-  const [images, setImages] = useState<HeroImage[]>([]);
+export default function AdminProjectsPage() {
+  const [projects, setProjects] = useState<FeaturedProject[]>([]);
   const [availableImages, setAvailableImages] = useState<AvailableImage[]>([]);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [filename, setFilename] = useState('');
-  const [imageUrl, setImageUrl] = useState(''); // Cloud URL
-  const [category, setCategory] = useState('Logo Design');
-  const [uploadFolder, setUploadFolder] = useState('hero'); // Which folder to upload to
+  const [imageUrl, setImageUrl] = useState('');
+  const [title, setTitle] = useState('');
+  const [category, setCategory] = useState('Artwork');
+  const [description, setDescription] = useState('');
+  const [clientName, setClientName] = useState('');
+  const [projectUrl, setProjectUrl] = useState('');
+  const [uploadFolder] = useState('projects'); // Fixed to projects folder
   const [order, setOrder] = useState(1);
   const [message, setMessage] = useState('');
   const [showImageBrowser, setShowImageBrowser] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const categories = [
+    'Artwork',
     'Logo Design',
     'Social Media',
-    'Artwork',
     'Video',
     'Branding',
+    'UI/UX Design',
+    'Web Development',
   ];
 
-  const uploadFolders = [
-    { value: 'hero', label: 'Hero Background', description: 'Animated background cards' },
-    { value: 'portfolio', label: 'Portfolio Items', description: 'Portfolio showcase' },
-    { value: 'projects', label: 'Featured Projects', description: 'Main project images' },
-    { value: 'logos', label: 'Logo Designs', description: 'Logo showcase' },
-    { value: 'team', label: 'Team Members', description: 'Team photos' },
-    { value: 'general', label: 'General', description: 'Miscellaneous images' },
-  ];
-
-  // Fetch hero images configuration
-  const fetchImages = async () => {
+  // Fetch featured projects
+  const fetchProjects = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/hero-images');
+      const response = await fetch('/api/featured-projects');
       const data = await response.json();
       if (data.success) {
-        setImages(data.images.sort((a: HeroImage, b: HeroImage) => a.order - b.order));
+        setProjects(data.projects.sort((a: FeaturedProject, b: FeaturedProject) => a.order - b.order));
       }
     } catch (error) {
-      console.error('Error fetching images:', error);
-      setMessage('Failed to fetch images');
+      console.error('Error fetching projects:', error);
+      setMessage('Failed to fetch projects');
     } finally {
       setLoading(false);
     }
   };
 
-  // Fetch available images from directory
+  // Fetch available images from projects folder
   const fetchAvailableImages = async () => {
     try {
       const response = await fetch(`/api/upload-image?folder=${uploadFolder}`);
@@ -79,9 +79,9 @@ export default function AdminHeroPage() {
   };
 
   useEffect(() => {
-    fetchImages();
+    fetchProjects();
     fetchAvailableImages();
-  }, [uploadFolder]); // Re-fetch when folder changes
+  }, []);
 
   // Handle file upload
   const handleFileUpload = async (file: File) => {
@@ -93,7 +93,7 @@ export default function AdminHeroPage() {
     try {
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('folder', uploadFolder); // Include folder selection
+      formData.append('folder', uploadFolder);
 
       const response = await fetch('/api/upload-image', {
         method: 'POST',
@@ -103,9 +103,8 @@ export default function AdminHeroPage() {
       const data = await response.json();
 
       if (data.success) {
-        setMessage(`✅ File uploaded to ${data.folder}: ${data.filename}`);
-        setFilename(data.filename);
-        setImageUrl(data.url || data.path); // Store cloud URL
+        setMessage(`✅ File uploaded: ${data.filename}`);
+        setImageUrl(data.url || data.path);
         await fetchAvailableImages();
       } else {
         setMessage('❌ ' + (data.error || 'Upload failed'));
@@ -133,46 +132,52 @@ export default function AdminHeroPage() {
     e.preventDefault();
   };
 
-  // Add image to hero configuration
+  // Add project
   const handleAdd = async () => {
-    if (!filename && !imageUrl) {
-      setMessage('Please select or upload an image first');
+    if (!imageUrl || !title || !description) {
+      setMessage('Please fill in all required fields (image, title, description)');
       return;
     }
 
     try {
-      const response = await fetch('/api/hero-images', {
+      const response = await fetch('/api/featured-projects', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          filename,
-          url: imageUrl || undefined, // Include cloud URL if available
+          title,
           category,
-          order
+          description,
+          image_url: imageUrl,
+          order,
+          client_name: clientName || null,
+          project_url: projectUrl || null,
         }),
       });
 
       const data = await response.json();
 
       if (data.success) {
-        setMessage('✅ Image added to hero section!');
-        setFilename('');
+        setMessage('✅ Project added successfully!');
+        setTitle('');
+        setDescription('');
+        setClientName('');
+        setProjectUrl('');
         setImageUrl('');
         setOrder(order + 1);
-        await fetchImages();
+        await fetchProjects();
       } else {
-        setMessage('❌ ' + (data.error || 'Failed to add image'));
+        setMessage('❌ ' + (data.error || 'Failed to add project'));
       }
     } catch (error) {
       console.error('Add error:', error);
-      setMessage('❌ Failed to add image');
+      setMessage('❌ Failed to add project');
     }
   };
 
   // Toggle active status
   const handleToggle = async (id: string, currentActive: boolean) => {
     try {
-      const response = await fetch('/api/hero-images', {
+      const response = await fetch('/api/featured-projects', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, active: !currentActive }),
@@ -182,7 +187,7 @@ export default function AdminHeroPage() {
 
       if (data.success) {
         setMessage('✅ Status updated');
-        await fetchImages();
+        await fetchProjects();
       } else {
         setMessage('❌ Update failed');
       }
@@ -192,22 +197,23 @@ export default function AdminHeroPage() {
     }
   };
 
-  // Delete from configuration
+  // Delete project
   const handleDelete = async (id: string) => {
-    if (!confirm('Remove this image from the hero section?')) {
+    if (!confirm('Delete this project? This will also remove the image from storage.')) {
       return;
     }
 
     try {
-      const response = await fetch(`/api/hero-images?id=${id}`, {
+      const response = await fetch(`/api/featured-projects?id=${id}`, {
         method: 'DELETE',
       });
 
       const data = await response.json();
 
       if (data.success) {
-        setMessage('✅ Image removed from hero section');
-        await fetchImages();
+        setMessage('✅ Project deleted');
+        await fetchProjects();
+        await fetchAvailableImages();
       } else {
         setMessage('❌ Delete failed');
       }
@@ -220,7 +226,7 @@ export default function AdminHeroPage() {
   // Update order
   const handleUpdateOrder = async (id: string, newOrder: number) => {
     try {
-      const response = await fetch('/api/hero-images', {
+      const response = await fetch('/api/featured-projects', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, order: newOrder }),
@@ -230,7 +236,7 @@ export default function AdminHeroPage() {
 
       if (data.success) {
         setMessage('✅ Order updated');
-        await fetchImages();
+        await fetchProjects();
       } else {
         setMessage('❌ Update failed');
       }
@@ -245,10 +251,10 @@ export default function AdminHeroPage() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <h1 className="text-4xl font-bold text-white mb-2">
-          Hero Images Manager
+          Featured Projects Manager
         </h1>
         <p className="text-gray-400 mb-8">
-          Upload and manage images for the hero section animated background
+          Upload and manage featured projects for the homepage carousel
         </p>
 
         {/* Message */}
@@ -260,33 +266,7 @@ export default function AdminHeroPage() {
 
         {/* Upload Section */}
         <div className="glass rounded-2xl p-6 mb-8">
-          <h2 className="text-2xl font-bold text-white mb-4">Step 1: Upload Image</h2>
-
-          {/* Folder Selector */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Upload To Folder:
-            </label>
-            <select
-              value={uploadFolder}
-              onChange={(e) => setUploadFolder(e.target.value)}
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-              style={{ colorScheme: 'dark' }}
-            >
-              {uploadFolders.map((folder) => (
-                <option
-                  key={folder.value}
-                  value={folder.value}
-                  className="bg-gray-900 text-white"
-                >
-                  {folder.label} - {folder.description}
-                </option>
-              ))}
-            </select>
-            <p className="text-xs text-gray-500 mt-2">
-              Select where this image will be used. Different folders for different purposes.
-            </p>
-          </div>
+          <h2 className="text-2xl font-bold text-white mb-4">Step 1: Upload Project Image</h2>
 
           {/* Drag and Drop Zone */}
           <div
@@ -302,7 +282,7 @@ export default function AdminHeroPage() {
                   Drag & Drop or Click to Upload
                 </p>
                 <p className="text-gray-400 text-sm">
-                  Supports: JPG, PNG, GIF, WebP, SVG
+                  Supports: JPG, PNG, GIF, WebP, SVG (Max 10MB)
                 </p>
               </div>
               <input
@@ -340,12 +320,11 @@ export default function AdminHeroPage() {
                   <div
                     key={img.filename}
                     onClick={() => {
-                      setFilename(img.filename);
-                      setImageUrl(img.path); // Set cloud URL
+                      setImageUrl(img.path);
                       setMessage(`✅ Selected: ${img.filename}`);
                     }}
                     className={`cursor-pointer border-2 rounded-lg overflow-hidden transition-all hover:scale-105 ${
-                      filename === img.filename
+                      imageUrl === img.path
                         ? 'border-purple-500 shadow-lg shadow-purple-500/50'
                         : 'border-white/10 hover:border-white/30'
                     }`}
@@ -368,70 +347,116 @@ export default function AdminHeroPage() {
           </div>
         </div>
 
-        {/* Add to Hero Section */}
+        {/* Add Project Form */}
         <div className="glass rounded-2xl p-6 mb-8">
-          <h2 className="text-2xl font-bold text-white mb-4">Step 2: Add to Hero Section</h2>
+          <h2 className="text-2xl font-bold text-white mb-4">Step 2: Project Details</h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                Selected Image
+                Project Title <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
-                value={filename}
-                readOnly
-                placeholder="Upload or select an image above"
-                className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="e.g., QuranPath LMS Dashboard"
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                Category
+                Category <span className="text-red-500">*</span>
               </label>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                style={{ colorScheme: 'dark' }}
               >
                 {categories.map((cat) => (
-                  <option key={cat} value={cat}>
+                  <option key={cat} value={cat} className="bg-gray-900 text-white">
                     {cat}
                   </option>
                 ))}
               </select>
             </div>
 
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Description <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Brief description of the project..."
+                rows={3}
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+              />
+            </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                Order
+                Client Name (Optional)
+              </label>
+              <input
+                type="text"
+                value={clientName}
+                onChange={(e) => setClientName(e.target.value)}
+                placeholder="e.g., Acme Corporation"
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Project URL (Optional)
+              </label>
+              <input
+                type="url"
+                value={projectUrl}
+                onChange={(e) => setProjectUrl(e.target.value)}
+                placeholder="https://example.com"
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Display Order
               </label>
               <input
                 type="number"
                 value={order}
                 onChange={(e) => setOrder(parseInt(e.target.value))}
                 min="1"
-                className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
             </div>
 
             <div className="flex items-end">
               <button
                 onClick={handleAdd}
-                disabled={!filename}
-                className="w-full px-6 py-2 bg-gradient-to-r from-purple-500 to-cyan-500 text-white font-semibold rounded-lg hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={!imageUrl || !title || !description}
+                className="w-full px-6 py-3 bg-gradient-to-r from-purple-500 to-cyan-500 text-white font-semibold rounded-lg hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Add to Hero
+                Add Project
               </button>
             </div>
           </div>
+
+          {imageUrl && (
+            <div className="mt-6 p-4 bg-green-500/20 border border-green-500/50 rounded-lg">
+              <p className="text-green-400 text-sm">✅ Image selected and ready</p>
+            </div>
+          )}
         </div>
 
-        {/* Active Hero Images */}
+        {/* Active Projects List */}
         <div className="glass rounded-2xl p-6">
           <h2 className="text-2xl font-bold text-white mb-4">
-            Hero Section Images ({images.length})
+            Featured Projects ({projects.length})
           </h2>
 
           {loading ? (
@@ -439,46 +464,44 @@ export default function AdminHeroPage() {
               <div className="inline-block w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
               <p className="text-gray-400 mt-4">Loading...</p>
             </div>
-          ) : images.length === 0 ? (
+          ) : projects.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-gray-400">No images in hero section yet. Add your first image above!</p>
+              <p className="text-gray-400">No projects yet. Add your first project above!</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {images.map((image) => (
+              {projects.map((project) => (
                 <div
-                  key={image.id}
+                  key={project.id}
                   className="bg-white/5 border border-white/10 rounded-lg overflow-hidden"
                 >
                   {/* Image Preview */}
-                  <div className="aspect-[2/3] bg-black relative">
-                    {image.url ? (
-                      <Image
-                        src={image.url}
-                        alt={image.category}
-                        fill
-                        className="object-cover"
-                      />
-                    ) : (
-                      <div className="flex items-center justify-center h-full text-gray-500">
-                        No URL
-                      </div>
-                    )}
+                  <div className="aspect-video bg-black relative">
+                    <Image
+                      src={project.image_url}
+                      alt={project.title}
+                      fill
+                      className="object-cover"
+                    />
                   </div>
 
                   {/* Info */}
                   <div className="p-4 space-y-3">
+                    <h3 className="text-lg font-bold text-white truncate">
+                      {project.title}
+                    </h3>
+
                     <div className="flex items-center justify-between">
                       <span className="px-3 py-1 bg-gradient-to-r from-purple-500 to-cyan-500 text-white text-xs font-semibold rounded-full">
-                        {image.category}
+                        {project.category}
                       </span>
                       <div className="flex items-center gap-2">
                         <span className="text-gray-400 text-sm">Order:</span>
                         <input
                           type="number"
-                          value={image.order}
+                          value={project.order}
                           onChange={(e) =>
-                            handleUpdateOrder(image.id, parseInt(e.target.value))
+                            handleUpdateOrder(project.id, parseInt(e.target.value))
                           }
                           className="w-16 px-2 py-1 bg-white/5 border border-white/10 rounded text-white text-sm text-center"
                           min="1"
@@ -486,28 +509,34 @@ export default function AdminHeroPage() {
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between">
+                    <p className="text-sm text-gray-400 line-clamp-2">
+                      {project.description}
+                    </p>
+
+                    {project.client_name && (
+                      <p className="text-xs text-gray-500">
+                        Client: {project.client_name}
+                      </p>
+                    )}
+
+                    <div className="flex items-center justify-between pt-2">
                       <label className="flex items-center gap-2 cursor-pointer">
                         <input
                           type="checkbox"
-                          checked={image.active}
-                          onChange={() => handleToggle(image.id, image.active)}
+                          checked={project.active}
+                          onChange={() => handleToggle(project.id, project.active)}
                           className="w-4 h-4"
                         />
                         <span className="text-sm text-gray-300">Active</span>
                       </label>
 
                       <button
-                        onClick={() => handleDelete(image.id)}
+                        onClick={() => handleDelete(project.id)}
                         className="px-3 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-400 text-sm rounded-lg transition-colors"
                       >
-                        Remove
+                        Delete
                       </button>
                     </div>
-
-                    <p className="text-xs text-gray-500 truncate">
-                      {image.filename}
-                    </p>
                   </div>
                 </div>
               ))}
