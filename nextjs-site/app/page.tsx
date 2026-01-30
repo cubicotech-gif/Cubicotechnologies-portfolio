@@ -497,17 +497,40 @@ export default function Home() {
                         boxShadow: '0 4px 24px rgba(0,0,0,0.4)',
                       }}
                     >
-                      {/* Background Image Placeholder */}
-                      <div className={`absolute inset-0 bg-gradient-to-br ${service.gradient} opacity-70 group-hover:scale-110 transition-transform duration-500`} />
-                      <div className="absolute inset-0 bg-black/40" />
+                      {/* Background Image - Use first slot image if available, otherwise gradient */}
+                      {serviceImages[service.title]?.[0] ? (
+                        <>
+                          <Image
+                            src={serviceImages[service.title][0]}
+                            alt={service.title}
+                            fill
+                            className="object-cover group-hover:scale-110 transition-transform duration-500"
+                            sizes="(max-width: 768px) 100vw, 50vw"
+                            quality={100}
+                          />
+                          {/* Dark overlay for text readability */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+                        </>
+                      ) : (
+                        <>
+                          {/* Fallback gradient if no image uploaded yet */}
+                          <div className={`absolute inset-0 bg-gradient-to-br ${service.gradient} opacity-70 group-hover:scale-110 transition-transform duration-500`} />
+                          <div className="absolute inset-0 bg-black/40" />
+                        </>
+                      )}
 
                       {/* Number Badge */}
                       <div className="absolute top-6 left-6 w-14 h-14 rounded-full backdrop-blur-md bg-white/10 border border-white/20 flex items-center justify-center z-10">
                         <span className="text-white font-bold text-xl">{service.number}</span>
                       </div>
 
-                      {/* Content */}
+                      {/* Content - Bottom left like featured projects */}
                       <div className="absolute inset-0 flex flex-col justify-end p-8 z-10">
+                        {/* Category badge */}
+                        <div className="inline-block w-fit px-3 py-1 bg-gradient-to-r from-purple-500 to-cyan-500 text-white text-xs font-semibold rounded-full mb-3">
+                          {service.category}
+                        </div>
+
                         <h3 className="text-4xl lg:text-5xl font-bold text-white mb-3 font-[family-name:var(--font-space-grotesk)]">
                           {service.title}
                         </h3>
