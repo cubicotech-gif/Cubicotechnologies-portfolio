@@ -1,12 +1,14 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
 export default function Navigation() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -14,6 +16,23 @@ export default function Navigation() {
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Fetch site logo
+  useEffect(() => {
+    const fetchLogo = async () => {
+      try {
+        const response = await fetch('/api/site-settings?key=site_logo');
+        const data = await response.json();
+        if (data.success && data.settings?.value) {
+          setLogoUrl(data.settings.value);
+        }
+      } catch (error) {
+        console.error('Error fetching logo:', error);
+      }
+    };
+
+    fetchLogo();
   }, []);
 
   const navLinks = [
@@ -38,10 +57,24 @@ export default function Navigation() {
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <Link href="/" className="relative group">
-            <span className="text-2xl lg:text-3xl font-bold text-white tracking-tight">
-              CUBICO
-            </span>
+          <Link href="/" className="relative group flex items-center">
+            {logoUrl ? (
+              <div className="relative h-12 w-auto">
+                <Image
+                  src={logoUrl}
+                  alt="Cubico Technologies"
+                  width={200}
+                  height={60}
+                  className="h-12 w-auto object-contain"
+                  quality={100}
+                  priority
+                />
+              </div>
+            ) : (
+              <span className="text-2xl lg:text-3xl font-bold text-white tracking-tight">
+                CUBICO
+              </span>
+            )}
             <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-500 to-cyan-500 group-hover:w-full transition-all duration-300" />
           </Link>
 
