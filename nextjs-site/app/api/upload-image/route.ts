@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { bucket } from '@/lib/firebase-admin';
+import { supabaseAdmin } from '@/lib/supabase';
 
 export const runtime = 'nodejs';
 
@@ -51,33 +51,37 @@ export async function POST(request: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Upload to Firebase Storage
-    const fileUpload = bucket.file(filePath);
-
-    await fileUpload.save(buffer, {
-      metadata: {
+    // Upload to Supabase Storage
+    const { data, error } = await supabaseAdmin.storage
+      .from('hero-images')
+      .upload(filePath, buffer, {
         contentType: file.type,
-        metadata: {
-          firebaseStorageDownloadTokens: timestamp.toString(),
-        }
-      },
-      public: true,
-    });
+        upsert: false,
+      });
 
-    // Make file publicly accessible
-    await fileUpload.makePublic();
+    if (error) {
+      console.error('Supabase upload error:', error);
+      return NextResponse.json(
+        { success: false, error: `Upload failed: ${error.message}` },
+        { status: 500 }
+      );
+    }
 
     // Get public URL
-    const publicUrl = `https://storage.googleapis.com/${bucket.name}/${filePath}`;
+    const { data: publicUrlData } = supabaseAdmin.storage
+      .from('hero-images')
+      .getPublicUrl(filePath);
 
-    console.log(`File uploaded to Firebase Storage: ${publicUrl}`);
+    const publicUrl = publicUrlData.publicUrl;
+
+    console.log(`File uploaded to Supabase Storage: ${publicUrl}`);
 
     return NextResponse.json({
       success: true,
       filename: filename,
       url: publicUrl,
       path: publicUrl,
-      message: 'File uploaded successfully to Firebase Storage'
+      message: 'File uploaded successfully to Supabase Storage'
     });
   } catch (error: any) {
     console.error('Upload error:', error);
@@ -88,27 +92,38 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET: List all images from Firebase Storage
+// GET: List all images from Supabase Storage
 export async function GET() {
   try {
-    const [files] = await bucket.getFiles({
-      prefix: 'hero/',
-    });
+    const { data: files, error } = await supabaseAdmin.storage
+      .from('hero-images')
+      .list('hero', {
+        limit: 100,
+        offset: 0,
+      });
+
+    if (error) {
+      console.error('Error listing images:', error);
+      return NextResponse.json(
+        { success: false, error: `Failed to list images: ${error.message}` },
+        { status: 500 }
+      );
+    }
 
     const images = files
       .filter(file => {
         // Filter out directories and non-image files
-        const name = file.name;
-        return name !== 'hero/' && /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(name);
+        return file.name && /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(file.name);
       })
       .map(file => {
-        const filename = file.name.replace('hero/', '');
-        const publicUrl = `https://storage.googleapis.com/${bucket.name}/${file.name}`;
+        const { data: publicUrlData } = supabaseAdmin.storage
+          .from('hero-images')
+          .getPublicUrl(`hero/${file.name}`);
 
         return {
-          filename,
-          path: publicUrl,
-          url: publicUrl,
+          filename: file.name,
+          path: publicUrlData.publicUrl,
+          url: publicUrlData.publicUrl,
         };
       });
 
@@ -117,11 +132,11 @@ export async function GET() {
     console.error('Error listing images:', error);
 
     // If error is due to missing credentials, return empty array
-    if (error.message?.includes('Could not load the default credentials')) {
+    if (error.message?.includes('SUPABASE_URL') || error.message?.includes('Invalid URL')) {
       return NextResponse.json({
         success: true,
         images: [],
-        message: 'Firebase not configured. Please set environment variables.'
+        message: 'Supabase not configured. Please set environment variables.'
       });
     }
 
