@@ -10,6 +10,7 @@ interface LibraryImage {
   path: string;
   created_at?: string;
   size?: number;
+  media_type?: 'image' | 'video';
 }
 
 export default function ImageLibraryPage() {
@@ -79,10 +80,10 @@ export default function ImageLibraryPage() {
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     const file = e.dataTransfer.files[0];
-    if (file && file.type.startsWith('image/')) {
+    if (file && (file.type.startsWith('image/') || file.type.startsWith('video/'))) {
       handleFileUpload(file);
     } else {
-      setMessage('❌ Please drop an image file');
+      setMessage('❌ Please drop an image or video file');
     }
   };
 
@@ -112,10 +113,10 @@ export default function ImageLibraryPage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-white mb-2">
-            📚 Image Library
+            📚 Media Library
           </h1>
           <p className="text-gray-400">
-            Upload all your images here, then use them across different sections
+            Upload images and videos here, then use them across different sections
           </p>
         </div>
 
@@ -128,7 +129,7 @@ export default function ImageLibraryPage() {
 
         {/* Upload Section */}
         <div className="glass rounded-2xl p-6 mb-8">
-          <h2 className="text-2xl font-bold text-white mb-4">Upload Images</h2>
+          <h2 className="text-2xl font-bold text-white mb-4">Upload Media</h2>
 
           {/* Drag and Drop Zone */}
           <div
@@ -144,16 +145,19 @@ export default function ImageLibraryPage() {
                   Drag & Drop or Click to Upload
                 </p>
                 <p className="text-gray-400 text-sm">
-                  Supports: JPG, PNG, GIF, WebP, SVG (Max 50MB)
+                  <strong>Images:</strong> JPG, PNG, GIF, WebP, SVG (Max 50MB)
+                </p>
+                <p className="text-gray-400 text-sm">
+                  <strong>Videos:</strong> MP4, WebM, MOV (Max 100MB)
                 </p>
                 <p className="text-gray-500 text-xs mt-1">
-                  Upload HD/high-resolution images - quality is preserved
+                  Upload HD/high-resolution files - quality is preserved
                 </p>
               </div>
               <input
                 ref={fileInputRef}
                 type="file"
-                accept="image/*"
+                accept="image/*,video/*"
                 onChange={(e) => {
                   const file = e.target.files?.[0];
                   if (file) handleFileUpload(file);
@@ -175,7 +179,7 @@ export default function ImageLibraryPage() {
         <div className="glass rounded-2xl p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-white">
-              Your Images ({images.length})
+              Your Media ({images.length})
             </h2>
             <button
               onClick={fetchImages}
@@ -192,7 +196,7 @@ export default function ImageLibraryPage() {
             </div>
           ) : images.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-gray-400">No images yet. Upload your first image above!</p>
+              <p className="text-gray-400">No media yet. Upload your first image or video above!</p>
             </div>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
@@ -206,14 +210,35 @@ export default function ImageLibraryPage() {
                       : 'border-white/10 hover:border-white/30'
                   }`}
                 >
-                  {/* Image Preview */}
+                  {/* Media Preview */}
                   <div className="aspect-square relative bg-black">
-                    <Image
-                      src={image.url}
-                      alt={image.filename}
-                      fill
-                      className="object-cover"
-                    />
+                    {image.media_type === 'video' ? (
+                      <video
+                        src={image.url}
+                        className="w-full h-full object-cover"
+                        muted
+                        loop
+                        playsInline
+                        onMouseEnter={(e) => e.currentTarget.play()}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.pause();
+                          e.currentTarget.currentTime = 0;
+                        }}
+                      />
+                    ) : (
+                      <Image
+                        src={image.url}
+                        alt={image.filename}
+                        fill
+                        className="object-cover"
+                      />
+                    )}
+                    {/* Media Type Badge */}
+                    {image.media_type === 'video' && (
+                      <div className="absolute top-2 right-2 bg-black/70 backdrop-blur-sm px-2 py-1 rounded text-xs text-white">
+                        🎬 VIDEO
+                      </div>
+                    )}
                   </div>
 
                   {/* Image Info */}
@@ -247,13 +272,13 @@ export default function ImageLibraryPage() {
         <div className="mt-8 p-6 bg-blue-500/20 border border-blue-500/50 rounded-lg">
           <h3 className="text-blue-400 font-semibold mb-3">✅ Next Step</h3>
           <p className="text-blue-300 text-sm mb-4">
-            Images uploaded! Now assign them to different sections of your website.
+            Media uploaded! Now assign images and videos to different sections of your website (e.g., Portfolio, Service Images).
           </p>
           <Link
             href="/admin/assign"
             className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-cyan-500 text-white font-bold rounded-lg hover:scale-105 transition-transform"
           >
-            🎯 Assign Images to Sections
+            🎯 Assign Media to Sections
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>

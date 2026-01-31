@@ -14,7 +14,13 @@ interface PortfolioItem {
   image_url?: string;
   year: string;
   services: string[];
+  media_type?: 'image' | 'video';
 }
+
+// Helper function to check if URL is a video
+const isVideoUrl = (url: string): boolean => {
+  return /\.(mp4|webm|mov|avi|mpeg|ogg)$/i.test(url);
+};
 
 const portfolioData: PortfolioItem[] = [
   {
@@ -333,16 +339,27 @@ export default function PortfolioPage() {
                   }`}
                   onClick={() => setSelectedProject(item)}
                 >
-                  {/* Image Container */}
+                  {/* Media Container */}
                   <div className={`relative overflow-hidden ${
                     index % 7 === 0 ? 'aspect-[16/10]' : 'aspect-[4/5]'
                   }`}>
-                    <Image
-                      src={item.image_url || item.imageUrl || ''}
-                      alt={item.title}
-                      fill
-                      className="object-cover transition-transform duration-700 group-hover:scale-110"
-                    />
+                    {item.media_type === 'video' || isVideoUrl(item.image_url || item.imageUrl || '') ? (
+                      <video
+                        src={item.image_url || item.imageUrl || ''}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        muted
+                        loop
+                        playsInline
+                        autoPlay
+                      />
+                    ) : (
+                      <Image
+                        src={item.image_url || item.imageUrl || ''}
+                        alt={item.title}
+                        fill
+                        className="object-cover transition-transform duration-700 group-hover:scale-110"
+                      />
+                    )}
 
                     {/* Gradient Overlay */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-60 group-hover:opacity-90 transition-opacity duration-300" />
@@ -457,15 +474,27 @@ export default function PortfolioPage() {
               </button>
 
               <div className="grid lg:grid-cols-2 gap-0">
-                {/* Left: Image */}
+                {/* Left: Media */}
                 <div className="relative aspect-[4/3] lg:aspect-auto lg:min-h-[600px]">
-                  <Image
-                    src={selectedProject.image_url || selectedProject.imageUrl || ''}
-                    alt={selectedProject.title}
-                    fill
-                    className="object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-transparent lg:bg-gradient-to-r lg:from-transparent lg:via-transparent lg:to-zinc-900" />
+                  {selectedProject.media_type === 'video' || isVideoUrl(selectedProject.image_url || selectedProject.imageUrl || '') ? (
+                    <video
+                      src={selectedProject.image_url || selectedProject.imageUrl || ''}
+                      className="w-full h-full object-cover"
+                      controls
+                      loop
+                      playsInline
+                      autoPlay
+                      muted
+                    />
+                  ) : (
+                    <Image
+                      src={selectedProject.image_url || selectedProject.imageUrl || ''}
+                      alt={selectedProject.title}
+                      fill
+                      className="object-cover"
+                    />
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-transparent lg:bg-gradient-to-r lg:from-transparent lg:via-transparent lg:to-zinc-900 pointer-events-none" />
                 </div>
 
                 {/* Right: Details */}
