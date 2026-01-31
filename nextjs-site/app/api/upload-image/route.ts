@@ -18,28 +18,37 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate file type
+    // Validate file type (images and videos)
     const validTypes = [
+      // Images
       'image/jpeg',
       'image/jpg',
       'image/png',
       'image/gif',
       'image/webp',
-      'image/svg+xml'
+      'image/svg+xml',
+      // Videos
+      'video/mp4',
+      'video/webm',
+      'video/quicktime', // .mov
+      'video/x-msvideo', // .avi
+      'video/mpeg',
+      'video/ogg'
     ];
 
     if (!validTypes.includes(file.type)) {
       return NextResponse.json(
-        { success: false, error: `Invalid file type: ${file.type}. Only images are allowed.` },
+        { success: false, error: `Invalid file type: ${file.type}. Only images and videos are allowed.` },
         { status: 400 }
       );
     }
 
-    // Validate file size (max 50MB for HD images)
-    const maxSize = 50 * 1024 * 1024; // 50MB
+    // Validate file size (max 100MB for videos, 50MB for images)
+    const isVideo = file.type.startsWith('video/');
+    const maxSize = isVideo ? 100 * 1024 * 1024 : 50 * 1024 * 1024; // 100MB for videos, 50MB for images
     if (file.size > maxSize) {
       return NextResponse.json(
-        { success: false, error: 'File too large. Maximum size is 50MB.' },
+        { success: false, error: `File too large. Maximum size is ${isVideo ? '100MB for videos' : '50MB for images'}.` },
         { status: 400 }
       );
     }
@@ -114,10 +123,10 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const images = files
+    const media = files
       .filter(file => {
-        // Filter out directories and non-image files
-        return file.name && /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(file.name);
+        // Filter out directories and include both images and videos
+        return file.name && /\.(jpg|jpeg|png|gif|webp|svg|mp4|webm|mov|avi|mpeg|ogg)$/i.test(file.name);
       })
       .map(file => {
         const filePath = `${LIBRARY_FOLDER}/${file.name}`;
@@ -125,16 +134,20 @@ export async function GET(request: NextRequest) {
           .from('images')
           .getPublicUrl(filePath);
 
+        // Determine media type
+        const isVideo = /\.(mp4|webm|mov|avi|mpeg|ogg)$/i.test(file.name);
+
         return {
           filename: file.name,
           path: publicUrlData.publicUrl,
           url: publicUrlData.publicUrl,
           created_at: file.created_at,
           size: file.metadata?.size || 0,
+          media_type: isVideo ? 'video' : 'image',
         };
       });
 
-    return NextResponse.json({ success: true, images, total: images.length });
+    return NextResponse.json({ success: true, images: media, total: media.length });
   } catch (error: any) {
     console.error('Error listing images:', error);
 
