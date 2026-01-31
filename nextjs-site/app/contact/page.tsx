@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSearchParams } from 'next/navigation';
 
@@ -65,7 +65,7 @@ const faqs = [
   }
 ];
 
-export default function ContactPage() {
+function ContactPageContent() {
   const searchParams = useSearchParams();
   const [formData, setFormData] = useState<FormData>({
     name: '',
@@ -639,5 +639,17 @@ export default function ContactPage() {
         </motion.div>
       </section>
     </main>
+  );
+}
+
+export default function ContactPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-white">Loading...</div>
+      </div>
+    }>
+      <ContactPageContent />
+    </Suspense>
   );
 }
