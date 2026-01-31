@@ -203,7 +203,37 @@ CREATE POLICY "Service role full access" ON portfolio_items
   FOR ALL USING (auth.role() = 'service_role');
 
 -- ===================================================================
--- 7. STORAGE POLICIES (Run only if not already created)
+-- 7. CONTACT SUBMISSIONS TABLE
+-- ===================================================================
+CREATE TABLE IF NOT EXISTS contact_submissions (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  phone TEXT,
+  service TEXT NOT NULL,
+  budget TEXT,
+  message TEXT NOT NULL,
+  status TEXT DEFAULT 'new' CHECK (status IN ('new', 'read', 'replied')),
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Indexes for performance
+CREATE INDEX IF NOT EXISTS idx_contact_submissions_status ON contact_submissions(status);
+CREATE INDEX IF NOT EXISTS idx_contact_submissions_created_at ON contact_submissions(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_contact_submissions_email ON contact_submissions(email);
+
+-- Enable Row Level Security
+ALTER TABLE contact_submissions ENABLE ROW LEVEL SECURITY;
+
+-- Drop existing policies if they exist
+DROP POLICY IF EXISTS "Service role full access" ON contact_submissions;
+
+-- Policies (only service role can access - for admin use)
+CREATE POLICY "Service role full access" ON contact_submissions
+  FOR ALL USING (auth.role() = 'service_role');
+
+-- ===================================================================
+-- 8. STORAGE POLICIES (Run only if not already created)
 -- ===================================================================
 
 -- Allow public to read all images
@@ -265,7 +295,7 @@ END $$;
 SELECT 'Tables Created:' as status;
 SELECT table_name FROM information_schema.tables
 WHERE table_schema = 'public'
-AND table_name IN ('hero_images', 'featured_projects', 'client_logos', 'site_settings', 'service_images', 'portfolio_items');
+AND table_name IN ('hero_images', 'featured_projects', 'client_logos', 'site_settings', 'service_images', 'portfolio_items', 'contact_submissions');
 
 -- Check storage policies
 SELECT 'Storage Policies:' as status;
@@ -279,6 +309,6 @@ ORDER BY policyname;
 -- ===================================================================
 SELECT
   '✅ Database setup complete!' as message,
-  'Tables: hero_images, featured_projects, client_logos, site_settings, service_images, portfolio_items' as tables,
+  'Tables: hero_images, featured_projects, client_logos, site_settings, service_images, portfolio_items, contact_submissions' as tables,
   'Storage: images bucket with read/write/delete policies' as storage,
   'Security: RLS enabled on all tables' as security;
