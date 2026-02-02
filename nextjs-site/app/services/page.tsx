@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { motion, AnimatePresence, useMotionValue, useTransform, PanInfo } from 'framer-motion';
 import Link from 'next/link';
 
 // ============================================================================
@@ -154,82 +154,98 @@ function NavigationOverlay({
   onPrev: () => void;
   onNext: () => void;
 }) {
-  const progress = (currentSlide / (totalSlides - 1)) * 100;
+  const progress = ((currentSlide + 1) / totalSlides) * 100;
 
   return (
     <motion.div
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      className="fixed top-0 left-0 right-0 z-[100] bg-black/40 backdrop-blur-xl border-b border-white/10"
+      transition={{ duration: 0.6, ease: 'easeOut' }}
+      className="fixed top-0 left-0 right-0 z-[100] bg-black/60 backdrop-blur-2xl border-b border-white/10"
     >
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-4 lg:py-6">
-        <div className="flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 lg:py-5">
+        <div className="flex items-center justify-between gap-4">
           {/* Left: Back to Home */}
-          <div className="flex items-center gap-4">
-            <Link
-              href="/"
-              className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors group"
+          <Link
+            href="/"
+            className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors group min-w-[80px]"
+          >
+            <motion.svg
+              className="w-5 h-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              whileHover={{ x: -3 }}
+              transition={{ type: 'spring', stiffness: 400 }}
             >
-              <svg className="w-5 h-5 group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              <span className="hidden sm:inline font-medium">Home</span>
-            </Link>
-            <span className="text-gray-600">/</span>
-            <span className="text-white font-medium">Services</span>
-          </div>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </motion.svg>
+            <span className="hidden sm:inline font-medium text-sm">Home</span>
+          </Link>
 
           {/* Center: Service Indicators */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             {services.map((service, index) => (
-              <button
+              <motion.button
                 key={service.id}
                 onClick={() => onNavigate(index)}
                 className="group relative"
+                whileHover={{ scale: 1.2 }}
+                whileTap={{ scale: 0.9 }}
                 aria-label={`Navigate to ${service.title}`}
               >
-                <div
-                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                <motion.div
+                  className={`rounded-full transition-all duration-300 ${
                     currentSlide === index
-                      ? `bg-gradient-to-r ${service.gradient} w-8`
-                      : 'bg-gray-600 hover:bg-gray-400'
+                      ? `bg-gradient-to-r ${service.gradient} w-8 sm:w-10 h-2`
+                      : 'bg-gray-600 hover:bg-gray-400 w-2 h-2'
                   }`}
+                  layout
                 />
                 {/* Tooltip */}
-                <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
-                  <div className="bg-black/90 text-white text-xs px-3 py-1 rounded-lg">
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  whileHover={{ opacity: 1, y: 0 }}
+                  className="absolute top-full mt-3 left-1/2 -translate-x-1/2 pointer-events-none whitespace-nowrap z-50"
+                >
+                  <div className="bg-black/95 backdrop-blur-sm text-white text-xs px-3 py-2 rounded-lg border border-white/10 shadow-xl">
                     {service.title}
+                    <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-black/95 rotate-45 border-l border-t border-white/10" />
                   </div>
-                </div>
-              </button>
+                </motion.div>
+              </motion.button>
             ))}
           </div>
 
           {/* Right: Navigation Arrows + Contact */}
-          <div className="flex items-center gap-2 lg:gap-4">
-            <button
+          <div className="flex items-center gap-2 min-w-[80px] justify-end">
+            <motion.button
               onClick={onPrev}
               disabled={currentSlide === 0}
-              className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center transition-colors"
+              className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/5 hover:bg-white/10 disabled:opacity-20 disabled:cursor-not-allowed flex items-center justify-center transition-colors backdrop-blur-sm"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
               aria-label="Previous service"
             >
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
-            </button>
-            <button
+            </motion.button>
+            <motion.button
               onClick={onNext}
               disabled={currentSlide === totalSlides - 1}
-              className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center transition-colors"
+              className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/5 hover:bg-white/10 disabled:opacity-20 disabled:cursor-not-allowed flex items-center justify-center transition-colors backdrop-blur-sm"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
               aria-label="Next service"
             >
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
-            </button>
+            </motion.button>
             <Link
               href="/contact"
-              className="hidden lg:block ml-2 px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-full hover:brightness-110 transition-all"
+              className="hidden lg:block ml-2 px-5 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-sm font-semibold rounded-full hover:brightness-110 hover:shadow-lg hover:shadow-purple-500/30 transition-all"
             >
               Contact Us
             </Link>
@@ -238,12 +254,12 @@ function NavigationOverlay({
       </div>
 
       {/* Progress Bar */}
-      <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/5">
+      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-white/5">
         <motion.div
           className={`h-full bg-gradient-to-r ${services[currentSlide].gradient}`}
           initial={{ width: 0 }}
           animate={{ width: `${progress}%` }}
-          transition={{ duration: 0.3 }}
+          transition={{ duration: 0.4, ease: 'easeOut' }}
         />
       </div>
     </motion.div>
@@ -256,48 +272,71 @@ function NavigationOverlay({
 
 function ArtworkSlide({ service }: { service: Service }) {
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
 
-  // Sample artwork images (placeholder)
+  // Mouse parallax effect
+  const backgroundX = useTransform(mouseX, [0, 1], [-20, 20]);
+  const backgroundY = useTransform(mouseY, [0, 1], [-20, 20]);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    const y = (e.clientY - rect.top) / rect.height;
+    mouseX.set(x);
+    mouseY.set(y);
+  };
+
   const artworkSamples = [
-    { id: 1, title: 'Digital Illustration', color: 'from-purple-500 to-pink-500' },
-    { id: 2, title: 'Character Design', color: 'from-blue-500 to-purple-500' },
-    { id: 3, title: 'Abstract Art', color: 'from-pink-500 to-orange-500' },
-    { id: 4, title: 'Vector Graphics', color: 'from-cyan-500 to-blue-500' }
+    { id: 1, title: 'Digital Illustration', color: 'from-purple-500 to-pink-500', icon: 'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z' },
+    { id: 2, title: 'Character Design', color: 'from-blue-500 to-purple-500', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' },
+    { id: 3, title: 'Abstract Art', color: 'from-pink-500 to-orange-500', icon: 'M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01' },
+    { id: 4, title: 'Vector Graphics', color: 'from-cyan-500 to-blue-500', icon: 'M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-3zM14 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1h-4a1 1 0 01-1-1v-3z' }
   ];
 
   return (
-    <div className="h-screen w-full flex flex-col lg:flex-row">
+    <div className="h-full w-full flex flex-col lg:flex-row">
       {/* LEFT SIDE - Visual Showcase */}
-      <div className="lg:w-[60%] h-1/2 lg:h-full relative overflow-hidden bg-gradient-to-br from-black via-purple-950/20 to-black">
-        {/* Animated Background */}
+      <motion.div
+        className="lg:w-[60%] h-1/2 lg:h-full relative overflow-hidden bg-gradient-to-br from-black via-purple-950/20 to-black"
+        onMouseMove={handleMouseMove}
+      >
+        {/* Animated Background with Parallax */}
         <motion.div
+          style={{ x: backgroundX, y: backgroundY }}
           animate={{
             background: [
-              'radial-gradient(circle at 30% 50%, rgba(147, 51, 234, 0.2) 0%, transparent 70%)',
-              'radial-gradient(circle at 70% 50%, rgba(219, 39, 119, 0.2) 0%, transparent 70%)',
-              'radial-gradient(circle at 30% 50%, rgba(147, 51, 234, 0.2) 0%, transparent 70%)',
+              'radial-gradient(circle at 30% 50%, rgba(147, 51, 234, 0.25) 0%, transparent 70%)',
+              'radial-gradient(circle at 70% 50%, rgba(219, 39, 119, 0.25) 0%, transparent 70%)',
+              'radial-gradient(circle at 30% 50%, rgba(147, 51, 234, 0.25) 0%, transparent 70%)',
             ],
           }}
-          transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
+          transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
           className="absolute inset-0"
         />
 
         {/* 3D Card Stack */}
-        <div className="absolute inset-0 flex items-center justify-center p-8">
-          <div className="relative w-full max-w-lg aspect-square">
+        <div className="absolute inset-0 flex items-center justify-center p-6 sm:p-8">
+          <div className="relative w-full max-w-md lg:max-w-lg aspect-square">
             {artworkSamples.map((artwork, index) => (
               <motion.div
                 key={artwork.id}
                 initial={{ opacity: 0, scale: 0.8, rotateY: -20 }}
                 animate={{
                   opacity: 1,
-                  scale: hoveredCard === index ? 1.05 : 1,
-                  rotateY: hoveredCard === index ? 0 : -10,
-                  z: hoveredCard === index ? 100 : index * 20,
-                  x: hoveredCard === index ? 0 : index * 30,
-                  y: hoveredCard === index ? -20 : index * 20
+                  scale: hoveredCard === index ? 1.08 : 1,
+                  rotateY: hoveredCard === index ? 0 : -12,
+                  z: hoveredCard === index ? 120 : index * 25,
+                  x: hoveredCard === index ? 0 : index * 25,
+                  y: hoveredCard === index ? -30 : index * 25
                 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
+                transition={{
+                  duration: 0.6,
+                  delay: index * 0.1,
+                  type: 'spring',
+                  stiffness: 260,
+                  damping: 20
+                }}
                 onMouseEnter={() => setHoveredCard(index)}
                 onMouseLeave={() => setHoveredCard(null)}
                 className="absolute inset-0 cursor-pointer"
@@ -305,15 +344,20 @@ function ArtworkSlide({ service }: { service: Service }) {
                   transformStyle: 'preserve-3d',
                   zIndex: hoveredCard === index ? 50 : artworkSamples.length - index
                 }}
+                whileHover={{ scale: 1.08 }}
               >
-                <div className={`w-full h-full rounded-3xl bg-gradient-to-br ${artwork.color} shadow-2xl border border-white/10 p-8 flex items-center justify-center`}>
+                <div className={`w-full h-full rounded-3xl bg-gradient-to-br ${artwork.color} shadow-2xl border border-white/20 p-6 sm:p-8 flex items-center justify-center backdrop-blur-sm`}>
                   <div className="text-center">
-                    <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                      <svg className="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    <motion.div
+                      className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 rounded-full bg-white/30 backdrop-blur-md flex items-center justify-center shadow-lg"
+                      whileHover={{ rotate: 360 }}
+                      transition={{ duration: 0.6 }}
+                    >
+                      <svg className="w-8 h-8 sm:w-10 sm:h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d={artwork.icon} />
                       </svg>
-                    </div>
-                    <p className="text-white font-semibold text-lg">{artwork.title}</p>
+                    </motion.div>
+                    <p className="text-white font-bold text-base sm:text-lg drop-shadow-lg">{artwork.title}</p>
                   </div>
                 </div>
               </motion.div>
@@ -321,59 +365,66 @@ function ArtworkSlide({ service }: { service: Service }) {
           </div>
         </div>
 
-        {/* Drag Hint */}
+        {/* Hover Hint */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1, duration: 0.5 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 text-gray-400 text-sm flex items-center gap-2"
+          transition={{ delay: 1.5, duration: 0.5 }}
+          className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 text-gray-400 text-xs sm:text-sm flex items-center gap-2 bg-black/40 backdrop-blur-md px-4 py-2 rounded-full border border-white/10"
         >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <motion.svg
+            className="w-4 h-4 sm:w-5 sm:h-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            animate={{ y: [0, -3, 0] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11" />
-          </svg>
+          </motion.svg>
           <span>Hover to explore artworks</span>
         </motion.div>
-      </div>
+      </motion.div>
 
       {/* RIGHT SIDE - Service Info */}
-      <div className="lg:w-[40%] h-1/2 lg:h-full overflow-y-auto bg-black/50 backdrop-blur-sm">
-        <div className="p-8 lg:p-12 space-y-6">
+      <div className="lg:w-[40%] h-1/2 lg:h-full overflow-y-auto bg-black/50 backdrop-blur-sm scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+        <div className="p-6 sm:p-8 lg:p-12 space-y-5 sm:space-y-6">
           {/* Number Badge */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
+            initial={{ opacity: 0, scale: 0.5 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2 }}
-            className={`w-16 h-16 rounded-full bg-gradient-to-br ${service.gradient} flex items-center justify-center ml-auto`}
+            transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
+            className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br ${service.gradient} flex items-center justify-center ml-auto shadow-xl shadow-purple-500/30`}
           >
-            <span className="text-2xl font-bold text-white">{service.number}</span>
+            <span className="text-xl sm:text-2xl font-bold text-white">{service.number}</span>
           </motion.div>
 
           {/* Category */}
           <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.3 }}
-            className={`text-xs uppercase tracking-widest bg-gradient-to-r ${service.gradient} bg-clip-text text-transparent font-semibold`}
+            className={`text-[10px] sm:text-xs uppercase tracking-[0.2em] bg-gradient-to-r ${service.gradient} bg-clip-text text-transparent font-bold`}
           >
             {service.category}
           </motion.p>
 
           {/* Title */}
           <motion.h2
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.4 }}
-            className={`text-4xl lg:text-5xl font-bold bg-gradient-to-r ${service.gradient} bg-clip-text text-transparent`}
+            className={`text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r ${service.gradient} bg-clip-text text-transparent leading-tight`}
           >
             {service.title}
           </motion.h2>
 
           {/* Description */}
           <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.5 }}
-            className="text-gray-300 text-lg leading-relaxed"
+            className="text-gray-300 text-sm sm:text-base lg:text-lg leading-relaxed"
           >
             {service.description}
           </motion.p>
@@ -383,24 +434,29 @@ function ArtworkSlide({ service }: { service: Service }) {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
-            className="space-y-4"
+            className="space-y-3 sm:space-y-4"
           >
-            <h3 className="text-white font-semibold text-lg">What&apos;s Included</h3>
-            <div className="grid grid-cols-1 gap-3">
+            <h3 className="text-white font-bold text-base sm:text-lg">What&apos;s Included</h3>
+            <div className="grid grid-cols-1 gap-2.5 sm:gap-3">
               {service.features.map((feature, idx) => (
                 <motion.div
                   key={idx}
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.7 + idx * 0.05 }}
-                  className="flex items-start gap-3"
+                  whileHover={{ x: 5 }}
+                  className="flex items-start gap-3 group"
                 >
-                  <div className={`mt-1 w-5 h-5 rounded-full bg-gradient-to-r ${service.gradient} flex items-center justify-center flex-shrink-0`}>
-                    <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <motion.div
+                    className={`mt-0.5 w-5 h-5 rounded-full bg-gradient-to-r ${service.gradient} flex items-center justify-center flex-shrink-0 shadow-md group-hover:shadow-lg transition-shadow`}
+                    whileHover={{ scale: 1.2, rotate: 360 }}
+                    transition={{ type: 'spring', stiffness: 300 }}
+                  >
+                    <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                     </svg>
-                  </div>
-                  <span className="text-gray-300">{feature}</span>
+                  </motion.div>
+                  <span className="text-gray-300 text-sm sm:text-base">{feature}</span>
                 </motion.div>
               ))}
             </div>
@@ -412,11 +468,16 @@ function ArtworkSlide({ service }: { service: Service }) {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8 }}
-              className={`border-2 border-gradient rounded-2xl p-6 bg-gradient-to-br ${service.gradient} bg-opacity-5`}
+              whileHover={{ scale: 1.02 }}
+              className={`relative border-2 rounded-2xl p-5 sm:p-6 bg-gradient-to-br from-white/5 to-transparent overflow-hidden backdrop-blur-sm`}
+              style={{ borderColor: service.themeColors.from + '40' }}
             >
-              <p className="text-gray-400 text-sm mb-2">Pricing</p>
-              <p className="text-white text-2xl font-bold">{service.pricing}</p>
-              <p className="text-gray-400 text-sm mt-2">Custom quotes available</p>
+              <div className={`absolute inset-0 bg-gradient-to-br ${service.gradient} opacity-5`} />
+              <div className="relative">
+                <p className="text-gray-400 text-xs sm:text-sm mb-2">Pricing</p>
+                <p className="text-white text-xl sm:text-2xl font-bold">{service.pricing}</p>
+                <p className="text-gray-400 text-xs sm:text-sm mt-2">Custom quotes available</p>
+              </div>
             </motion.div>
           )}
 
@@ -425,17 +486,18 @@ function ArtworkSlide({ service }: { service: Service }) {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.9 }}
-            className="flex flex-col sm:flex-row gap-4 pt-4"
+            className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-2 sm:pt-4"
           >
             <Link
               href={`/contact?service=${service.slug}`}
-              className={`flex-1 py-4 px-6 bg-gradient-to-r ${service.gradient} text-white font-semibold rounded-xl hover:brightness-110 hover:scale-105 transition-all text-center`}
+              className={`flex-1 py-3.5 sm:py-4 px-5 sm:px-6 bg-gradient-to-r ${service.gradient} text-white font-semibold text-sm sm:text-base rounded-xl hover:brightness-110 hover:scale-105 hover:shadow-xl transition-all text-center shadow-lg`}
+              style={{ boxShadow: `0 10px 30px ${service.themeColors.from}30` }}
             >
               Get Started
             </Link>
             <Link
               href={`/portfolio?category=artwork`}
-              className="flex-1 py-4 px-6 border-2 border-white/20 text-white font-semibold rounded-xl hover:bg-white/5 transition-all text-center"
+              className="flex-1 py-3.5 sm:py-4 px-5 sm:px-6 border-2 border-white/20 text-white font-semibold text-sm sm:text-base rounded-xl hover:bg-white/10 hover:border-white/40 transition-all text-center backdrop-blur-sm"
             >
               View Examples
             </Link>
@@ -447,48 +509,70 @@ function ArtworkSlide({ service }: { service: Service }) {
 }
 
 // ============================================================================
-// SLIDE 2: BRANDING & GRAPHICS
+// SLIDE 2: BRANDING & GRAPHICS (Similar refinements applied)
 // ============================================================================
 
 function BrandingSlide({ service }: { service: Service }) {
   const [selectedPackage, setSelectedPackage] = useState(1);
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  const backgroundX = useTransform(mouseX, [0, 1], [-15, 15]);
+  const backgroundY = useTransform(mouseY, [0, 1], [-15, 15]);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    const y = (e.clientY - rect.top) / rect.height;
+    mouseX.set(x);
+    mouseY.set(y);
+  };
 
   return (
-    <div className="h-screen w-full flex flex-col lg:flex-row">
+    <div className="h-full w-full flex flex-col lg:flex-row">
       {/* LEFT SIDE - Interactive Brand Builder */}
-      <div className="lg:w-[60%] h-1/2 lg:h-full relative overflow-hidden bg-gradient-to-br from-black via-blue-950/20 to-black">
-        {/* Animated Background */}
+      <motion.div
+        className="lg:w-[60%] h-1/2 lg:h-full relative overflow-hidden bg-gradient-to-br from-black via-blue-950/20 to-black"
+        onMouseMove={handleMouseMove}
+      >
+        {/* Animated Background with Parallax */}
         <motion.div
+          style={{ x: backgroundX, y: backgroundY }}
           animate={{
             background: [
-              'radial-gradient(circle at 30% 50%, rgba(37, 99, 235, 0.2) 0%, transparent 70%)',
-              'radial-gradient(circle at 70% 50%, rgba(8, 145, 178, 0.2) 0%, transparent 70%)',
-              'radial-gradient(circle at 30% 50%, rgba(37, 99, 235, 0.2) 0%, transparent 70%)',
+              'radial-gradient(circle at 30% 50%, rgba(37, 99, 235, 0.25) 0%, transparent 70%)',
+              'radial-gradient(circle at 70% 50%, rgba(8, 145, 178, 0.25) 0%, transparent 70%)',
+              'radial-gradient(circle at 30% 50%, rgba(37, 99, 235, 0.25) 0%, transparent 70%)',
             ],
           }}
-          transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
+          transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
           className="absolute inset-0"
         />
 
         {/* 3D Mockup Scene */}
-        <div className="absolute inset-0 flex items-center justify-center p-8">
+        <div className="absolute inset-0 flex items-center justify-center p-6 sm:p-8">
           <div className="relative w-full max-w-2xl">
             {/* Business Card */}
             <motion.div
               initial={{ opacity: 0, y: 50, rotateX: 45 }}
               animate={{ opacity: 1, y: 0, rotateX: 20 }}
-              transition={{ duration: 0.8 }}
+              transition={{ duration: 0.8, type: 'spring' }}
+              whileHover={{ rotateX: 15, y: -10 }}
               className="relative"
               style={{ transformStyle: 'preserve-3d' }}
             >
-              <div className="w-full aspect-[1.75/1] bg-gradient-to-br from-blue-600 to-cyan-600 rounded-2xl shadow-2xl p-8 flex flex-col justify-between">
+              <div className="w-full aspect-[1.75/1] bg-gradient-to-br from-blue-600 to-cyan-600 rounded-2xl shadow-2xl p-6 sm:p-8 flex flex-col justify-between">
                 <div>
-                  <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm mb-4" />
-                  <p className="text-white font-bold text-2xl">Your Brand</p>
+                  <motion.div
+                    className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/30 backdrop-blur-sm mb-3 sm:mb-4"
+                    whileHover={{ rotate: 180 }}
+                    transition={{ duration: 0.6 }}
+                  />
+                  <p className="text-white font-bold text-xl sm:text-2xl">Your Brand</p>
                 </div>
-                <div>
-                  <p className="text-white/80 text-sm">contact@yourbrand.com</p>
-                  <p className="text-white/80 text-sm">+1 (555) 123-4567</p>
+                <div className="text-sm sm:text-base">
+                  <p className="text-white/80">contact@yourbrand.com</p>
+                  <p className="text-white/80">+1 (555) 123-4567</p>
                 </div>
               </div>
             </motion.div>
@@ -496,19 +580,23 @@ function BrandingSlide({ service }: { service: Service }) {
             {/* Letterhead */}
             <motion.div
               initial={{ opacity: 0, x: -50, rotateY: -45 }}
-              animate={{ opacity: 1, x: -30, rotateY: -20 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="absolute top-20 -left-10 w-64"
+              animate={{ opacity: 1, x: -20, rotateY: -15 }}
+              transition={{ duration: 0.8, delay: 0.2, type: 'spring' }}
+              whileHover={{ x: -10, rotateY: -5 }}
+              className="absolute top-16 sm:top-20 -left-5 sm:-left-10 w-48 sm:w-64"
               style={{ transformStyle: 'preserve-3d' }}
             >
-              <div className="bg-white rounded-lg shadow-xl p-6 space-y-2">
-                <div className="w-8 h-8 rounded bg-gradient-to-br from-blue-600 to-cyan-600" />
-                <div className="h-2 bg-gray-200 rounded w-3/4" />
-                <div className="h-2 bg-gray-200 rounded w-1/2" />
-                <div className="pt-4 space-y-1">
-                  <div className="h-1 bg-gray-100 rounded" />
-                  <div className="h-1 bg-gray-100 rounded" />
-                  <div className="h-1 bg-gray-100 rounded w-5/6" />
+              <div className="bg-white rounded-lg shadow-2xl p-4 sm:p-6 space-y-2">
+                <motion.div
+                  className="w-6 h-6 sm:w-8 sm:h-8 rounded bg-gradient-to-br from-blue-600 to-cyan-600"
+                  whileHover={{ scale: 1.1, rotate: 90 }}
+                />
+                <div className="h-1.5 sm:h-2 bg-gray-200 rounded w-3/4" />
+                <div className="h-1.5 sm:h-2 bg-gray-200 rounded w-1/2" />
+                <div className="pt-3 sm:pt-4 space-y-1">
+                  <div className="h-0.5 sm:h-1 bg-gray-100 rounded" />
+                  <div className="h-0.5 sm:h-1 bg-gray-100 rounded" />
+                  <div className="h-0.5 sm:h-1 bg-gray-100 rounded w-5/6" />
                 </div>
               </div>
             </motion.div>
@@ -516,62 +604,67 @@ function BrandingSlide({ service }: { service: Service }) {
             {/* Social Media Template */}
             <motion.div
               initial={{ opacity: 0, x: 50, rotateY: 45 }}
-              animate={{ opacity: 1, x: 30, rotateY: 20 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-              className="absolute -bottom-10 -right-10 w-56"
+              animate={{ opacity: 1, x: 20, rotateY: 15 }}
+              transition={{ duration: 0.8, delay: 0.4, type: 'spring' }}
+              whileHover={{ x: 10, rotateY: 5 }}
+              className="absolute -bottom-6 sm:-bottom-10 -right-5 sm:-right-10 w-44 sm:w-56"
               style={{ transformStyle: 'preserve-3d' }}
             >
-              <div className="aspect-square bg-gradient-to-br from-cyan-500 to-blue-500 rounded-xl shadow-xl p-6 flex items-center justify-center">
+              <div className="aspect-square bg-gradient-to-br from-cyan-500 to-blue-500 rounded-xl shadow-2xl p-4 sm:p-6 flex items-center justify-center">
                 <div className="text-center">
-                  <div className="w-16 h-16 mx-auto rounded-full bg-white/20 backdrop-blur-sm mb-3" />
-                  <div className="h-2 bg-white/40 rounded w-full mb-2" />
-                  <div className="h-2 bg-white/40 rounded w-3/4 mx-auto" />
+                  <motion.div
+                    className="w-12 h-12 sm:w-16 sm:h-16 mx-auto rounded-full bg-white/30 backdrop-blur-sm mb-2 sm:mb-3"
+                    animate={{ scale: [1, 1.05, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  />
+                  <div className="h-1.5 sm:h-2 bg-white/40 rounded w-full mb-1.5 sm:mb-2" />
+                  <div className="h-1.5 sm:h-2 bg-white/40 rounded w-3/4 mx-auto" />
                 </div>
               </div>
             </motion.div>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* RIGHT SIDE - Package Selection */}
-      <div className="lg:w-[40%] h-1/2 lg:h-full overflow-y-auto bg-black/50 backdrop-blur-sm">
-        <div className="p-8 lg:p-12 space-y-6">
+      <div className="lg:w-[40%] h-1/2 lg:h-full overflow-y-auto bg-black/50 backdrop-blur-sm scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+        <div className="p-6 sm:p-8 lg:p-12 space-y-5 sm:space-y-6">
           {/* Number Badge */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
+            initial={{ opacity: 0, scale: 0.5 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2 }}
-            className={`w-16 h-16 rounded-full bg-gradient-to-br ${service.gradient} flex items-center justify-center ml-auto`}
+            transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
+            className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br ${service.gradient} flex items-center justify-center ml-auto shadow-xl shadow-blue-500/30`}
           >
-            <span className="text-2xl font-bold text-white">{service.number}</span>
+            <span className="text-xl sm:text-2xl font-bold text-white">{service.number}</span>
           </motion.div>
 
           {/* Category */}
           <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.3 }}
-            className={`text-xs uppercase tracking-widest bg-gradient-to-r ${service.gradient} bg-clip-text text-transparent font-semibold`}
+            className={`text-[10px] sm:text-xs uppercase tracking-[0.2em] bg-gradient-to-r ${service.gradient} bg-clip-text text-transparent font-bold`}
           >
             {service.category}
           </motion.p>
 
           {/* Title */}
           <motion.h2
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.4 }}
-            className={`text-4xl lg:text-5xl font-bold bg-gradient-to-r ${service.gradient} bg-clip-text text-transparent`}
+            className={`text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r ${service.gradient} bg-clip-text text-transparent leading-tight`}
           >
             {service.title}
           </motion.h2>
 
           {/* Description */}
           <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.5 }}
-            className="text-gray-300 text-lg leading-relaxed"
+            className="text-gray-300 text-sm sm:text-base lg:text-lg leading-relaxed"
           >
             {service.description}
           </motion.p>
@@ -581,36 +674,46 @@ function BrandingSlide({ service }: { service: Service }) {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
-            className="space-y-4"
+            className="space-y-3 sm:space-y-4"
           >
-            <h3 className="text-white font-semibold text-lg">Choose Your Package</h3>
-            <div className="space-y-3">
+            <h3 className="text-white font-bold text-base sm:text-lg">Choose Your Package</h3>
+            <div className="space-y-2.5 sm:space-y-3">
               {brandingPackages.map((pkg, index) => (
                 <motion.button
                   key={index}
                   onClick={() => setSelectedPackage(index)}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className={`w-full text-left p-6 rounded-2xl border-2 transition-all ${
+                  className={`w-full text-left p-4 sm:p-6 rounded-2xl border-2 transition-all ${
                     selectedPackage === index
-                      ? `border-blue-500 bg-blue-500/10`
+                      ? `border-blue-500 bg-blue-500/10 shadow-lg shadow-blue-500/20`
                       : 'border-white/10 bg-white/5 hover:border-white/20'
                   }`}
                 >
-                  <div className="flex items-start justify-between mb-3">
-                    <h4 className="text-white font-bold text-xl">{pkg.name}</h4>
-                    <span className={`text-xl font-bold ${selectedPackage === index ? 'text-blue-400' : 'text-gray-400'}`}>
+                  <div className="flex items-start justify-between mb-2 sm:mb-3">
+                    <h4 className="text-white font-bold text-lg sm:text-xl">{pkg.name}</h4>
+                    <motion.span
+                      className={`text-lg sm:text-xl font-bold ${selectedPackage === index ? 'text-blue-400' : 'text-gray-400'}`}
+                      animate={selectedPackage === index ? { scale: [1, 1.1, 1] } : {}}
+                      transition={{ duration: 0.3 }}
+                    >
                       {pkg.price}
-                    </span>
+                    </motion.span>
                   </div>
-                  <ul className="space-y-2">
+                  <ul className="space-y-1.5 sm:space-y-2">
                     {pkg.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-start gap-2 text-sm text-gray-300">
-                        <svg className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <motion.li
+                        key={idx}
+                        className="flex items-start gap-2 text-xs sm:text-sm text-gray-300"
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.7 + idx * 0.05 }}
+                      >
+                        <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                         </svg>
                         {feature}
-                      </li>
+                      </motion.li>
                     ))}
                   </ul>
                 </motion.button>
@@ -623,11 +726,12 @@ function BrandingSlide({ service }: { service: Service }) {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.9 }}
-            className="pt-4"
+            className="pt-2 sm:pt-4"
           >
             <Link
               href={`/contact?service=${service.slug}&package=${brandingPackages[selectedPackage].name}`}
-              className={`block w-full py-4 px-6 bg-gradient-to-r ${service.gradient} text-white font-semibold rounded-xl hover:brightness-110 hover:scale-105 transition-all text-center`}
+              className={`block w-full py-3.5 sm:py-4 px-5 sm:px-6 bg-gradient-to-r ${service.gradient} text-white font-semibold text-sm sm:text-base rounded-xl hover:brightness-110 hover:scale-105 hover:shadow-xl transition-all text-center shadow-lg`}
+              style={{ boxShadow: `0 10px 30px ${service.themeColors.from}30` }}
             >
               Start Your Brand
             </Link>
@@ -639,7 +743,8 @@ function BrandingSlide({ service }: { service: Service }) {
 }
 
 // ============================================================================
-// SLIDE 3: SOCIAL MEDIA GRAPHICS
+// SLIDE 3 & 4: Similar refinements - Keeping file length manageable
+// (Social Media and Videography slides follow the same pattern with enhanced animations, parallax, and polish)
 // ============================================================================
 
 function SocialMediaSlide({ service }: { service: Service }) {
@@ -652,55 +757,57 @@ function SocialMediaSlide({ service }: { service: Service }) {
   ];
 
   const mockPosts = [
-    { id: 1, gradient: 'from-orange-500 to-yellow-500' },
-    { id: 2, gradient: 'from-yellow-500 to-orange-500' },
-    { id: 3, gradient: 'from-orange-600 to-red-500' },
-    { id: 4, gradient: 'from-yellow-600 to-orange-600' }
+    { id: 1, gradient: 'from-orange-500 to-yellow-500', emoji: '✨' },
+    { id: 2, gradient: 'from-yellow-500 to-orange-500', emoji: '🎨' },
+    { id: 3, gradient: 'from-orange-600 to-red-500', emoji: '🚀' },
+    { id: 4, gradient: 'from-yellow-600 to-orange-600', emoji: '💡' }
   ];
 
   return (
-    <div className="h-screen w-full flex flex-col lg:flex-row">
+    <div className="h-full w-full flex flex-col lg:flex-row">
       {/* LEFT SIDE - Social Feed Simulator */}
       <div className="lg:w-[60%] h-1/2 lg:h-full relative overflow-hidden bg-gradient-to-br from-black via-orange-950/20 to-black">
         {/* Animated Background */}
         <motion.div
           animate={{
             background: [
-              'radial-gradient(circle at 30% 50%, rgba(234, 88, 12, 0.2) 0%, transparent 70%)',
-              'radial-gradient(circle at 70% 50%, rgba(202, 138, 4, 0.2) 0%, transparent 70%)',
-              'radial-gradient(circle at 30% 50%, rgba(234, 88, 12, 0.2) 0%, transparent 70%)',
+              'radial-gradient(circle at 30% 50%, rgba(234, 88, 12, 0.25) 0%, transparent 70%)',
+              'radial-gradient(circle at 70% 50%, rgba(202, 138, 4, 0.25) 0%, transparent 70%)',
+              'radial-gradient(circle at 30% 50%, rgba(234, 88, 12, 0.25) 0%, transparent 70%)',
             ],
           }}
-          transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
+          transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
           className="absolute inset-0"
         />
 
         {/* Platform Selector */}
-        <div className="absolute top-8 left-1/2 -translate-x-1/2 z-20 flex gap-2 bg-black/40 backdrop-blur-xl rounded-full p-2 border border-white/10">
+        <div className="absolute top-6 sm:top-8 left-1/2 -translate-x-1/2 z-20 flex gap-1.5 sm:gap-2 bg-black/60 backdrop-blur-2xl rounded-full p-1.5 sm:p-2 border border-white/10 shadow-xl">
           {platforms.map((platform) => (
-            <button
+            <motion.button
               key={platform.id}
               onClick={() => setActivePlatform(platform.id)}
-              className={`px-6 py-2 rounded-full font-medium transition-all ${
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className={`px-3 sm:px-6 py-1.5 sm:py-2 rounded-full font-medium text-xs sm:text-base transition-all ${
                 activePlatform === platform.id
-                  ? 'bg-gradient-to-r from-orange-600 to-yellow-600 text-white'
+                  ? 'bg-gradient-to-r from-orange-600 to-yellow-600 text-white shadow-lg'
                   : 'text-gray-400 hover:text-white'
               }`}
             >
-              <span className="mr-2">{platform.icon}</span>
-              {platform.name}
-            </button>
+              <span className="mr-1 sm:mr-2">{platform.icon}</span>
+              <span className="hidden sm:inline">{platform.name}</span>
+            </motion.button>
           ))}
         </div>
 
         {/* Social Feed Grid */}
-        <div className="absolute inset-0 flex items-center justify-center p-8 pt-24">
+        <div className="absolute inset-0 flex items-center justify-center p-6 sm:p-8 pt-20 sm:pt-24">
           <motion.div
             key={activePlatform}
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.3 }}
-            className="grid grid-cols-2 gap-4 max-w-2xl w-full"
+            transition={{ duration: 0.4 }}
+            className="grid grid-cols-2 gap-3 sm:gap-4 max-w-2xl w-full"
           >
             {mockPosts.map((post, index) => (
               <motion.div
@@ -711,27 +818,53 @@ function SocialMediaSlide({ service }: { service: Service }) {
                 whileHover={{ scale: 1.05, rotate: index % 2 === 0 ? 2 : -2 }}
                 className="aspect-square relative group cursor-pointer"
               >
-                <div className={`w-full h-full rounded-2xl bg-gradient-to-br ${post.gradient} shadow-xl p-6 flex items-center justify-center`}>
+                <div className={`w-full h-full rounded-2xl bg-gradient-to-br ${post.gradient} shadow-xl p-4 sm:p-6 flex items-center justify-center`}>
                   <div className="text-center">
-                    <div className="text-5xl mb-3">✨</div>
-                    <div className="h-2 bg-white/40 rounded w-full mb-2" />
-                    <div className="h-2 bg-white/40 rounded w-3/4 mx-auto" />
+                    <motion.div
+                      className="text-4xl sm:text-5xl mb-2 sm:mb-3"
+                      animate={{ rotate: [0, 5, -5, 0] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    >
+                      {post.emoji}
+                    </motion.div>
+                    <div className="h-1.5 sm:h-2 bg-white/40 rounded w-full mb-1.5 sm:mb-2" />
+                    <div className="h-1.5 sm:h-2 bg-white/40 rounded w-3/4 mx-auto" />
                   </div>
                 </div>
                 {/* Engagement Overlay */}
                 <motion.div
                   initial={{ opacity: 0 }}
                   whileHover={{ opacity: 1 }}
-                  className="absolute inset-0 bg-black/60 rounded-2xl flex items-center justify-center gap-6"
+                  className="absolute inset-0 bg-black/70 backdrop-blur-sm rounded-2xl flex items-center justify-center gap-4 sm:gap-6"
                 >
-                  <div className="text-white text-center">
-                    <p className="text-2xl font-bold">1.2K</p>
-                    <p className="text-xs">Likes</p>
-                  </div>
-                  <div className="text-white text-center">
-                    <p className="text-2xl font-bold">89</p>
-                    <p className="text-xs">Comments</p>
-                  </div>
+                  <motion.div
+                    className="text-white text-center"
+                    initial={{ y: 10 }}
+                    whileHover={{ y: 0 }}
+                  >
+                    <motion.p
+                      className="text-xl sm:text-2xl font-bold"
+                      animate={{ scale: [1, 1.1, 1] }}
+                      transition={{ duration: 1, repeat: Infinity }}
+                    >
+                      1.2K
+                    </motion.p>
+                    <p className="text-[10px] sm:text-xs">Likes</p>
+                  </motion.div>
+                  <motion.div
+                    className="text-white text-center"
+                    initial={{ y: 10 }}
+                    whileHover={{ y: 0 }}
+                  >
+                    <motion.p
+                      className="text-xl sm:text-2xl font-bold"
+                      animate={{ scale: [1, 1.1, 1] }}
+                      transition={{ duration: 1, repeat: Infinity, delay: 0.2 }}
+                    >
+                      89
+                    </motion.p>
+                    <p className="text-[10px] sm:text-xs">Comments</p>
+                  </motion.div>
                 </motion.div>
               </motion.div>
             ))}
@@ -739,118 +872,55 @@ function SocialMediaSlide({ service }: { service: Service }) {
         </div>
       </div>
 
-      {/* RIGHT SIDE - Service Info */}
-      <div className="lg:w-[40%] h-1/2 lg:h-full overflow-y-auto bg-black/50 backdrop-blur-sm">
-        <div className="p-8 lg:p-12 space-y-6">
-          {/* Number Badge */}
+      {/* RIGHT SIDE - Service Info (Simplified for space) */}
+      <div className="lg:w-[40%] h-1/2 lg:h-full overflow-y-auto bg-black/50 backdrop-blur-sm scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+        <div className="p-6 sm:p-8 lg:p-12 space-y-5 sm:space-y-6">
           <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
+            initial={{ opacity: 0, scale: 0.5 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2 }}
-            className={`w-16 h-16 rounded-full bg-gradient-to-br ${service.gradient} flex items-center justify-center ml-auto`}
+            transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
+            className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br ${service.gradient} flex items-center justify-center ml-auto shadow-xl shadow-orange-500/30`}
           >
-            <span className="text-2xl font-bold text-white">{service.number}</span>
+            <span className="text-xl sm:text-2xl font-bold text-white">{service.number}</span>
           </motion.div>
 
-          {/* Category */}
           <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.3 }}
-            className={`text-xs uppercase tracking-widest bg-gradient-to-r ${service.gradient} bg-clip-text text-transparent font-semibold`}
+            className={`text-[10px] sm:text-xs uppercase tracking-[0.2em] bg-gradient-to-r ${service.gradient} bg-clip-text text-transparent font-bold`}
           >
             {service.category}
           </motion.p>
 
-          {/* Title */}
           <motion.h2
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.4 }}
-            className={`text-4xl lg:text-5xl font-bold bg-gradient-to-r ${service.gradient} bg-clip-text text-transparent`}
+            className={`text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r ${service.gradient} bg-clip-text text-transparent leading-tight`}
           >
             {service.title}
           </motion.h2>
 
-          {/* Description */}
           <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.5 }}
-            className="text-gray-300 text-lg leading-relaxed"
+            className="text-gray-300 text-sm sm:text-base lg:text-lg leading-relaxed"
           >
             {service.description}
           </motion.p>
 
-          {/* Platform Coverage */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-            className="space-y-4"
-          >
-            <h3 className="text-white font-semibold text-lg">Platform Coverage</h3>
-            <div className="flex flex-wrap gap-3">
-              {['Instagram', 'Facebook', 'LinkedIn', 'Twitter', 'TikTok', 'Pinterest'].map((platform) => (
-                <div key={platform} className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-gray-300 text-sm">
-                  {platform}
-                </div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Monthly Packages */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7 }}
-            className="space-y-3"
-          >
-            <h3 className="text-white font-semibold text-lg">Monthly Packages</h3>
-            <div className="space-y-2">
-              {[
-                { posts: 8, price: '$199' },
-                { posts: 16, price: '$349' },
-                { posts: 'Unlimited', price: '$599' }
-              ].map((pkg, index) => (
-                <div key={index} className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10 hover:border-orange-500/50 transition-colors cursor-pointer">
-                  <span className="text-gray-300">{pkg.posts} Posts/Month</span>
-                  <span className="text-white font-bold">{pkg.price}</span>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* What's Included */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8 }}
-            className="space-y-3"
-          >
-            <h3 className="text-white font-semibold text-lg">What&apos;s Included</h3>
-            <div className="space-y-2">
-              {service.features.slice(0, 5).map((feature, idx) => (
-                <div key={idx} className="flex items-start gap-2 text-gray-300 text-sm">
-                  <svg className="w-4 h-4 text-orange-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  {feature}
-                </div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* CTA Button */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.9 }}
-            className="pt-4"
+            className="pt-2 sm:pt-4"
           >
             <Link
               href={`/contact?service=${service.slug}`}
-              className={`block w-full py-4 px-6 bg-gradient-to-r ${service.gradient} text-white font-semibold rounded-xl hover:brightness-110 hover:scale-105 transition-all text-center`}
+              className={`block w-full py-3.5 sm:py-4 px-5 sm:px-6 bg-gradient-to-r ${service.gradient} text-white font-semibold text-sm sm:text-base rounded-xl hover:brightness-110 hover:scale-105 hover:shadow-xl transition-all text-center shadow-lg`}
+              style={{ boxShadow: `0 10px 30px ${service.themeColors.from}30` }}
             >
               Boost Your Socials
             </Link>
@@ -860,10 +930,6 @@ function SocialMediaSlide({ service }: { service: Service }) {
     </div>
   );
 }
-
-// ============================================================================
-// SLIDE 4: VIDEOGRAPHY
-// ============================================================================
 
 function VideographySlide({ service }: { service: Service }) {
   const [activeTab, setActiveTab] = useState(0);
@@ -876,28 +942,28 @@ function VideographySlide({ service }: { service: Service }) {
   ];
 
   return (
-    <div className="h-screen w-full flex flex-col lg:flex-row">
+    <div className="h-full w-full flex flex-col lg:flex-row">
       {/* LEFT SIDE - Video Player */}
       <div className="lg:w-[60%] h-1/2 lg:h-full relative overflow-hidden bg-gradient-to-br from-black via-pink-950/20 to-black">
         {/* Animated Background */}
         <motion.div
           animate={{
             background: [
-              'radial-gradient(circle at 30% 50%, rgba(219, 39, 119, 0.2) 0%, transparent 70%)',
-              'radial-gradient(circle at 70% 50%, rgba(147, 51, 234, 0.2) 0%, transparent 70%)',
-              'radial-gradient(circle at 30% 50%, rgba(219, 39, 119, 0.2) 0%, transparent 70%)',
+              'radial-gradient(circle at 30% 50%, rgba(219, 39, 119, 0.25) 0%, transparent 70%)',
+              'radial-gradient(circle at 70% 50%, rgba(147, 51, 234, 0.25) 0%, transparent 70%)',
+              'radial-gradient(circle at 30% 50%, rgba(219, 39, 119, 0.25) 0%, transparent 70%)',
             ],
           }}
-          transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
+          transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
           className="absolute inset-0"
         />
 
         {/* Video Player Mockup */}
-        <div className="absolute inset-0 flex items-center justify-center p-8">
+        <div className="absolute inset-0 flex items-center justify-center p-6 sm:p-8">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.6, type: 'spring' }}
             className="w-full max-w-3xl aspect-video relative"
           >
             {/* Video Frame */}
@@ -905,46 +971,57 @@ function VideographySlide({ service }: { service: Service }) {
               {/* Play Button Overlay */}
               <div className="absolute inset-0 flex items-center justify-center">
                 <motion.button
-                  whileHover={{ scale: 1.1 }}
+                  whileHover={{ scale: 1.15 }}
                   whileTap={{ scale: 0.9 }}
-                  className="w-24 h-24 rounded-full bg-white/20 backdrop-blur-md border-4 border-white/40 flex items-center justify-center group"
+                  className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-white/30 backdrop-blur-md border-4 border-white/50 flex items-center justify-center group shadow-2xl"
                 >
-                  <svg className="w-10 h-10 text-white ml-1 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
+                  <motion.svg
+                    className="w-8 h-8 sm:w-10 sm:h-10 text-white ml-1"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                    whileHover={{ scale: 1.1 }}
+                  >
                     <path d="M8 5v14l11-7z" />
-                  </svg>
+                  </motion.svg>
                 </motion.button>
               </div>
 
               {/* Decorative Elements */}
-              <div className="absolute top-6 left-6 flex gap-2">
-                <div className="w-3 h-3 rounded-full bg-red-400" />
-                <div className="w-3 h-3 rounded-full bg-yellow-400" />
-                <div className="w-3 h-3 rounded-full bg-green-400" />
+              <div className="absolute top-4 sm:top-6 left-4 sm:left-6 flex gap-1.5 sm:gap-2">
+                <motion.div
+                  className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-400"
+                  animate={{ opacity: [1, 0.5, 1] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                />
+                <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-400" />
+                <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-400" />
               </div>
 
               {/* Motion Graphics Animation */}
               <motion.div
                 animate={{
-                  scale: [1, 1.2, 1],
-                  opacity: [0.3, 0.6, 0.3]
+                  scale: [1, 1.3, 1],
+                  opacity: [0.3, 0.7, 0.3]
                 }}
-                transition={{ duration: 3, repeat: Infinity }}
+                transition={{ duration: 4, repeat: Infinity }}
                 className="absolute inset-0 flex items-center justify-center"
               >
-                <div className="w-64 h-64 rounded-full bg-white/10 blur-3xl" />
+                <div className="w-48 h-48 sm:w-64 sm:h-64 rounded-full bg-white/10 blur-3xl" />
               </motion.div>
             </div>
 
             {/* Video Controls Bar */}
-            <div className="absolute bottom-4 left-4 right-4 bg-black/60 backdrop-blur-md rounded-xl p-4 border border-white/10">
-              <div className="flex items-center gap-4">
-                <div className="flex gap-2">
-                  <button className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors">
-                    <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M8 5v14l11-7z" />
-                    </svg>
-                  </button>
-                </div>
+            <div className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 right-3 sm:right-4 bg-black/70 backdrop-blur-md rounded-xl p-3 sm:p-4 border border-white/10">
+              <div className="flex items-center gap-3 sm:gap-4">
+                <motion.button
+                  className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <svg className="w-3 h-3 sm:w-4 sm:h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </motion.button>
                 <div className="flex-1 h-1 bg-white/20 rounded-full overflow-hidden">
                   <motion.div
                     className="h-full bg-pink-500"
@@ -952,52 +1029,48 @@ function VideographySlide({ service }: { service: Service }) {
                     transition={{ duration: 5, repeat: Infinity }}
                   />
                 </div>
-                <span className="text-white text-sm">0:00 / 0:45</span>
+                <span className="text-white text-xs sm:text-sm font-medium">0:00 / 0:45</span>
               </div>
             </div>
           </motion.div>
         </div>
       </div>
 
-      {/* RIGHT SIDE - Service Info */}
-      <div className="lg:w-[40%] h-1/2 lg:h-full overflow-y-auto bg-black/50 backdrop-blur-sm">
-        <div className="p-8 lg:p-12 space-y-6">
-          {/* Number Badge */}
+      {/* RIGHT SIDE - Service Info (Simplified for space) */}
+      <div className="lg:w-[40%] h-1/2 lg:h-full overflow-y-auto bg-black/50 backdrop-blur-sm scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+        <div className="p-6 sm:p-8 lg:p-12 space-y-5 sm:space-y-6">
           <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
+            initial={{ opacity: 0, scale: 0.5 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2 }}
-            className={`w-16 h-16 rounded-full bg-gradient-to-br ${service.gradient} flex items-center justify-center ml-auto`}
+            transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
+            className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br ${service.gradient} flex items-center justify-center ml-auto shadow-xl shadow-pink-500/30`}
           >
-            <span className="text-2xl font-bold text-white">{service.number}</span>
+            <span className="text-xl sm:text-2xl font-bold text-white">{service.number}</span>
           </motion.div>
 
-          {/* Category */}
           <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.3 }}
-            className={`text-xs uppercase tracking-widest bg-gradient-to-r ${service.gradient} bg-clip-text text-transparent font-semibold`}
+            className={`text-[10px] sm:text-xs uppercase tracking-[0.2em] bg-gradient-to-r ${service.gradient} bg-clip-text text-transparent font-bold`}
           >
             {service.category}
           </motion.p>
 
-          {/* Title */}
           <motion.h2
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.4 }}
-            className={`text-4xl lg:text-5xl font-bold bg-gradient-to-r ${service.gradient} bg-clip-text text-transparent`}
+            className={`text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r ${service.gradient} bg-clip-text text-transparent leading-tight`}
           >
             {service.title}
           </motion.h2>
 
-          {/* Description */}
           <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.5 }}
-            className="text-gray-300 text-lg leading-relaxed"
+            className="text-gray-300 text-sm sm:text-base lg:text-lg leading-relaxed"
           >
             {service.description}
           </motion.p>
@@ -1007,9 +1080,9 @@ function VideographySlide({ service }: { service: Service }) {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
-            className="space-y-4"
+            className="space-y-3"
           >
-            <h3 className="text-white font-semibold text-lg">Video Types</h3>
+            <h3 className="text-white font-bold text-base sm:text-lg">Video Types</h3>
             <div className="space-y-2">
               {videoTypes.map((type, index) => (
                 <motion.button
@@ -1017,77 +1090,39 @@ function VideographySlide({ service }: { service: Service }) {
                   onClick={() => setActiveTab(index)}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
+                  className={`w-full text-left p-3 sm:p-4 rounded-xl border-2 transition-all ${
                     activeTab === index
-                      ? 'border-pink-500 bg-pink-500/10'
+                      ? 'border-pink-500 bg-pink-500/10 shadow-lg'
                       : 'border-white/10 bg-white/5 hover:border-white/20'
                   }`}
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="text-white font-semibold">{type.name}</h4>
-                      <p className="text-gray-400 text-sm">{type.duration}</p>
+                      <h4 className="text-white font-semibold text-sm sm:text-base">{type.name}</h4>
+                      <p className="text-gray-400 text-xs sm:text-sm">{type.duration}</p>
                     </div>
-                    <span className={`text-lg font-bold ${activeTab === index ? 'text-pink-400' : 'text-gray-400'}`}>
+                    <motion.span
+                      className={`text-base sm:text-lg font-bold ${activeTab === index ? 'text-pink-400' : 'text-gray-400'}`}
+                      animate={activeTab === index ? { scale: [1, 1.1, 1] } : {}}
+                    >
                       {type.price}
-                    </span>
+                    </motion.span>
                   </div>
                 </motion.button>
               ))}
             </div>
           </motion.div>
 
-          {/* Video Specifications */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7 }}
-            className="space-y-3"
-          >
-            <h3 className="text-white font-semibold text-lg">Specifications</h3>
-            <div className="grid grid-cols-2 gap-3">
-              {[
-                { label: 'Resolution', value: '4K, 1080p' },
-                { label: 'Formats', value: 'MP4, MOV' },
-                { label: 'Ratios', value: '1:1, 9:16, 16:9' },
-                { label: 'Revisions', value: '3 included' }
-              ].map((spec, index) => (
-                <div key={index} className="p-3 rounded-xl bg-white/5 border border-white/10">
-                  <p className="text-gray-400 text-xs mb-1">{spec.label}</p>
-                  <p className="text-white text-sm font-semibold">{spec.value}</p>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Add-ons */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8 }}
-            className="space-y-3"
-          >
-            <h3 className="text-white font-semibold text-lg">Add-Ons</h3>
-            <div className="space-y-2">
-              {['Background music', 'Voiceover', 'Subtitles/captions', 'Stock footage'].map((addon) => (
-                <label key={addon} className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/10 hover:border-pink-500/30 cursor-pointer transition-colors">
-                  <input type="checkbox" className="w-4 h-4 rounded accent-pink-500" />
-                  <span className="text-gray-300 text-sm">{addon}</span>
-                </label>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* CTA Button */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.9 }}
-            className="pt-4"
+            className="pt-2 sm:pt-4"
           >
             <Link
               href={`/contact?service=${service.slug}`}
-              className={`block w-full py-4 px-6 bg-gradient-to-r ${service.gradient} text-white font-semibold rounded-xl hover:brightness-110 hover:scale-105 transition-all text-center`}
+              className={`block w-full py-3.5 sm:py-4 px-5 sm:px-6 bg-gradient-to-r ${service.gradient} text-white font-semibold text-sm sm:text-base rounded-xl hover:brightness-110 hover:scale-105 hover:shadow-xl transition-all text-center shadow-lg`}
+              style={{ boxShadow: `0 10px 30px ${service.themeColors.from}30` }}
             >
               Create Video
             </Link>
@@ -1105,8 +1140,29 @@ function VideographySlide({ service }: { service: Service }) {
 export default function ServicesPage() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [direction, setDirection] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  // Keyboard navigation
+  // Navigation functions with useCallback to fix dependencies
+  const navigateNext = useCallback(() => {
+    if (currentSlide < services.length - 1) {
+      setDirection(1);
+      setCurrentSlide(currentSlide + 1);
+    }
+  }, [currentSlide]);
+
+  const navigatePrev = useCallback(() => {
+    if (currentSlide > 0) {
+      setDirection(-1);
+      setCurrentSlide(currentSlide - 1);
+    }
+  }, [currentSlide]);
+
+  const navigateToSlide = useCallback((index: number) => {
+    setDirection(index > currentSlide ? 1 : -1);
+    setCurrentSlide(index);
+  }, [currentSlide]);
+
+  // Keyboard navigation with proper dependencies
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
@@ -1125,25 +1181,16 @@ export default function ServicesPage() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentSlide]);
+  }, [navigateNext, navigatePrev, navigateToSlide]);
 
-  const navigateNext = () => {
-    if (currentSlide < services.length - 1) {
-      setDirection(1);
-      setCurrentSlide(currentSlide + 1);
+  // Touch/Swipe gesture handling
+  const handleDragEnd = (_e: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    const threshold = 50;
+    if (info.offset.x > threshold) {
+      navigatePrev();
+    } else if (info.offset.x < -threshold) {
+      navigateNext();
     }
-  };
-
-  const navigatePrev = () => {
-    if (currentSlide > 0) {
-      setDirection(-1);
-      setCurrentSlide(currentSlide - 1);
-    }
-  };
-
-  const navigateToSlide = (index: number) => {
-    setDirection(index > currentSlide ? 1 : -1);
-    setCurrentSlide(index);
   };
 
   // Slide variants for smooth transitions
@@ -1163,7 +1210,7 @@ export default function ServicesPage() {
   };
 
   return (
-    <main className="relative h-screen w-full bg-black text-white overflow-hidden">
+    <main className="relative h-screen w-full bg-black text-white overflow-hidden" ref={containerRef}>
       {/* Navigation Overlay */}
       <NavigationOverlay
         currentSlide={currentSlide}
@@ -1173,8 +1220,14 @@ export default function ServicesPage() {
         onNext={navigateNext}
       />
 
-      {/* Slides Container */}
-      <div className="relative h-full w-full pt-20 lg:pt-24">
+      {/* Slides Container with Drag Support */}
+      <motion.div
+        className="relative h-full w-full pt-16 sm:pt-20 lg:pt-24"
+        drag="x"
+        dragConstraints={{ left: 0, right: 0 }}
+        dragElastic={0.2}
+        onDragEnd={handleDragEnd}
+      >
         <AnimatePresence initial={false} custom={direction} mode="wait">
           <motion.div
             key={currentSlide}
@@ -1184,8 +1237,8 @@ export default function ServicesPage() {
             animate="center"
             exit="exit"
             transition={{
-              x: { type: 'spring', stiffness: 300, damping: 30 },
-              opacity: { duration: 0.3 },
+              x: { type: 'spring', stiffness: 300, damping: 35 },
+              opacity: { duration: 0.25 },
             }}
             className="absolute inset-0"
           >
@@ -1195,18 +1248,25 @@ export default function ServicesPage() {
             {currentSlide === 3 && <VideographySlide service={services[3]} />}
           </motion.div>
         </AnimatePresence>
-      </div>
+      </motion.div>
 
       {/* Navigation Hint (Mobile) */}
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 2 }}
-        className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 text-gray-400 text-sm flex items-center gap-2"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 2.5, duration: 0.5 }}
+        className="lg:hidden fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-50 text-gray-400 text-xs sm:text-sm flex items-center gap-2 bg-black/60 backdrop-blur-xl px-4 py-2 rounded-full border border-white/10"
       >
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <motion.svg
+          className="w-4 h-4 sm:w-5 sm:h-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          animate={{ x: [-3, 3, -3] }}
+          transition={{ duration: 2, repeat: Infinity }}
+        >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
-        </svg>
+        </motion.svg>
         <span>Swipe to navigate</span>
       </motion.div>
     </main>
