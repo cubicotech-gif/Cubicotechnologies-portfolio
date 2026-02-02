@@ -288,10 +288,47 @@ function ArtworkSlide({ service }: { service: Service }) {
   };
 
   const artworkSamples = [
-    { id: 1, title: 'Digital Illustration', color: 'from-purple-500 to-pink-500', icon: 'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z' },
-    { id: 2, title: 'Character Design', color: 'from-blue-500 to-purple-500', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' },
-    { id: 3, title: 'Abstract Art', color: 'from-pink-500 to-orange-500', icon: 'M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01' },
-    { id: 4, title: 'Vector Graphics', color: 'from-cyan-500 to-blue-500', icon: 'M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-3zM14 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1h-4a1 1 0 01-1-1v-3z' }
+    {
+      id: 1,
+      title: 'Digital Illustration',
+      color: 'from-purple-500 via-purple-600 to-pink-500',
+      pattern: 'radial-gradient(circle at 30% 40%, rgba(255,255,255,0.3) 0%, transparent 50%), radial-gradient(circle at 70% 60%, rgba(255,255,255,0.2) 0%, transparent 50%)',
+      shapes: [
+        { size: 'w-32 h-32', color: 'bg-white/20', blur: 'blur-2xl', position: 'top-4 left-4' },
+        { size: 'w-24 h-24', color: 'bg-pink-300/30', blur: 'blur-xl', position: 'bottom-6 right-6' }
+      ]
+    },
+    {
+      id: 2,
+      title: 'Character Design',
+      color: 'from-blue-500 via-indigo-500 to-purple-500',
+      pattern: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 50%), radial-gradient(circle at 50% 30%, rgba(255,255,255,0.25) 0%, transparent 60%)',
+      shapes: [
+        { size: 'w-28 h-28', color: 'bg-indigo-300/25', blur: 'blur-2xl', position: 'top-8 right-8' },
+        { size: 'w-36 h-36', color: 'bg-blue-200/20', blur: 'blur-3xl', position: 'bottom-4 left-4' }
+      ]
+    },
+    {
+      id: 3,
+      title: 'Abstract Art',
+      color: 'from-pink-500 via-rose-500 to-orange-500',
+      pattern: 'conic-gradient(from 45deg at 50% 50%, rgba(255,255,255,0.2) 0deg, transparent 90deg, rgba(255,255,255,0.15) 180deg, transparent 270deg)',
+      shapes: [
+        { size: 'w-40 h-40', color: 'bg-orange-300/25', blur: 'blur-3xl', position: 'top-1/4 left-1/4' },
+        { size: 'w-32 h-32', color: 'bg-pink-200/30', blur: 'blur-2xl', position: 'bottom-1/3 right-1/4' }
+      ]
+    },
+    {
+      id: 4,
+      title: 'Vector Graphics',
+      color: 'from-cyan-500 via-teal-500 to-blue-500',
+      pattern: 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.05) 10px, rgba(255,255,255,0.05) 20px), radial-gradient(circle at 50% 50%, rgba(255,255,255,0.2) 0%, transparent 70%)',
+      shapes: [
+        { size: 'w-20 h-20', color: 'bg-cyan-200/40', blur: 'blur-xl', position: 'top-6 right-10' },
+        { size: 'w-24 h-24', color: 'bg-teal-300/30', blur: 'blur-2xl', position: 'bottom-8 left-8' },
+        { size: 'w-16 h-16', color: 'bg-blue-200/35', blur: 'blur-lg', position: 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2' }
+      ]
+    }
   ];
 
   return (
@@ -346,18 +383,40 @@ function ArtworkSlide({ service }: { service: Service }) {
                 }}
                 whileHover={{ scale: 1.08 }}
               >
-                <div className={`w-full h-full rounded-3xl bg-gradient-to-br ${artwork.color} shadow-2xl border border-white/20 p-6 sm:p-8 flex items-center justify-center backdrop-blur-sm`}>
-                  <div className="text-center">
+                <div className={`w-full h-full rounded-3xl bg-gradient-to-br ${artwork.color} shadow-2xl border border-white/20 overflow-hidden relative backdrop-blur-sm`}>
+                  {/* Pattern overlay */}
+                  <div
+                    className="absolute inset-0 opacity-60"
+                    style={{ background: artwork.pattern }}
+                  />
+
+                  {/* Animated shapes */}
+                  {artwork.shapes.map((shape, shapeIdx) => (
                     <motion.div
-                      className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 rounded-full bg-white/30 backdrop-blur-md flex items-center justify-center shadow-lg"
-                      whileHover={{ rotate: 360 }}
-                      transition={{ duration: 0.6 }}
+                      key={shapeIdx}
+                      className={`absolute ${shape.size} ${shape.color} ${shape.blur} ${shape.position} rounded-full`}
+                      animate={{
+                        scale: [1, 1.2, 1],
+                        opacity: [0.6, 0.8, 0.6]
+                      }}
+                      transition={{
+                        duration: 3 + shapeIdx,
+                        repeat: Infinity,
+                        ease: 'easeInOut'
+                      }}
+                    />
+                  ))}
+
+                  {/* Title overlay */}
+                  <div className="absolute inset-0 flex items-end p-6 sm:p-8 bg-gradient-to-t from-black/60 via-transparent to-transparent">
+                    <motion.p
+                      className="text-white font-bold text-lg sm:text-xl drop-shadow-2xl"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.3 + index * 0.1 }}
                     >
-                      <svg className="w-8 h-8 sm:w-10 sm:h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d={artwork.icon} />
-                      </svg>
-                    </motion.div>
-                    <p className="text-white font-bold text-base sm:text-lg drop-shadow-lg">{artwork.title}</p>
+                      {artwork.title}
+                    </motion.p>
                   </div>
                 </div>
               </motion.div>
@@ -561,18 +620,41 @@ function BrandingSlide({ service }: { service: Service }) {
               className="relative"
               style={{ transformStyle: 'preserve-3d' }}
             >
-              <div className="w-full aspect-[1.75/1] bg-gradient-to-br from-blue-600 to-cyan-600 rounded-2xl shadow-2xl p-6 sm:p-8 flex flex-col justify-between">
-                <div>
-                  <motion.div
-                    className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/30 backdrop-blur-sm mb-3 sm:mb-4"
-                    whileHover={{ rotate: 180 }}
-                    transition={{ duration: 0.6 }}
-                  />
-                  <p className="text-white font-bold text-xl sm:text-2xl">Your Brand</p>
-                </div>
-                <div className="text-sm sm:text-base">
-                  <p className="text-white/80">contact@yourbrand.com</p>
-                  <p className="text-white/80">+1 (555) 123-4567</p>
+              <div className="w-full aspect-[1.75/1] bg-gradient-to-br from-blue-600 via-cyan-600 to-teal-500 rounded-2xl shadow-2xl overflow-hidden relative">
+                {/* Pattern overlay */}
+                <div
+                  className="absolute inset-0 opacity-30"
+                  style={{
+                    background: 'radial-gradient(circle at 80% 20%, rgba(255,255,255,0.4) 0%, transparent 50%), linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 60%)'
+                  }}
+                />
+
+                {/* Animated shapes */}
+                <motion.div
+                  className="absolute w-32 h-32 bg-cyan-300/20 blur-2xl rounded-full top-0 right-0"
+                  animate={{
+                    scale: [1, 1.2, 1],
+                    opacity: [0.3, 0.5, 0.3]
+                  }}
+                  transition={{ duration: 3, repeat: Infinity }}
+                />
+
+                {/* Content */}
+                <div className="absolute inset-0 p-6 sm:p-8 flex flex-col justify-between">
+                  <div>
+                    <motion.div
+                      className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/40 backdrop-blur-md mb-3 sm:mb-4 border border-white/30 shadow-lg flex items-center justify-center"
+                      whileHover={{ rotate: 180 }}
+                      transition={{ duration: 0.6 }}
+                    >
+                      <div className="w-5 h-5 sm:w-6 sm:h-6 bg-white rounded-sm" />
+                    </motion.div>
+                    <p className="text-white font-bold text-xl sm:text-2xl drop-shadow-lg">Your Brand</p>
+                  </div>
+                  <div className="text-sm sm:text-base">
+                    <p className="text-white/90 drop-shadow">contact@yourbrand.com</p>
+                    <p className="text-white/90 drop-shadow">+1 (555) 123-4567</p>
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -586,17 +668,35 @@ function BrandingSlide({ service }: { service: Service }) {
               className="absolute top-16 sm:top-20 -left-5 sm:-left-10 w-48 sm:w-64"
               style={{ transformStyle: 'preserve-3d' }}
             >
-              <div className="bg-white rounded-lg shadow-2xl p-4 sm:p-6 space-y-2">
-                <motion.div
-                  className="w-6 h-6 sm:w-8 sm:h-8 rounded bg-gradient-to-br from-blue-600 to-cyan-600"
-                  whileHover={{ scale: 1.1, rotate: 90 }}
+              <div className="bg-white rounded-lg shadow-2xl p-4 sm:p-6 space-y-2 relative overflow-hidden">
+                {/* Subtle pattern */}
+                <div
+                  className="absolute inset-0 opacity-5"
+                  style={{
+                    background: 'repeating-linear-gradient(45deg, #000 0px, #000 1px, transparent 1px, transparent 10px)'
+                  }}
                 />
-                <div className="h-1.5 sm:h-2 bg-gray-200 rounded w-3/4" />
-                <div className="h-1.5 sm:h-2 bg-gray-200 rounded w-1/2" />
-                <div className="pt-3 sm:pt-4 space-y-1">
-                  <div className="h-0.5 sm:h-1 bg-gray-100 rounded" />
-                  <div className="h-0.5 sm:h-1 bg-gray-100 rounded" />
-                  <div className="h-0.5 sm:h-1 bg-gray-100 rounded w-5/6" />
+
+                <div className="relative">
+                  <motion.div
+                    className="w-6 h-6 sm:w-8 sm:h-8 rounded bg-gradient-to-br from-blue-600 via-cyan-600 to-teal-500 shadow-md"
+                    whileHover={{ scale: 1.1, rotate: 90 }}
+                  >
+                    <motion.div
+                      className="w-full h-full rounded flex items-center justify-center"
+                      animate={{ opacity: [0.5, 0.8, 0.5] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    >
+                      <div className="w-2 h-2 sm:w-3 sm:h-3 bg-white/60 rounded-sm" />
+                    </motion.div>
+                  </motion.div>
+                  <div className="h-1.5 sm:h-2 bg-gradient-to-r from-gray-200 to-gray-100 rounded w-3/4 mt-2" />
+                  <div className="h-1.5 sm:h-2 bg-gradient-to-r from-gray-200 to-transparent rounded w-1/2" />
+                  <div className="pt-3 sm:pt-4 space-y-1">
+                    <div className="h-0.5 sm:h-1 bg-gray-100 rounded" />
+                    <div className="h-0.5 sm:h-1 bg-gray-100 rounded" />
+                    <div className="h-0.5 sm:h-1 bg-gray-100 rounded w-5/6" />
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -610,15 +710,54 @@ function BrandingSlide({ service }: { service: Service }) {
               className="absolute -bottom-6 sm:-bottom-10 -right-5 sm:-right-10 w-44 sm:w-56"
               style={{ transformStyle: 'preserve-3d' }}
             >
-              <div className="aspect-square bg-gradient-to-br from-cyan-500 to-blue-500 rounded-xl shadow-2xl p-4 sm:p-6 flex items-center justify-center">
-                <div className="text-center">
-                  <motion.div
-                    className="w-12 h-12 sm:w-16 sm:h-16 mx-auto rounded-full bg-white/30 backdrop-blur-sm mb-2 sm:mb-3"
-                    animate={{ scale: [1, 1.05, 1] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                  />
-                  <div className="h-1.5 sm:h-2 bg-white/40 rounded w-full mb-1.5 sm:mb-2" />
-                  <div className="h-1.5 sm:h-2 bg-white/40 rounded w-3/4 mx-auto" />
+              <div className="aspect-square bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-600 rounded-xl shadow-2xl overflow-hidden relative">
+                {/* Pattern overlay */}
+                <div
+                  className="absolute inset-0 opacity-40"
+                  style={{
+                    background: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.4) 0%, transparent 60%), conic-gradient(from 45deg at 70% 70%, rgba(255,255,255,0.2) 0deg, transparent 90deg)'
+                  }}
+                />
+
+                {/* Animated shapes */}
+                <motion.div
+                  className="absolute w-20 h-20 sm:w-28 sm:h-28 bg-blue-300/30 blur-2xl rounded-full top-2 right-2"
+                  animate={{
+                    scale: [1, 1.3, 1],
+                    opacity: [0.3, 0.6, 0.3]
+                  }}
+                  transition={{ duration: 3, repeat: Infinity }}
+                />
+                <motion.div
+                  className="absolute w-16 h-16 sm:w-20 sm:h-20 bg-cyan-200/25 blur-xl rounded-full bottom-4 left-4"
+                  animate={{
+                    scale: [1.2, 1, 1.2],
+                    opacity: [0.4, 0.7, 0.4]
+                  }}
+                  transition={{ duration: 2.5, repeat: Infinity }}
+                />
+
+                {/* Content */}
+                <div className="absolute inset-0 p-4 sm:p-6 flex items-center justify-center">
+                  <div className="text-center w-full">
+                    <motion.div
+                      className="w-12 h-12 sm:w-16 sm:h-16 mx-auto rounded-full bg-white/40 backdrop-blur-md border border-white/30 mb-2 sm:mb-3 shadow-lg flex items-center justify-center"
+                      animate={{ scale: [1, 1.05, 1] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    >
+                      <div className="w-5 h-5 sm:w-7 sm:h-7 bg-white/70 rounded-full" />
+                    </motion.div>
+                    <motion.div
+                      className="h-1.5 sm:h-2 bg-white/50 rounded w-full mb-1.5 sm:mb-2 shadow-sm"
+                      animate={{ opacity: [0.5, 0.8, 0.5] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    />
+                    <motion.div
+                      className="h-1.5 sm:h-2 bg-white/40 rounded w-3/4 mx-auto shadow-sm"
+                      animate={{ opacity: [0.4, 0.7, 0.4] }}
+                      transition={{ duration: 2, repeat: Infinity, delay: 0.3 }}
+                    />
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -757,10 +896,46 @@ function SocialMediaSlide({ service }: { service: Service }) {
   ];
 
   const mockPosts = [
-    { id: 1, gradient: 'from-orange-500 to-yellow-500', emoji: '✨' },
-    { id: 2, gradient: 'from-yellow-500 to-orange-500', emoji: '🎨' },
-    { id: 3, gradient: 'from-orange-600 to-red-500', emoji: '🚀' },
-    { id: 4, gradient: 'from-yellow-600 to-orange-600', emoji: '💡' }
+    {
+      id: 1,
+      gradient: 'from-orange-500 via-amber-500 to-yellow-500',
+      pattern: 'radial-gradient(circle at 60% 40%, rgba(255,255,255,0.4) 0%, transparent 60%)',
+      shapes: [
+        { size: 'w-24 h-24', color: 'bg-yellow-200/40', blur: 'blur-2xl', position: 'top-4 right-4' },
+        { size: 'w-32 h-32', color: 'bg-orange-300/30', blur: 'blur-3xl', position: 'bottom-0 left-0' }
+      ],
+      overlayText: 'Brand Story'
+    },
+    {
+      id: 2,
+      gradient: 'from-yellow-500 via-orange-400 to-orange-500',
+      pattern: 'linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 60%), radial-gradient(circle at 30% 70%, rgba(255,200,100,0.4) 0%, transparent 50%)',
+      shapes: [
+        { size: 'w-28 h-28', color: 'bg-amber-200/35', blur: 'blur-2xl', position: 'top-6 left-6' },
+        { size: 'w-20 h-20', color: 'bg-yellow-300/40', blur: 'blur-xl', position: 'bottom-8 right-8' }
+      ],
+      overlayText: 'Engagement'
+    },
+    {
+      id: 3,
+      gradient: 'from-orange-600 via-red-500 to-red-600',
+      pattern: 'conic-gradient(from 90deg at 40% 50%, rgba(255,255,255,0.25) 0deg, transparent 120deg, rgba(255,255,255,0.2) 240deg)',
+      shapes: [
+        { size: 'w-36 h-36', color: 'bg-red-300/30', blur: 'blur-3xl', position: 'top-1/4 left-1/4' },
+        { size: 'w-24 h-24', color: 'bg-orange-200/35', blur: 'blur-2xl', position: 'bottom-1/4 right-1/3' }
+      ],
+      overlayText: 'Viral Content'
+    },
+    {
+      id: 4,
+      gradient: 'from-yellow-600 via-amber-600 to-orange-600',
+      pattern: 'repeating-radial-gradient(circle at 50% 50%, transparent 0px, rgba(255,255,255,0.1) 30px, transparent 60px), radial-gradient(circle at 70% 30%, rgba(255,255,255,0.3) 0%, transparent 50%)',
+      shapes: [
+        { size: 'w-28 h-28', color: 'bg-amber-300/35', blur: 'blur-2xl', position: 'top-8 right-6' },
+        { size: 'w-20 h-20', color: 'bg-yellow-200/40', blur: 'blur-xl', position: 'bottom-6 left-8' }
+      ],
+      overlayText: 'Growth'
+    }
   ];
 
   return (
@@ -818,24 +993,62 @@ function SocialMediaSlide({ service }: { service: Service }) {
                 whileHover={{ scale: 1.05, rotate: index % 2 === 0 ? 2 : -2 }}
                 className="aspect-square relative group cursor-pointer"
               >
-                <div className={`w-full h-full rounded-2xl bg-gradient-to-br ${post.gradient} shadow-xl p-4 sm:p-6 flex items-center justify-center`}>
-                  <div className="text-center">
+                <div className={`w-full h-full rounded-2xl bg-gradient-to-br ${post.gradient} shadow-xl overflow-hidden relative`}>
+                  {/* Pattern overlay */}
+                  <div
+                    className="absolute inset-0 opacity-70"
+                    style={{ background: post.pattern }}
+                  />
+
+                  {/* Animated shapes */}
+                  {post.shapes.map((shape, shapeIdx) => (
                     <motion.div
-                      className="text-4xl sm:text-5xl mb-2 sm:mb-3"
-                      animate={{ rotate: [0, 5, -5, 0] }}
-                      transition={{ duration: 2, repeat: Infinity }}
+                      key={shapeIdx}
+                      className={`absolute ${shape.size} ${shape.color} ${shape.blur} ${shape.position} rounded-full`}
+                      animate={{
+                        scale: [1, 1.3, 1],
+                        opacity: [0.5, 0.8, 0.5],
+                        x: [0, 10, 0],
+                        y: [0, -10, 0]
+                      }}
+                      transition={{
+                        duration: 4 + shapeIdx,
+                        repeat: Infinity,
+                        ease: 'easeInOut'
+                      }}
+                    />
+                  ))}
+
+                  {/* Content overlay */}
+                  <div className="absolute inset-0 flex flex-col items-center justify-center p-4 sm:p-6 bg-gradient-to-t from-black/40 via-transparent to-transparent">
+                    <motion.div
+                      className="text-white font-bold text-sm sm:text-base drop-shadow-lg mb-3"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.3 + index * 0.1 }}
                     >
-                      {post.emoji}
+                      {post.overlayText}
                     </motion.div>
-                    <div className="h-1.5 sm:h-2 bg-white/40 rounded w-full mb-1.5 sm:mb-2" />
-                    <div className="h-1.5 sm:h-2 bg-white/40 rounded w-3/4 mx-auto" />
+                    <div className="w-full space-y-2">
+                      <motion.div
+                        className="h-1.5 sm:h-2 bg-white/50 rounded w-full"
+                        animate={{ opacity: [0.5, 0.8, 0.5] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                      />
+                      <motion.div
+                        className="h-1.5 sm:h-2 bg-white/40 rounded w-3/4 mx-auto"
+                        animate={{ opacity: [0.4, 0.7, 0.4] }}
+                        transition={{ duration: 2, repeat: Infinity, delay: 0.3 }}
+                      />
+                    </div>
                   </div>
                 </div>
+
                 {/* Engagement Overlay */}
                 <motion.div
                   initial={{ opacity: 0 }}
                   whileHover={{ opacity: 1 }}
-                  className="absolute inset-0 bg-black/70 backdrop-blur-sm rounded-2xl flex items-center justify-center gap-4 sm:gap-6"
+                  className="absolute inset-0 bg-black/80 backdrop-blur-md rounded-2xl flex items-center justify-center gap-4 sm:gap-6"
                 >
                   <motion.div
                     className="text-white text-center"
@@ -847,7 +1060,7 @@ function SocialMediaSlide({ service }: { service: Service }) {
                       animate={{ scale: [1, 1.1, 1] }}
                       transition={{ duration: 1, repeat: Infinity }}
                     >
-                      1.2K
+                      {index === 0 ? '2.4K' : index === 1 ? '1.8K' : index === 2 ? '3.1K' : '1.5K'}
                     </motion.p>
                     <p className="text-[10px] sm:text-xs">Likes</p>
                   </motion.div>
@@ -861,7 +1074,7 @@ function SocialMediaSlide({ service }: { service: Service }) {
                       animate={{ scale: [1, 1.1, 1] }}
                       transition={{ duration: 1, repeat: Infinity, delay: 0.2 }}
                     >
-                      89
+                      {index === 0 ? '142' : index === 1 ? '89' : index === 2 ? '203' : '76'}
                     </motion.p>
                     <p className="text-[10px] sm:text-xs">Comments</p>
                   </motion.div>
@@ -967,16 +1180,73 @@ function VideographySlide({ service }: { service: Service }) {
             className="w-full max-w-3xl aspect-video relative"
           >
             {/* Video Frame */}
-            <div className="w-full h-full rounded-3xl bg-gradient-to-br from-pink-600 to-purple-600 shadow-2xl overflow-hidden relative">
+            <div className="w-full h-full rounded-3xl bg-gradient-to-br from-pink-600 via-fuchsia-600 to-purple-600 shadow-2xl overflow-hidden relative">
+              {/* Pattern overlay */}
+              <div
+                className="absolute inset-0 opacity-30"
+                style={{
+                  background: 'radial-gradient(circle at 40% 40%, rgba(255,255,255,0.3) 0%, transparent 60%), linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 70%)'
+                }}
+              />
+
+              {/* Animated visual elements */}
+              <motion.div
+                className="absolute w-64 h-64 sm:w-80 sm:h-80 bg-pink-300/20 blur-3xl rounded-full top-0 right-0"
+                animate={{
+                  scale: [1, 1.2, 1],
+                  opacity: [0.3, 0.5, 0.3],
+                  x: [0, 20, 0],
+                  y: [0, 20, 0]
+                }}
+                transition={{ duration: 5, repeat: Infinity }}
+              />
+              <motion.div
+                className="absolute w-48 h-48 sm:w-64 sm:h-64 bg-purple-400/25 blur-3xl rounded-full bottom-0 left-0"
+                animate={{
+                  scale: [1.2, 1, 1.2],
+                  opacity: [0.4, 0.6, 0.4],
+                  x: [0, -15, 0],
+                  y: [0, -15, 0]
+                }}
+                transition={{ duration: 4, repeat: Infinity }}
+              />
+
+              {/* Simulated video content */}
+              <motion.div
+                className="absolute inset-8 sm:inset-12 rounded-2xl bg-gradient-to-br from-pink-500/30 to-purple-500/30 backdrop-blur-sm border border-white/20"
+                animate={{
+                  opacity: [0.6, 0.8, 0.6]
+                }}
+                transition={{ duration: 3, repeat: Infinity }}
+              >
+                <motion.div
+                  className="absolute top-4 left-4 w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/20 blur-xl"
+                  animate={{
+                    scale: [1, 1.5, 1],
+                    x: [0, 40, 0],
+                    y: [0, 30, 0]
+                  }}
+                  transition={{ duration: 4, repeat: Infinity }}
+                />
+                <motion.div
+                  className="absolute bottom-6 right-6 w-12 h-12 sm:w-16 sm:h-16 rounded-lg bg-white/15 blur-lg"
+                  animate={{
+                    scale: [1.2, 1, 1.2],
+                    rotate: [0, 180, 360]
+                  }}
+                  transition={{ duration: 6, repeat: Infinity }}
+                />
+              </motion.div>
+
               {/* Play Button Overlay */}
-              <div className="absolute inset-0 flex items-center justify-center">
+              <div className="absolute inset-0 flex items-center justify-center z-10">
                 <motion.button
                   whileHover={{ scale: 1.15 }}
                   whileTap={{ scale: 0.9 }}
-                  className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-white/30 backdrop-blur-md border-4 border-white/50 flex items-center justify-center group shadow-2xl"
+                  className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-white/40 backdrop-blur-md border-4 border-white/60 flex items-center justify-center group shadow-2xl"
                 >
                   <motion.svg
-                    className="w-8 h-8 sm:w-10 sm:h-10 text-white ml-1"
+                    className="w-8 h-8 sm:w-10 sm:h-10 text-white ml-1 drop-shadow-lg"
                     fill="currentColor"
                     viewBox="0 0 24 24"
                     whileHover={{ scale: 1.1 }}
@@ -987,27 +1257,15 @@ function VideographySlide({ service }: { service: Service }) {
               </div>
 
               {/* Decorative Elements */}
-              <div className="absolute top-4 sm:top-6 left-4 sm:left-6 flex gap-1.5 sm:gap-2">
+              <div className="absolute top-4 sm:top-6 left-4 sm:left-6 flex gap-1.5 sm:gap-2 z-10">
                 <motion.div
-                  className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-400"
+                  className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-400 shadow-lg"
                   animate={{ opacity: [1, 0.5, 1] }}
                   transition={{ duration: 2, repeat: Infinity }}
                 />
-                <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-400" />
-                <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-400" />
+                <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-400 shadow-lg" />
+                <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-400 shadow-lg" />
               </div>
-
-              {/* Motion Graphics Animation */}
-              <motion.div
-                animate={{
-                  scale: [1, 1.3, 1],
-                  opacity: [0.3, 0.7, 0.3]
-                }}
-                transition={{ duration: 4, repeat: Infinity }}
-                className="absolute inset-0 flex items-center justify-center"
-              >
-                <div className="w-48 h-48 sm:w-64 sm:h-64 rounded-full bg-white/10 blur-3xl" />
-              </motion.div>
             </div>
 
             {/* Video Controls Bar */}
