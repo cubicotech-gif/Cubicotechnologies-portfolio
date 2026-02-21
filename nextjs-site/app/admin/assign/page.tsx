@@ -8,6 +8,7 @@ interface LibraryImage {
   filename: string;
   url: string;
   path: string;
+  media_type?: 'image' | 'video';
 }
 
 // Define field types for section configuration
@@ -369,16 +370,15 @@ export default function UnifiedImageManager() {
 
           {selectedImage && (
             <div className="mb-4 p-4 bg-green-500/20 border border-green-500/50 rounded-lg flex items-center gap-4">
-              <div className="w-16 h-16 relative rounded overflow-hidden">
-                <Image
-                  src={selectedImage.url}
-                  alt="Selected"
-                  fill
-                  className="object-cover"
-                />
+              <div className="w-16 h-16 relative rounded overflow-hidden bg-black">
+                {selectedImage.media_type === 'video' ? (
+                  <video src={selectedImage.url} className="w-full h-full object-cover" muted />
+                ) : (
+                  <Image src={selectedImage.url} alt="Selected" fill className="object-cover" />
+                )}
               </div>
               <div className="flex-1">
-                <p className="text-green-400 font-semibold">✅ Image Selected</p>
+                <p className="text-green-400 font-semibold">✅ {selectedImage.media_type === 'video' ? 'Video' : 'Image'} Selected</p>
                 <p className="text-green-300 text-sm">{selectedImage.filename}</p>
               </div>
               <button
@@ -424,12 +424,32 @@ export default function UnifiedImageManager() {
                     }`}
                   >
                     <div className="aspect-square relative bg-black">
-                      <Image
-                        src={img.url}
-                        alt={img.filename}
-                        fill
-                        className="object-cover"
-                      />
+                      {img.media_type === 'video' ? (
+                        <video
+                          src={img.url}
+                          className="w-full h-full object-cover"
+                          muted
+                          loop
+                          playsInline
+                          onMouseEnter={(e) => e.currentTarget.play()}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.pause();
+                            e.currentTarget.currentTime = 0;
+                          }}
+                        />
+                      ) : (
+                        <Image
+                          src={img.url}
+                          alt={img.filename}
+                          fill
+                          className="object-cover"
+                        />
+                      )}
+                      {img.media_type === 'video' && (
+                        <div className="absolute top-1 right-1 bg-black/70 px-1.5 py-0.5 rounded text-[10px] text-white">
+                          🎬 VIDEO
+                        </div>
+                      )}
                     </div>
                     <p className="text-xs text-gray-400 p-2 truncate bg-black/50">
                       {img.filename}
