@@ -337,6 +337,11 @@ export default function AssignedMediaPage() {
     }
   };
 
+  // ====== Check if URL is a video ======
+  const isVideoUrl = (url: string): boolean => {
+    return /\.(mp4|webm|mov|avi|mpeg|ogg)(\?|$)/i.test(url);
+  };
+
   // ====== Get image URL for any section item ======
   const getItemImageUrl = (section: SectionTab, item: any): string => {
     if (section === 'hero') return item.url || '';
@@ -501,14 +506,36 @@ export default function AssignedMediaPage() {
                         'aspect-video'
                       }`}>
                         {imageUrl ? (
-                          <Image
-                            src={imageUrl}
-                            alt={label}
-                            fill
-                            className={`${activeTab === 'logos' ? 'object-contain p-3' : 'object-cover'}`}
-                          />
+                          isVideoUrl(imageUrl) ? (
+                            <video
+                              src={imageUrl}
+                              className="w-full h-full object-cover"
+                              muted
+                              loop
+                              playsInline
+                              onMouseEnter={(e) => e.currentTarget.play()}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.pause();
+                                e.currentTarget.currentTime = 0;
+                              }}
+                            />
+                          ) : (
+                            <Image
+                              src={imageUrl}
+                              alt={label}
+                              fill
+                              className={`${activeTab === 'logos' ? 'object-contain p-3' : 'object-cover'}`}
+                            />
+                          )
                         ) : (
                           <div className="flex items-center justify-center h-full text-gray-500 text-sm">No Image</div>
+                        )}
+
+                        {/* Video Badge */}
+                        {imageUrl && isVideoUrl(imageUrl) && (
+                          <div className="absolute bottom-2 right-2 bg-black/70 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] text-white">
+                            🎬 VIDEO
+                          </div>
                         )}
 
                         {/* Active/Inactive Badge */}
@@ -641,12 +668,23 @@ export default function AssignedMediaPage() {
                     editModal.section === 'logos' ? 'w-24 h-24 bg-white' :
                     'w-40 aspect-video'
                   }`}>
-                    <Image
-                      src={replaceImageUrl || getItemImageUrl(editModal.section, editModal.item)}
-                      alt="Preview"
-                      fill
-                      className={editModal.section === 'logos' ? 'object-contain p-2' : 'object-cover'}
-                    />
+                    {isVideoUrl(replaceImageUrl || getItemImageUrl(editModal.section, editModal.item)) ? (
+                      <video
+                        src={replaceImageUrl || getItemImageUrl(editModal.section, editModal.item)}
+                        className="w-full h-full object-cover"
+                        muted
+                        autoPlay
+                        loop
+                        playsInline
+                      />
+                    ) : (
+                      <Image
+                        src={replaceImageUrl || getItemImageUrl(editModal.section, editModal.item)}
+                        alt="Preview"
+                        fill
+                        className={editModal.section === 'logos' ? 'object-contain p-2' : 'object-cover'}
+                      />
+                    )}
                   </div>
                   {replaceImageUrl && (
                     <p className="text-green-400 text-xs mt-2">✅ New image selected (will replace current)</p>
