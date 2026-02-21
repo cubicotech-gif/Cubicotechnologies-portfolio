@@ -65,6 +65,14 @@ export default function AdminDashboard() {
       color: 'from-indigo-500 to-purple-500',
     },
     {
+      title: 'Assigned Media',
+      description: 'View, edit, replace and delete all assigned images',
+      href: '/admin/assigned',
+      icon: '📋',
+      count: stats.heroImages + stats.featuredProjects + stats.clientLogos,
+      color: 'from-orange-500 to-red-500',
+    },
+    {
       title: 'Hero Images',
       description: 'View and manage hero section images',
       href: '/admin/hero',
