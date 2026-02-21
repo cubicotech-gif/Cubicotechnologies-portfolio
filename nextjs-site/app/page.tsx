@@ -243,7 +243,7 @@ export default function Home() {
   return (
     <div className="relative">
       {/* HERO SECTION */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden">
+      <section className="relative h-screen -mt-16 flex items-center justify-center overflow-hidden">
         {/* Animated Cards Background Layer */}
         <AnimatedCardsBackground />
 

@@ -266,7 +266,7 @@ function ArtworkSlide({ service }: { service: Service }) {
   ];
 
   return (
-    <div className="h-screen w-full flex flex-col lg:flex-row">
+    <div className="h-[calc(100vh-4rem)] w-full flex flex-col lg:flex-row">
       {/* LEFT SIDE - Visual Showcase */}
       <div className="lg:w-[60%] h-1/2 lg:h-full relative overflow-hidden bg-gradient-to-br from-black via-purple-950/20 to-black">
         {/* Animated Background */}
@@ -454,7 +454,7 @@ function BrandingSlide({ service }: { service: Service }) {
   const [selectedPackage, setSelectedPackage] = useState(1);
 
   return (
-    <div className="h-screen w-full flex flex-col lg:flex-row">
+    <div className="h-[calc(100vh-4rem)] w-full flex flex-col lg:flex-row">
       {/* LEFT SIDE - Interactive Brand Builder */}
       <div className="lg:w-[60%] h-1/2 lg:h-full relative overflow-hidden bg-gradient-to-br from-black via-blue-950/20 to-black">
         {/* Animated Background */}
@@ -659,7 +659,7 @@ function SocialMediaSlide({ service }: { service: Service }) {
   ];
 
   return (
-    <div className="h-screen w-full flex flex-col lg:flex-row">
+    <div className="h-[calc(100vh-4rem)] w-full flex flex-col lg:flex-row">
       {/* LEFT SIDE - Social Feed Simulator */}
       <div className="lg:w-[60%] h-1/2 lg:h-full relative overflow-hidden bg-gradient-to-br from-black via-orange-950/20 to-black">
         {/* Animated Background */}
@@ -876,7 +876,7 @@ function VideographySlide({ service }: { service: Service }) {
   ];
 
   return (
-    <div className="h-screen w-full flex flex-col lg:flex-row">
+    <div className="h-[calc(100vh-4rem)] w-full flex flex-col lg:flex-row">
       {/* LEFT SIDE - Video Player */}
       <div className="lg:w-[60%] h-1/2 lg:h-full relative overflow-hidden bg-gradient-to-br from-black via-pink-950/20 to-black">
         {/* Animated Background */}

@@ -32,7 +32,9 @@ export default function RootLayout({
       <body className={`${inter.variable} ${spaceGrotesk.variable} font-sans antialiased`}>
         <div className="relative min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a1a] to-[#0a0a0a]">
           <Navigation />
-          {children}
+          <main className="pt-16">
+            {children}
+          </main>
           <Footer />
         </div>
       </body>

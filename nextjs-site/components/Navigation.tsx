@@ -55,23 +55,23 @@ export default function Navigation() {
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
+        <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="relative group flex items-center">
             {logoUrl ? (
-              <div className="relative h-16 w-auto">
+              <div className="relative h-9 w-auto">
                 <Image
                   src={logoUrl}
                   alt="Cubico Technologies"
-                  width={266}
-                  height={80}
-                  className="h-16 w-auto object-contain"
+                  width={160}
+                  height={36}
+                  className="h-9 w-auto object-contain"
                   quality={100}
                   priority
                 />
               </div>
             ) : (
-              <span className="text-2xl lg:text-3xl font-bold text-white tracking-tight">
+              <span className="text-xl lg:text-2xl font-bold text-white tracking-tight">
                 CUBICO
               </span>
             )}
