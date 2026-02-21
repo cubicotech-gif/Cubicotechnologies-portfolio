@@ -3,15 +3,18 @@ import { supabaseAdmin } from '@/lib/supabase';
 
 export const runtime = 'nodejs';
 
+// Increase body size limit for large file uploads (100MB)
+export const maxDuration = 60;
+
 // All images go to a single library folder
 const LIBRARY_FOLDER = 'library';
 
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
-    const file = formData.get('file') as File;
+    const files = formData.getAll('file') as File[];
 
-    if (!file) {
+    if (!files || files.length === 0) {
       return NextResponse.json(
         { success: false, error: 'No file provided' },
         { status: 400 }
@@ -36,64 +39,82 @@ export async function POST(request: NextRequest) {
       'video/ogg'
     ];
 
-    if (!validTypes.includes(file.type)) {
-      return NextResponse.json(
-        { success: false, error: `Invalid file type: ${file.type}. Only images and videos are allowed.` },
-        { status: 400 }
-      );
-    }
+    const results: any[] = [];
+    const errors: string[] = [];
 
-    // Validate file size (max 100MB for videos, 50MB for images)
-    const isVideo = file.type.startsWith('video/');
-    const maxSize = isVideo ? 100 * 1024 * 1024 : 50 * 1024 * 1024; // 100MB for videos, 50MB for images
-    if (file.size > maxSize) {
-      return NextResponse.json(
-        { success: false, error: `File too large. Maximum size is ${isVideo ? '100MB for videos' : '50MB for images'}.` },
-        { status: 400 }
-      );
-    }
+    for (const file of files) {
+      if (!validTypes.includes(file.type)) {
+        errors.push(`${file.name}: Invalid file type (${file.type}). Only images and videos are allowed.`);
+        continue;
+      }
 
-    // Generate unique filename
-    const timestamp = Date.now();
-    const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-    const filename = `${timestamp}-${sanitizedName}`;
-    const filePath = `${LIBRARY_FOLDER}/${filename}`;
+      // Validate file size (max 100MB for videos, 50MB for images)
+      const isVideo = file.type.startsWith('video/');
+      const maxSize = isVideo ? 100 * 1024 * 1024 : 50 * 1024 * 1024;
+      if (file.size > maxSize) {
+        errors.push(`${file.name}: File too large. Maximum is ${isVideo ? '100MB for videos' : '50MB for images'}.`);
+        continue;
+      }
 
-    // Convert file to buffer
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
+      // Generate unique filename
+      const timestamp = Date.now();
+      const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+      const filename = `${timestamp}-${sanitizedName}`;
+      const filePath = `${LIBRARY_FOLDER}/${filename}`;
 
-    // Upload to Supabase Storage (all images go to 'images' bucket, 'library' folder)
-    const { data, error } = await supabaseAdmin.storage
-      .from('images')
-      .upload(filePath, buffer, {
-        contentType: file.type,
-        upsert: false,
+      // Convert file to buffer
+      const bytes = await file.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+
+      // Upload to Supabase Storage
+      const { error } = await supabaseAdmin.storage
+        .from('images')
+        .upload(filePath, buffer, {
+          contentType: file.type,
+          upsert: false,
+        });
+
+      if (error) {
+        console.error('Supabase upload error:', error);
+        errors.push(`${file.name}: Upload failed - ${error.message}`);
+        continue;
+      }
+
+      // Get public URL
+      const { data: publicUrlData } = supabaseAdmin.storage
+        .from('images')
+        .getPublicUrl(filePath);
+
+      const publicUrl = publicUrlData.publicUrl;
+      console.log(`File uploaded to image library: ${publicUrl}`);
+
+      results.push({
+        filename,
+        url: publicUrl,
+        path: publicUrl,
+        originalName: file.name,
+        size: file.size,
+        media_type: isVideo ? 'video' : 'image',
       });
-
-    if (error) {
-      console.error('Supabase upload error:', error);
-      return NextResponse.json(
-        { success: false, error: `Upload failed: ${error.message}` },
-        { status: 500 }
-      );
     }
 
-    // Get public URL
-    const { data: publicUrlData } = supabaseAdmin.storage
-      .from('images')
-      .getPublicUrl(filePath);
+    // Single file response (backwards compatible)
+    if (files.length === 1 && results.length === 1) {
+      return NextResponse.json({
+        success: true,
+        filename: results[0].filename,
+        url: results[0].url,
+        path: results[0].path,
+        message: 'File uploaded successfully to image library'
+      });
+    }
 
-    const publicUrl = publicUrlData.publicUrl;
-
-    console.log(`File uploaded to image library: ${publicUrl}`);
-
+    // Multi-file response
     return NextResponse.json({
-      success: true,
-      filename: filename,
-      url: publicUrl,
-      path: publicUrl,
-      message: 'File uploaded successfully to image library'
+      success: results.length > 0,
+      uploaded: results,
+      errors: errors.length > 0 ? errors : undefined,
+      message: `${results.length} file(s) uploaded successfully${errors.length > 0 ? `, ${errors.length} failed` : ''}`,
     });
   } catch (error: any) {
     console.error('Upload error:', error);
@@ -125,7 +146,6 @@ export async function GET(request: NextRequest) {
 
     const media = files
       .filter(file => {
-        // Filter out directories and include both images and videos
         return file.name && /\.(jpg|jpeg|png|gif|webp|svg|mp4|webm|mov|avi|mpeg|ogg)$/i.test(file.name);
       })
       .map(file => {
@@ -134,7 +154,6 @@ export async function GET(request: NextRequest) {
           .from('images')
           .getPublicUrl(filePath);
 
-        // Determine media type
         const isVideo = /\.(mp4|webm|mov|avi|mpeg|ogg)$/i.test(file.name);
 
         return {
@@ -151,7 +170,6 @@ export async function GET(request: NextRequest) {
   } catch (error: any) {
     console.error('Error listing images:', error);
 
-    // If error is due to missing credentials, return empty array
     if (error.message?.includes('SUPABASE_URL') || error.message?.includes('Invalid URL')) {
       return NextResponse.json({
         success: true,
@@ -162,6 +180,48 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(
       { success: false, error: `Failed to list images: ${error.message}` },
+      { status: 500 }
+    );
+  }
+}
+
+// DELETE: Remove file from library storage
+export async function DELETE(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const filename = searchParams.get('filename');
+
+    if (!filename) {
+      return NextResponse.json(
+        { success: false, error: 'Filename is required' },
+        { status: 400 }
+      );
+    }
+
+    const filePath = `${LIBRARY_FOLDER}/${filename}`;
+
+    const { error } = await supabaseAdmin.storage
+      .from('images')
+      .remove([filePath]);
+
+    if (error) {
+      console.error('Supabase delete error:', error);
+      return NextResponse.json(
+        { success: false, error: `Delete failed: ${error.message}` },
+        { status: 500 }
+      );
+    }
+
+    console.log(`File deleted from library: ${filePath}`);
+
+    return NextResponse.json({
+      success: true,
+      message: 'File deleted from library',
+    });
+  } catch (error: any) {
+    console.error('Delete error:', error);
+    return NextResponse.json(
+      { success: false, error: `Delete failed: ${error.message}` },
       { status: 500 }
     );
   }

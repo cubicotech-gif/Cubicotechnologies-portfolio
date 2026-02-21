@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
-    const { id, category, order, active } = body;
+    const { id, category, order, active, url, filename } = body;
 
     if (!id) {
       return NextResponse.json(
@@ -99,6 +99,8 @@ export async function PUT(request: NextRequest) {
     if (category !== undefined) updates.category = category;
     if (order !== undefined) updates.order = order;
     if (active !== undefined) updates.active = active;
+    if (url !== undefined) updates.url = url;
+    if (filename !== undefined) updates.filename = filename;
 
     const { data, error } = await supabaseAdmin
       .from('hero_images')
