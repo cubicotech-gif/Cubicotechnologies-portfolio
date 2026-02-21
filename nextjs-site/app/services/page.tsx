@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -254,22 +255,11 @@ function NavigationOverlay({
 // SLIDE 1: ARTWORK DESIGNING
 // ============================================================================
 
-function ArtworkSlide({ service }: { service: Service }) {
-  const [hoveredCard, setHoveredCard] = useState<number | null>(null);
-
-  // Sample artwork images (placeholder)
-  const artworkSamples = [
-    { id: 1, title: 'Digital Illustration', color: 'from-purple-500 to-pink-500' },
-    { id: 2, title: 'Character Design', color: 'from-blue-500 to-purple-500' },
-    { id: 3, title: 'Abstract Art', color: 'from-pink-500 to-orange-500' },
-    { id: 4, title: 'Vector Graphics', color: 'from-cyan-500 to-blue-500' }
-  ];
-
+function ArtworkSlide({ service, images }: { service: Service; images: string[] }) {
   return (
     <div className="h-[calc(100vh-4rem)] w-full flex flex-col lg:flex-row">
-      {/* LEFT SIDE - Visual Showcase */}
+      {/* LEFT SIDE - Image Gallery */}
       <div className="lg:w-[60%] h-1/2 lg:h-full relative overflow-hidden bg-gradient-to-br from-black via-purple-950/20 to-black">
-        {/* Animated Background */}
         <motion.div
           animate={{
             background: [
@@ -282,57 +272,35 @@ function ArtworkSlide({ service }: { service: Service }) {
           className="absolute inset-0"
         />
 
-        {/* 3D Card Stack */}
-        <div className="absolute inset-0 flex items-center justify-center p-8">
-          <div className="relative w-full max-w-lg aspect-square">
-            {artworkSamples.map((artwork, index) => (
-              <motion.div
-                key={artwork.id}
-                initial={{ opacity: 0, scale: 0.8, rotateY: -20 }}
-                animate={{
-                  opacity: 1,
-                  scale: hoveredCard === index ? 1.05 : 1,
-                  rotateY: hoveredCard === index ? 0 : -10,
-                  z: hoveredCard === index ? 100 : index * 20,
-                  x: hoveredCard === index ? 0 : index * 30,
-                  y: hoveredCard === index ? -20 : index * 20
-                }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                onMouseEnter={() => setHoveredCard(index)}
-                onMouseLeave={() => setHoveredCard(null)}
-                className="absolute inset-0 cursor-pointer"
-                style={{
-                  transformStyle: 'preserve-3d',
-                  zIndex: hoveredCard === index ? 50 : artworkSamples.length - index
-                }}
-              >
-                <div className={`w-full h-full rounded-3xl bg-gradient-to-br ${artwork.color} shadow-2xl border border-white/10 p-8 flex items-center justify-center`}>
-                  <div className="text-center">
-                    <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                      <svg className="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                    </div>
-                    <p className="text-white font-semibold text-lg">{artwork.title}</p>
-                  </div>
+        <div className="absolute inset-0 p-6 lg:p-10 grid grid-cols-2 gap-4">
+          {[0, 1, 2, 3].map((i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: i * 0.15, duration: 0.5 }}
+              whileHover={{ scale: 1.05, zIndex: 10 }}
+              className="relative rounded-2xl overflow-hidden border border-white/10 shadow-2xl group cursor-pointer"
+            >
+              {images[i] ? (
+                <Image
+                  src={images[i]}
+                  alt={`Artwork example ${i + 1}`}
+                  fill
+                  className="object-cover group-hover:scale-110 transition-transform duration-500"
+                  sizes="(max-width: 768px) 50vw, 30vw"
+                />
+              ) : (
+                <div className={`w-full h-full bg-gradient-to-br ${service.gradient} opacity-40 flex items-center justify-center`}>
+                  <svg className="w-12 h-12 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
                 </div>
-              </motion.div>
-            ))}
-          </div>
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            </motion.div>
+          ))}
         </div>
-
-        {/* Drag Hint */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1, duration: 0.5 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 text-gray-400 text-sm flex items-center gap-2"
-        >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11" />
-          </svg>
-          <span>Hover to explore artworks</span>
-        </motion.div>
       </div>
 
       {/* RIGHT SIDE - Service Info */}
@@ -450,14 +418,13 @@ function ArtworkSlide({ service }: { service: Service }) {
 // SLIDE 2: BRANDING & GRAPHICS
 // ============================================================================
 
-function BrandingSlide({ service }: { service: Service }) {
+function BrandingSlide({ service, images }: { service: Service; images: string[] }) {
   const [selectedPackage, setSelectedPackage] = useState(1);
 
   return (
     <div className="h-[calc(100vh-4rem)] w-full flex flex-col lg:flex-row">
-      {/* LEFT SIDE - Interactive Brand Builder */}
+      {/* LEFT SIDE - Image Gallery */}
       <div className="lg:w-[60%] h-1/2 lg:h-full relative overflow-hidden bg-gradient-to-br from-black via-blue-950/20 to-black">
-        {/* Animated Background */}
         <motion.div
           animate={{
             background: [
@@ -470,66 +437,34 @@ function BrandingSlide({ service }: { service: Service }) {
           className="absolute inset-0"
         />
 
-        {/* 3D Mockup Scene */}
-        <div className="absolute inset-0 flex items-center justify-center p-8">
-          <div className="relative w-full max-w-2xl">
-            {/* Business Card */}
+        <div className="absolute inset-0 p-6 lg:p-10 grid grid-cols-2 gap-4">
+          {[0, 1, 2, 3].map((i) => (
             <motion.div
-              initial={{ opacity: 0, y: 50, rotateX: 45 }}
-              animate={{ opacity: 1, y: 0, rotateX: 20 }}
-              transition={{ duration: 0.8 }}
-              className="relative"
-              style={{ transformStyle: 'preserve-3d' }}
+              key={i}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: i * 0.15, duration: 0.5 }}
+              whileHover={{ scale: 1.05, zIndex: 10 }}
+              className="relative rounded-2xl overflow-hidden border border-white/10 shadow-2xl group cursor-pointer"
             >
-              <div className="w-full aspect-[1.75/1] bg-gradient-to-br from-blue-600 to-cyan-600 rounded-2xl shadow-2xl p-8 flex flex-col justify-between">
-                <div>
-                  <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm mb-4" />
-                  <p className="text-white font-bold text-2xl">Your Brand</p>
+              {images[i] ? (
+                <Image
+                  src={images[i]}
+                  alt={`Branding example ${i + 1}`}
+                  fill
+                  className="object-cover group-hover:scale-110 transition-transform duration-500"
+                  sizes="(max-width: 768px) 50vw, 30vw"
+                />
+              ) : (
+                <div className={`w-full h-full bg-gradient-to-br ${service.gradient} opacity-40 flex items-center justify-center`}>
+                  <svg className="w-12 h-12 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
                 </div>
-                <div>
-                  <p className="text-white/80 text-sm">contact@yourbrand.com</p>
-                  <p className="text-white/80 text-sm">+1 (555) 123-4567</p>
-                </div>
-              </div>
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </motion.div>
-
-            {/* Letterhead */}
-            <motion.div
-              initial={{ opacity: 0, x: -50, rotateY: -45 }}
-              animate={{ opacity: 1, x: -30, rotateY: -20 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="absolute top-20 -left-10 w-64"
-              style={{ transformStyle: 'preserve-3d' }}
-            >
-              <div className="bg-white rounded-lg shadow-xl p-6 space-y-2">
-                <div className="w-8 h-8 rounded bg-gradient-to-br from-blue-600 to-cyan-600" />
-                <div className="h-2 bg-gray-200 rounded w-3/4" />
-                <div className="h-2 bg-gray-200 rounded w-1/2" />
-                <div className="pt-4 space-y-1">
-                  <div className="h-1 bg-gray-100 rounded" />
-                  <div className="h-1 bg-gray-100 rounded" />
-                  <div className="h-1 bg-gray-100 rounded w-5/6" />
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Social Media Template */}
-            <motion.div
-              initial={{ opacity: 0, x: 50, rotateY: 45 }}
-              animate={{ opacity: 1, x: 30, rotateY: 20 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-              className="absolute -bottom-10 -right-10 w-56"
-              style={{ transformStyle: 'preserve-3d' }}
-            >
-              <div className="aspect-square bg-gradient-to-br from-cyan-500 to-blue-500 rounded-xl shadow-xl p-6 flex items-center justify-center">
-                <div className="text-center">
-                  <div className="w-16 h-16 mx-auto rounded-full bg-white/20 backdrop-blur-sm mb-3" />
-                  <div className="h-2 bg-white/40 rounded w-full mb-2" />
-                  <div className="h-2 bg-white/40 rounded w-3/4 mx-auto" />
-                </div>
-              </div>
-            </motion.div>
-          </div>
+          ))}
         </div>
       </div>
 
@@ -642,27 +577,11 @@ function BrandingSlide({ service }: { service: Service }) {
 // SLIDE 3: SOCIAL MEDIA GRAPHICS
 // ============================================================================
 
-function SocialMediaSlide({ service }: { service: Service }) {
-  const [activePlatform, setActivePlatform] = useState<'instagram' | 'facebook' | 'linkedin'>('instagram');
-
-  const platforms = [
-    { id: 'instagram' as const, name: 'Instagram', icon: '📷' },
-    { id: 'facebook' as const, name: 'Facebook', icon: '👥' },
-    { id: 'linkedin' as const, name: 'LinkedIn', icon: '💼' }
-  ];
-
-  const mockPosts = [
-    { id: 1, gradient: 'from-orange-500 to-yellow-500' },
-    { id: 2, gradient: 'from-yellow-500 to-orange-500' },
-    { id: 3, gradient: 'from-orange-600 to-red-500' },
-    { id: 4, gradient: 'from-yellow-600 to-orange-600' }
-  ];
-
+function SocialMediaSlide({ service, images }: { service: Service; images: string[] }) {
   return (
     <div className="h-[calc(100vh-4rem)] w-full flex flex-col lg:flex-row">
-      {/* LEFT SIDE - Social Feed Simulator */}
+      {/* LEFT SIDE - Image Gallery */}
       <div className="lg:w-[60%] h-1/2 lg:h-full relative overflow-hidden bg-gradient-to-br from-black via-orange-950/20 to-black">
-        {/* Animated Background */}
         <motion.div
           animate={{
             background: [
@@ -675,67 +594,34 @@ function SocialMediaSlide({ service }: { service: Service }) {
           className="absolute inset-0"
         />
 
-        {/* Platform Selector */}
-        <div className="absolute top-8 left-1/2 -translate-x-1/2 z-20 flex gap-2 bg-black/40 backdrop-blur-xl rounded-full p-2 border border-white/10">
-          {platforms.map((platform) => (
-            <button
-              key={platform.id}
-              onClick={() => setActivePlatform(platform.id)}
-              className={`px-6 py-2 rounded-full font-medium transition-all ${
-                activePlatform === platform.id
-                  ? 'bg-gradient-to-r from-orange-600 to-yellow-600 text-white'
-                  : 'text-gray-400 hover:text-white'
-              }`}
+        <div className="absolute inset-0 p-6 lg:p-10 grid grid-cols-2 gap-4">
+          {[0, 1, 2, 3].map((i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: i * 0.15, duration: 0.5 }}
+              whileHover={{ scale: 1.05, zIndex: 10 }}
+              className="relative rounded-2xl overflow-hidden border border-white/10 shadow-2xl group cursor-pointer"
             >
-              <span className="mr-2">{platform.icon}</span>
-              {platform.name}
-            </button>
-          ))}
-        </div>
-
-        {/* Social Feed Grid */}
-        <div className="absolute inset-0 flex items-center justify-center p-8 pt-24">
-          <motion.div
-            key={activePlatform}
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.3 }}
-            className="grid grid-cols-2 gap-4 max-w-2xl w-full"
-          >
-            {mockPosts.map((post, index) => (
-              <motion.div
-                key={post.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                whileHover={{ scale: 1.05, rotate: index % 2 === 0 ? 2 : -2 }}
-                className="aspect-square relative group cursor-pointer"
-              >
-                <div className={`w-full h-full rounded-2xl bg-gradient-to-br ${post.gradient} shadow-xl p-6 flex items-center justify-center`}>
-                  <div className="text-center">
-                    <div className="text-5xl mb-3">✨</div>
-                    <div className="h-2 bg-white/40 rounded w-full mb-2" />
-                    <div className="h-2 bg-white/40 rounded w-3/4 mx-auto" />
-                  </div>
+              {images[i] ? (
+                <Image
+                  src={images[i]}
+                  alt={`Social media example ${i + 1}`}
+                  fill
+                  className="object-cover group-hover:scale-110 transition-transform duration-500"
+                  sizes="(max-width: 768px) 50vw, 30vw"
+                />
+              ) : (
+                <div className={`w-full h-full bg-gradient-to-br ${service.gradient} opacity-40 flex items-center justify-center`}>
+                  <svg className="w-12 h-12 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
                 </div>
-                {/* Engagement Overlay */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  whileHover={{ opacity: 1 }}
-                  className="absolute inset-0 bg-black/60 rounded-2xl flex items-center justify-center gap-6"
-                >
-                  <div className="text-white text-center">
-                    <p className="text-2xl font-bold">1.2K</p>
-                    <p className="text-xs">Likes</p>
-                  </div>
-                  <div className="text-white text-center">
-                    <p className="text-2xl font-bold">89</p>
-                    <p className="text-xs">Comments</p>
-                  </div>
-                </motion.div>
-              </motion.div>
-            ))}
-          </motion.div>
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            </motion.div>
+          ))}
         </div>
       </div>
 
@@ -865,7 +751,7 @@ function SocialMediaSlide({ service }: { service: Service }) {
 // SLIDE 4: VIDEOGRAPHY
 // ============================================================================
 
-function VideographySlide({ service }: { service: Service }) {
+function VideographySlide({ service, images }: { service: Service; images: string[] }) {
   const [activeTab, setActiveTab] = useState(0);
 
   const videoTypes = [
@@ -877,9 +763,8 @@ function VideographySlide({ service }: { service: Service }) {
 
   return (
     <div className="h-[calc(100vh-4rem)] w-full flex flex-col lg:flex-row">
-      {/* LEFT SIDE - Video Player */}
+      {/* LEFT SIDE - Image Gallery */}
       <div className="lg:w-[60%] h-1/2 lg:h-full relative overflow-hidden bg-gradient-to-br from-black via-pink-950/20 to-black">
-        {/* Animated Background */}
         <motion.div
           animate={{
             background: [
@@ -892,70 +777,34 @@ function VideographySlide({ service }: { service: Service }) {
           className="absolute inset-0"
         />
 
-        {/* Video Player Mockup */}
-        <div className="absolute inset-0 flex items-center justify-center p-8">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-            className="w-full max-w-3xl aspect-video relative"
-          >
-            {/* Video Frame */}
-            <div className="w-full h-full rounded-3xl bg-gradient-to-br from-pink-600 to-purple-600 shadow-2xl overflow-hidden relative">
-              {/* Play Button Overlay */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  className="w-24 h-24 rounded-full bg-white/20 backdrop-blur-md border-4 border-white/40 flex items-center justify-center group"
-                >
-                  <svg className="w-10 h-10 text-white ml-1 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M8 5v14l11-7z" />
+        <div className="absolute inset-0 p-6 lg:p-10 grid grid-cols-2 gap-4">
+          {[0, 1, 2, 3].map((i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: i * 0.15, duration: 0.5 }}
+              whileHover={{ scale: 1.05, zIndex: 10 }}
+              className="relative rounded-2xl overflow-hidden border border-white/10 shadow-2xl group cursor-pointer"
+            >
+              {images[i] ? (
+                <Image
+                  src={images[i]}
+                  alt={`Videography example ${i + 1}`}
+                  fill
+                  className="object-cover group-hover:scale-110 transition-transform duration-500"
+                  sizes="(max-width: 768px) 50vw, 30vw"
+                />
+              ) : (
+                <div className={`w-full h-full bg-gradient-to-br ${service.gradient} opacity-40 flex items-center justify-center`}>
+                  <svg className="w-12 h-12 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
                   </svg>
-                </motion.button>
-              </div>
-
-              {/* Decorative Elements */}
-              <div className="absolute top-6 left-6 flex gap-2">
-                <div className="w-3 h-3 rounded-full bg-red-400" />
-                <div className="w-3 h-3 rounded-full bg-yellow-400" />
-                <div className="w-3 h-3 rounded-full bg-green-400" />
-              </div>
-
-              {/* Motion Graphics Animation */}
-              <motion.div
-                animate={{
-                  scale: [1, 1.2, 1],
-                  opacity: [0.3, 0.6, 0.3]
-                }}
-                transition={{ duration: 3, repeat: Infinity }}
-                className="absolute inset-0 flex items-center justify-center"
-              >
-                <div className="w-64 h-64 rounded-full bg-white/10 blur-3xl" />
-              </motion.div>
-            </div>
-
-            {/* Video Controls Bar */}
-            <div className="absolute bottom-4 left-4 right-4 bg-black/60 backdrop-blur-md rounded-xl p-4 border border-white/10">
-              <div className="flex items-center gap-4">
-                <div className="flex gap-2">
-                  <button className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors">
-                    <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M8 5v14l11-7z" />
-                    </svg>
-                  </button>
                 </div>
-                <div className="flex-1 h-1 bg-white/20 rounded-full overflow-hidden">
-                  <motion.div
-                    className="h-full bg-pink-500"
-                    animate={{ width: ['0%', '100%'] }}
-                    transition={{ duration: 5, repeat: Infinity }}
-                  />
-                </div>
-                <span className="text-white text-sm">0:00 / 0:45</span>
-              </div>
-            </div>
-          </motion.div>
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            </motion.div>
+          ))}
         </div>
       </div>
 
@@ -1105,6 +954,30 @@ function VideographySlide({ service }: { service: Service }) {
 export default function ServicesPage() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [direction, setDirection] = useState(0);
+  const [serviceImages, setServiceImages] = useState<Record<string, string[]>>({});
+
+  // Fetch service images
+  useEffect(() => {
+    const fetchImages = async () => {
+      try {
+        const response = await fetch('/api/service-images?active=true');
+        const data = await response.json();
+        if (data.success && data.images.length > 0) {
+          const imagesByService: Record<string, string[]> = {};
+          data.images.forEach((img: { service_type: string; image_slot: number; image_url: string }) => {
+            if (!imagesByService[img.service_type]) {
+              imagesByService[img.service_type] = [];
+            }
+            imagesByService[img.service_type][img.image_slot - 1] = img.image_url;
+          });
+          setServiceImages(imagesByService);
+        }
+      } catch (error) {
+        console.error('Error fetching service images:', error);
+      }
+    };
+    fetchImages();
+  }, []);
 
   // Keyboard navigation
   useEffect(() => {
@@ -1189,10 +1062,10 @@ export default function ServicesPage() {
             }}
             className="absolute inset-0"
           >
-            {currentSlide === 0 && <ArtworkSlide service={services[0]} />}
-            {currentSlide === 1 && <BrandingSlide service={services[1]} />}
-            {currentSlide === 2 && <SocialMediaSlide service={services[2]} />}
-            {currentSlide === 3 && <VideographySlide service={services[3]} />}
+            {currentSlide === 0 && <ArtworkSlide service={services[0]} images={serviceImages[services[0].title] || []} />}
+            {currentSlide === 1 && <BrandingSlide service={services[1]} images={serviceImages[services[1].title] || []} />}
+            {currentSlide === 2 && <SocialMediaSlide service={services[2]} images={serviceImages[services[2].title] || []} />}
+            {currentSlide === 3 && <VideographySlide service={services[3]} images={serviceImages[services[3].title] || []} />}
           </motion.div>
         </AnimatePresence>
       </div>

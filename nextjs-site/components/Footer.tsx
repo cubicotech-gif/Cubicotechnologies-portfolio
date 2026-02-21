@@ -24,11 +24,16 @@ export default function Footer() {
           {/* Company Info */}
           <div>
             <h3 className="text-2xl font-bold text-white mb-3">CUBICO</h3>
-            <p className="text-gray-400 text-sm leading-relaxed">
+            <p className="text-gray-400 text-sm leading-relaxed mb-3">
               Creative Excellence Since 2020
               <br />
               Crafting exceptional visual experiences for global brands.
             </p>
+            <div className="space-y-1 text-sm text-gray-500">
+              <p>17965 SW 1st Street, Pembroke Pines, FL 33029</p>
+              <p>+1 (347) 718-8716</p>
+              <p>info@cubicotech.com</p>
+            </div>
           </div>
 
           {/* Quick Links */}

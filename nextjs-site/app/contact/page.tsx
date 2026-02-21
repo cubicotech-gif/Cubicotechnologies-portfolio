@@ -253,7 +253,7 @@ function ContactPageContent() {
                       className="bg-gradient-to-r from-red-600/20 to-orange-600/20 border border-red-500/30 rounded-xl p-4 mb-6"
                     >
                       <p className="text-red-300 text-sm">
-                        Sorry, something went wrong. Please try again or email us directly at info@cubico.tech
+                        Sorry, something went wrong. Please try again or email us directly at info@cubicotech.com
                       </p>
                     </motion.div>
                   )}
@@ -312,7 +312,7 @@ function ContactPageContent() {
                         name="phone"
                         value={formData.phone}
                         onChange={handleChange}
-                        placeholder="+92 XXX XXXXXXX"
+                        placeholder="+1 (347) 718-8716"
                         className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition-all duration-200"
                       />
                     </div>
@@ -419,9 +419,9 @@ function ContactPageContent() {
             <div>
               <h3 className="text-2xl font-bold mb-6">Get in Touch</h3>
 
-              {/* Email Card */}
+              {/* Email Cards */}
               <a
-                href="mailto:info@cubico.tech"
+                href="mailto:info@cubicotech.com"
                 className="block bg-white/3 border border-white/5 rounded-2xl p-6 mb-4 hover:border-white/10 hover:-translate-y-1 transition-all duration-300 group"
               >
                 <div className="flex items-start gap-4">
@@ -431,15 +431,32 @@ function ContactPageContent() {
                     </svg>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-400 mb-1">Email Us</p>
-                    <p className="text-white font-medium group-hover:underline">info@cubico.tech</p>
+                    <p className="text-sm text-gray-400 mb-1">General Inquiries</p>
+                    <p className="text-white font-medium group-hover:underline">info@cubicotech.com</p>
+                  </div>
+                </div>
+              </a>
+
+              <a
+                href="mailto:sales@cubicotech.com"
+                className="block bg-white/3 border border-white/5 rounded-2xl p-6 mb-4 hover:border-white/10 hover:-translate-y-1 transition-all duration-300 group"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center flex-shrink-0">
+                    <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-400 mb-1">Sales & Projects</p>
+                    <p className="text-white font-medium group-hover:underline">sales@cubicotech.com</p>
                   </div>
                 </div>
               </a>
 
               {/* Phone Card */}
               <a
-                href="tel:+92XXXXXXXXXX"
+                href="tel:+13477188716"
                 className="block bg-white/3 border border-white/5 rounded-2xl p-6 mb-4 hover:border-white/10 hover:-translate-y-1 transition-all duration-300 group"
               >
                 <div className="flex items-start gap-4">
@@ -450,7 +467,7 @@ function ContactPageContent() {
                   </div>
                   <div>
                     <p className="text-sm text-gray-400 mb-1">Call Us</p>
-                    <p className="text-white font-medium group-hover:underline">+92 XXX XXXXXXX</p>
+                    <p className="text-white font-medium group-hover:underline">+1 (347) 718-8716</p>
                   </div>
                 </div>
               </a>
@@ -466,8 +483,8 @@ function ContactPageContent() {
                   </div>
                   <div>
                     <p className="text-sm text-gray-400 mb-1">Visit Us</p>
-                    <p className="text-white font-medium">Karachi, Pakistan</p>
-                    <p className="text-sm text-gray-500 mt-1">We also serve clients worldwide</p>
+                    <p className="text-white font-medium">17965 SW 1st Street</p>
+                    <p className="text-sm text-gray-400">Pembroke Pines, FL 33029</p>
                   </div>
                 </div>
               </div>
@@ -490,7 +507,7 @@ function ContactPageContent() {
                     <span className="font-medium text-white">Sunday</span>
                     <span className="text-gray-400">Closed</span>
                   </div>
-                  <p className="text-sm text-gray-500 pt-2">Pakistan Standard Time (PKT)</p>
+                  <p className="text-sm text-gray-500 pt-2">Eastern Standard Time (EST)</p>
                 </div>
               </div>
             </div>
@@ -624,7 +641,7 @@ function ContactPageContent() {
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4">
             <a
-              href="mailto:info@cubico.tech"
+              href="mailto:info@cubicotech.com"
               className="px-8 py-4 bg-gradient-to-r from-purple-600 to-cyan-600 text-white font-semibold rounded-full hover:brightness-110 transition-all duration-300 hover:scale-105"
             >
               Email Us
