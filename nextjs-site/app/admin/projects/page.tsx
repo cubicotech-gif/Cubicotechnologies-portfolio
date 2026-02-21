@@ -100,22 +100,33 @@ export default function AdminProjectsPage() {
     setMessage('Uploading...');
 
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const response = await fetch('/api/upload-image', {
+      // Get signed upload URL
+      const urlRes = await fetch('/api/upload-url', {
         method: 'POST',
-        body: formData,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename: file.name, contentType: file.type }),
+      });
+      const urlData = await urlRes.json();
+
+      if (!urlData.success) {
+        setMessage('❌ ' + (urlData.error || 'Failed to get upload URL'));
+        setUploading(false);
+        return;
+      }
+
+      // Upload directly to Supabase
+      const uploadRes = await fetch(urlData.signedUrl, {
+        method: 'PUT',
+        headers: { 'Content-Type': file.type },
+        body: file,
       });
 
-      const data = await response.json();
-
-      if (data.success) {
-        setMessage(`✅ File uploaded: ${data.filename}`);
-        setImageUrl(data.url || data.path);
+      if (uploadRes.ok) {
+        setMessage(`✅ File uploaded: ${urlData.filename}`);
+        setImageUrl(urlData.publicUrl);
         await fetchLibraryImages();
       } else {
-        setMessage('❌ ' + (data.error || 'Upload failed'));
+        setMessage('❌ Upload failed');
       }
     } catch (error) {
       console.error('Upload error:', error);

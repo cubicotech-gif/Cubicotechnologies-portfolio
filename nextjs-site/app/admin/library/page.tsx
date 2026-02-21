@@ -57,6 +57,39 @@ export default function ImageLibraryPage() {
     fetchImages();
   }, []);
 
+  // Upload a single file using signed URL (direct to Supabase, no size limit)
+  const uploadSingleFile = async (file: File): Promise<{ success: boolean; error?: string }> => {
+    try {
+      // Step 1: Get a signed upload URL from our API
+      const urlResponse = await fetch('/api/upload-url', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename: file.name, contentType: file.type }),
+      });
+
+      const urlData = await urlResponse.json();
+
+      if (!urlData.success) {
+        return { success: false, error: urlData.error || 'Failed to get upload URL' };
+      }
+
+      // Step 2: Upload file directly to Supabase using the signed URL
+      const uploadResponse = await fetch(urlData.signedUrl, {
+        method: 'PUT',
+        headers: { 'Content-Type': file.type },
+        body: file,
+      });
+
+      if (!uploadResponse.ok) {
+        return { success: false, error: `Upload failed (${uploadResponse.status})` };
+      }
+
+      return { success: true };
+    } catch (error: any) {
+      return { success: false, error: error.message || 'Network error' };
+    }
+  };
+
   // Handle single or multi file upload
   const handleFileUpload = async (fileList: FileList) => {
     const files = Array.from(fileList);
@@ -73,24 +106,20 @@ export default function ImageLibraryPage() {
       const file = files[i];
       setUploadProgress({ total: files.length, done: i, current: file.name });
 
-      try {
-        const formData = new FormData();
-        formData.append('file', file);
+      // Validate file size on client side
+      const isVideo = file.type.startsWith('video/');
+      const maxSize = isVideo ? 100 * 1024 * 1024 : 50 * 1024 * 1024;
+      if (file.size > maxSize) {
+        errors.push(`${file.name}: File too large (max ${isVideo ? '100MB' : '50MB'})`);
+        continue;
+      }
 
-        const response = await fetch('/api/upload-image', {
-          method: 'POST',
-          body: formData,
-        });
+      const result = await uploadSingleFile(file);
 
-        const data = await response.json();
-
-        if (data.success) {
-          successCount++;
-        } else {
-          errors.push(`${file.name}: ${data.error || 'Upload failed'}`);
-        }
-      } catch (error) {
-        errors.push(`${file.name}: Network error`);
+      if (result.success) {
+        successCount++;
+      } else {
+        errors.push(`${file.name}: ${result.error}`);
       }
     }
 

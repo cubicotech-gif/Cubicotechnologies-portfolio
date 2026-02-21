@@ -3,7 +3,7 @@ import { supabaseAdmin } from '@/lib/supabase';
 
 export const runtime = 'nodejs';
 
-// Increase body size limit for large file uploads (100MB)
+// Increase timeout for large file uploads
 export const maxDuration = 60;
 
 // All images go to a single library folder
