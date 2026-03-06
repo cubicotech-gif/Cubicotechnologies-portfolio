@@ -335,7 +335,7 @@ export default function PortfolioPage() {
                   exit={{ opacity: 0, scale: 0.9 }}
                   transition={{ duration: 0.4, delay: index * 0.05 }}
                   className={`group relative overflow-hidden rounded-2xl bg-zinc-900 cursor-pointer ${
-                    index % 7 === 0 ? 'md:col-span-2 md:row-span-2 aspect-[16/10]' : 'aspect-[4/5]'
+                    index % 7 === 0 ? 'md:col-span-2 md:row-span-2' : 'aspect-[4/5]'
                   }`}
                   onClick={() => setSelectedProject(item)}
                 >
