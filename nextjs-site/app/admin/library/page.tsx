@@ -58,6 +58,7 @@ export default function ImageLibraryPage() {
   }, []);
 
   // Handle single or multi file upload
+  // Uses direct-to-Supabase upload via signed URLs to bypass Vercel's 4.5MB body limit
   const handleFileUpload = async (fileList: FileList) => {
     const files = Array.from(fileList);
     if (files.length === 0) return;
@@ -74,31 +75,37 @@ export default function ImageLibraryPage() {
       setUploadProgress({ total: files.length, done: i, current: file.name });
 
       try {
-        const formData = new FormData();
-        formData.append('file', file);
-
-        const response = await fetch('/api/upload-image', {
+        // Step 1: Get a signed upload URL from our server (tiny request — no file data)
+        const urlResponse = await fetch('/api/get-upload-url', {
           method: 'POST',
-          body: formData,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            filename: file.name,
+            contentType: file.type,
+            fileSize: file.size,
+          }),
         });
 
-        if (response.status === 413) {
-          errors.push(`${file.name}: File too large for server (HTTP 413). Contact hosting support to increase upload limits.`);
+        const urlData = await urlResponse.json();
+
+        if (!urlData.success) {
+          errors.push(`${file.name}: ${urlData.error || 'Failed to get upload URL'}`);
           continue;
         }
 
-        if (!response.ok) {
-          errors.push(`${file.name}: Server error (HTTP ${response.status})`);
+        // Step 2: Upload the file directly from browser to Supabase (bypasses Vercel limits)
+        const uploadResponse = await fetch(urlData.signedUrl, {
+          method: 'PUT',
+          headers: { 'Content-Type': file.type },
+          body: file,
+        });
+
+        if (!uploadResponse.ok) {
+          errors.push(`${file.name}: Upload to storage failed (HTTP ${uploadResponse.status})`);
           continue;
         }
 
-        const data = await response.json();
-
-        if (data.success) {
-          successCount++;
-        } else {
-          errors.push(`${file.name}: ${data.error || 'Upload failed'}`);
-        }
+        successCount++;
       } catch (error) {
         errors.push(`${file.name}: Request failed - check network connection`);
       }
