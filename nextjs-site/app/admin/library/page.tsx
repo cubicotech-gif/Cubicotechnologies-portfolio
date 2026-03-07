@@ -82,6 +82,16 @@ export default function ImageLibraryPage() {
           body: formData,
         });
 
+        if (response.status === 413) {
+          errors.push(`${file.name}: File too large for server (HTTP 413). Contact hosting support to increase upload limits.`);
+          continue;
+        }
+
+        if (!response.ok) {
+          errors.push(`${file.name}: Server error (HTTP ${response.status})`);
+          continue;
+        }
+
         const data = await response.json();
 
         if (data.success) {
@@ -90,7 +100,7 @@ export default function ImageLibraryPage() {
           errors.push(`${file.name}: ${data.error || 'Upload failed'}`);
         }
       } catch (error) {
-        errors.push(`${file.name}: Network error`);
+        errors.push(`${file.name}: Request failed - check network connection`);
       }
     }
 
