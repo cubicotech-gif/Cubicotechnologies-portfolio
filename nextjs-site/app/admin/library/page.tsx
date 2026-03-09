@@ -58,6 +58,7 @@ export default function ImageLibraryPage() {
   }, []);
 
   // Handle single or multi file upload
+  // Uses direct-to-Supabase upload via signed URLs to bypass Vercel's 4.5MB body limit
   const handleFileUpload = async (fileList: FileList) => {
     const files = Array.from(fileList);
     if (files.length === 0) return;
@@ -74,23 +75,46 @@ export default function ImageLibraryPage() {
       setUploadProgress({ total: files.length, done: i, current: file.name });
 
       try {
-        const formData = new FormData();
-        formData.append('file', file);
-
-        const response = await fetch('/api/upload-image', {
+        // Step 1: Get a signed upload URL from our server (tiny request — no file data)
+        const urlResponse = await fetch('/api/get-upload-url', {
           method: 'POST',
-          body: formData,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            filename: file.name,
+            contentType: file.type,
+            fileSize: file.size,
+          }),
         });
 
-        const data = await response.json();
+        const urlData = await urlResponse.json();
 
-        if (data.success) {
-          successCount++;
-        } else {
-          errors.push(`${file.name}: ${data.error || 'Upload failed'}`);
+        if (!urlData.success) {
+          errors.push(`${file.name}: ${urlData.error || 'Failed to get upload URL'}`);
+          continue;
         }
+
+        // Step 2: Upload the file directly from browser to Supabase (bypasses Vercel limits)
+        const contentType = file.type || 'application/octet-stream';
+        const uploadResponse = await fetch(urlData.signedUrl, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': contentType,
+            'x-upsert': 'false',
+            'Cache-Control': 'max-age=3600',
+          },
+          body: file,
+        });
+
+        if (!uploadResponse.ok) {
+          let detail = '';
+          try { detail = await uploadResponse.text(); } catch { /* ignore */ }
+          errors.push(`${file.name}: Supabase upload failed (HTTP ${uploadResponse.status})${detail ? ': ' + detail : ''}`);
+          continue;
+        }
+
+        successCount++;
       } catch (error) {
-        errors.push(`${file.name}: Network error`);
+        errors.push(`${file.name}: Request failed - check network connection`);
       }
     }
 

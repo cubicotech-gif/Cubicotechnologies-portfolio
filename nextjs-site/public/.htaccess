@@ -1,0 +1,8 @@
+# Increase upload size limit for video uploads
+# This removes Apache's body size restriction so large video files can pass through to Next.js
+LimitRequestBody 0
+
+# If using Phusion Passenger (HostGator Node.js hosting)
+<IfModule mod_passenger.c>
+    PassengerMaxRequestBodySize 0
+</IfModule>
