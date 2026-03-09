@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { supabase } from '@/lib/supabase';
 
 interface LibraryImage {
   filename: string;
@@ -58,6 +59,9 @@ export default function ImageLibraryPage() {
   }, []);
 
   // Handle single or multi file upload
+  // Uses a two-step flow to bypass Vercel's 4.5MB payload limit:
+  //   1. Send only filename/type/size to Vercel → get a Supabase signed URL back
+  //   2. Upload the actual file bytes directly from the browser to Supabase
   const handleFileUpload = async (fileList: FileList) => {
     const files = Array.from(fileList);
     if (files.length === 0) return;
@@ -74,21 +78,31 @@ export default function ImageLibraryPage() {
       setUploadProgress({ total: files.length, done: i, current: file.name });
 
       try {
-        const formData = new FormData();
-        formData.append('file', file);
-
-        const response = await fetch('/api/upload-image', {
+        // Step 1: Get a signed upload URL from the server (tiny JSON — no file bytes)
+        const response = await fetch('/api/upload-signed-url', {
           method: 'POST',
-          body: formData,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filename: file.name, contentType: file.type, fileSize: file.size }),
         });
 
         const data = await response.json();
 
-        if (data.success) {
-          successCount++;
-        } else {
-          errors.push(`${file.name}: ${data.error || 'Upload failed'}`);
+        if (!data.success) {
+          errors.push(`${file.name}: ${data.error || 'Failed to get upload URL'}`);
+          continue;
         }
+
+        // Step 2: Upload file directly from browser → Supabase (Vercel never sees the bytes)
+        const { error: uploadError } = await supabase.storage
+          .from('images')
+          .uploadToSignedUrl(data.path, data.token, file, { contentType: file.type });
+
+        if (uploadError) {
+          errors.push(`${file.name}: ${uploadError.message}`);
+          continue;
+        }
+
+        successCount++;
       } catch (error) {
         errors.push(`${file.name}: Network error`);
       }
