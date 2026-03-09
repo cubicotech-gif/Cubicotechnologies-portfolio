@@ -14,6 +14,14 @@ const validTypes = [
 // bypassing Vercel's 4.5MB serverless function body size limit.
 export async function POST(request: NextRequest) {
   try {
+    if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      console.error('SUPABASE_SERVICE_ROLE_KEY is not set — signed URL creation will fail');
+      return NextResponse.json(
+        { success: false, error: 'Server storage credentials are not configured. Please set SUPABASE_SERVICE_ROLE_KEY in Vercel environment variables.' },
+        { status: 500 }
+      );
+    }
+
     const { filename, contentType, fileSize } = await request.json();
 
     if (!filename || !contentType) {

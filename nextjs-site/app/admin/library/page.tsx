@@ -94,14 +94,21 @@ export default function ImageLibraryPage() {
         }
 
         // Step 2: Upload the file directly from browser to Supabase (bypasses Vercel limits)
+        const contentType = file.type || 'application/octet-stream';
         const uploadResponse = await fetch(urlData.signedUrl, {
           method: 'PUT',
-          headers: { 'Content-Type': file.type },
+          headers: {
+            'Content-Type': contentType,
+            'x-upsert': 'false',
+            'Cache-Control': 'max-age=3600',
+          },
           body: file,
         });
 
         if (!uploadResponse.ok) {
-          errors.push(`${file.name}: Upload to storage failed (HTTP ${uploadResponse.status})`);
+          let detail = '';
+          try { detail = await uploadResponse.text(); } catch { /* ignore */ }
+          errors.push(`${file.name}: Supabase upload failed (HTTP ${uploadResponse.status})${detail ? ': ' + detail : ''}`);
           continue;
         }
 
