@@ -335,14 +335,12 @@ export default function PortfolioPage() {
                   exit={{ opacity: 0, scale: 0.9 }}
                   transition={{ duration: 0.4, delay: index * 0.05 }}
                   className={`group relative overflow-hidden rounded-2xl bg-zinc-900 cursor-pointer ${
-                    index % 7 === 0 ? 'md:col-span-2 md:row-span-2' : ''
+                    index % 7 === 0 ? 'md:col-span-2 md:row-span-2 aspect-[4/5]' : 'aspect-[4/5]'
                   }`}
                   onClick={() => setSelectedProject(item)}
                 >
-                  {/* Media Container */}
-                  <div className={`relative overflow-hidden ${
-                    index % 7 === 0 ? 'aspect-[16/10]' : 'aspect-[4/5]'
-                  }`}>
+                  {/* Media Container - fills entire card */}
+                  <div className="absolute inset-0 overflow-hidden">
                     {item.media_type === 'video' || isVideoUrl(item.image_url || item.imageUrl || '') ? (
                       <video
                         src={item.image_url || item.imageUrl || ''}
