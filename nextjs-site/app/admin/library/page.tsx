@@ -27,6 +27,12 @@ export default function ImageLibraryPage() {
   const [deleting, setDeleting] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Focal point state
+  const [focalPoints, setFocalPoints] = useState<Record<string, { focal_x: number; focal_y: number }>>({});
+  const [editingFocalPoint, setEditingFocalPoint] = useState<LibraryImage | null>(null);
+  const [tempFocal, setTempFocal] = useState({ x: 50, y: 50 });
+  const [savingFocal, setSavingFocal] = useState(false);
+
   const showMessage = (text: string, type: 'success' | 'error' | 'info' = 'info') => {
     setMessage(text);
     setMessageType(type);
@@ -54,8 +60,17 @@ export default function ImageLibraryPage() {
     }
   };
 
+  const fetchFocalPoints = async () => {
+    try {
+      const res = await fetch('/api/image-metadata');
+      const data = await res.json();
+      if (data.success) setFocalPoints(data.metadata ?? {});
+    } catch { /* non-critical — thumbnails fall back to center */ }
+  };
+
   useEffect(() => {
     fetchImages();
+    fetchFocalPoints();
   }, []);
 
   // Handle single or multi file upload
@@ -123,6 +138,44 @@ export default function ImageLibraryPage() {
 
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
+    }
+  };
+
+  // Focal point editor
+  const openFocalPointEditor = (image: LibraryImage) => {
+    const existing = focalPoints[image.url];
+    setTempFocal({ x: existing?.focal_x ?? 50, y: existing?.focal_y ?? 50 });
+    setEditingFocalPoint(image);
+  };
+
+  const updateFocalFromPointer = (e: React.PointerEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = Math.round(((e.clientX - rect.left) / rect.width) * 100);
+    const y = Math.round(((e.clientY - rect.top) / rect.height) * 100);
+    setTempFocal({ x: Math.max(0, Math.min(100, x)), y: Math.max(0, Math.min(100, y)) });
+  };
+
+  const saveFocalPoint = async () => {
+    if (!editingFocalPoint) return;
+    setSavingFocal(true);
+    try {
+      const res = await fetch('/api/image-metadata', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: editingFocalPoint.url, focal_x: tempFocal.x, focal_y: tempFocal.y }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setFocalPoints(prev => ({ ...prev, [editingFocalPoint.url]: { focal_x: tempFocal.x, focal_y: tempFocal.y } }));
+        setEditingFocalPoint(null);
+        showMessage('✅ Focal point saved!', 'success');
+      } else {
+        showMessage('❌ Failed to save: ' + (data.error || ''), 'error');
+      }
+    } catch {
+      showMessage('❌ Network error saving focal point', 'error');
+    } finally {
+      setSavingFocal(false);
     }
   };
 
@@ -458,6 +511,11 @@ export default function ImageLibraryPage() {
                         alt={image.filename}
                         fill
                         className="object-cover"
+                        style={{
+                          objectPosition: focalPoints[image.url]
+                            ? `${focalPoints[image.url].focal_x}% ${focalPoints[image.url].focal_y}%`
+                            : 'center',
+                        }}
                       />
                     )}
 
@@ -480,6 +538,19 @@ export default function ImageLibraryPage() {
                       </p>
                     ) : null}
 
+                    {image.media_type !== 'video' && (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); openFocalPointEditor(image); }}
+                        className="w-full px-2 py-1.5 bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-400 text-xs rounded transition-colors flex items-center justify-center gap-1"
+                      >
+                        🎯 Focal Point
+                        {focalPoints[image.url] && (
+                          <span className="text-cyan-600">
+                            ({focalPoints[image.url].focal_x}%,{focalPoints[image.url].focal_y}%)
+                          </span>
+                        )}
+                      </button>
+                    )}
                     <div className="flex gap-2">
                       <button
                         onClick={(e) => {
@@ -565,6 +636,142 @@ export default function ImageLibraryPage() {
                   />
                 </div>
               )}
+            </div>
+          </div>
+        )}
+
+        {/* Focal Point Editor Modal */}
+        {editingFocalPoint && (
+          <div
+            className="fixed inset-0 bg-black/90 z-[60] flex items-center justify-center p-4"
+            onClick={() => setEditingFocalPoint(null)}
+          >
+            <div
+              className="bg-zinc-900 border border-white/10 rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between p-5 border-b border-white/10">
+                <div>
+                  <h2 className="text-white font-bold text-lg">🎯 Set Focal Point</h2>
+                  <p className="text-gray-500 text-xs mt-0.5">
+                    Click or drag on the image to set which area stays visible when cropped
+                  </p>
+                </div>
+                <button
+                  onClick={() => setEditingFocalPoint(null)}
+                  className="text-gray-400 hover:text-white text-2xl leading-none px-2"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Left: interactive focal point selector */}
+                <div>
+                  <p className="text-gray-400 text-sm mb-3">
+                    Click (or click-drag) to move the crosshair to the most important part of the image.
+                  </p>
+                  <div
+                    className="relative rounded-lg overflow-hidden bg-black select-none cursor-crosshair"
+                    onPointerDown={(e) => {
+                      e.currentTarget.setPointerCapture(e.pointerId);
+                      updateFocalFromPointer(e);
+                    }}
+                    onPointerMove={(e) => {
+                      if (e.buttons === 1) updateFocalFromPointer(e);
+                    }}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={editingFocalPoint.url}
+                      alt=""
+                      className="w-full h-auto block"
+                      draggable={false}
+                    />
+                    {/* Crosshair */}
+                    <div
+                      className="absolute pointer-events-none"
+                      style={{ left: `${tempFocal.x}%`, top: `${tempFocal.y}%`, transform: 'translate(-50%, -50%)' }}
+                    >
+                      {/* top line */}
+                      <div className="absolute left-1/2 -translate-x-px bg-white opacity-90" style={{ bottom: '50%', marginBottom: 14, width: 2, height: 16 }} />
+                      {/* bottom line */}
+                      <div className="absolute left-1/2 -translate-x-px bg-white opacity-90" style={{ top: '50%', marginTop: 14, width: 2, height: 16 }} />
+                      {/* left line */}
+                      <div className="absolute top-1/2 -translate-y-px bg-white opacity-90" style={{ right: '50%', marginRight: 14, height: 2, width: 16 }} />
+                      {/* right line */}
+                      <div className="absolute top-1/2 -translate-y-px bg-white opacity-90" style={{ left: '50%', marginLeft: 14, height: 2, width: 16 }} />
+                      {/* circle */}
+                      <div
+                        className="w-7 h-7 rounded-full border-2 border-white flex items-center justify-center"
+                        style={{ boxShadow: '0 0 0 1.5px rgba(0,0,0,0.6)' }}
+                      >
+                        <div className="w-1.5 h-1.5 bg-white rounded-full" />
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-gray-600 text-xs mt-2 text-center">
+                    Position: <span className="text-gray-400 font-mono">{tempFocal.x}% × {tempFocal.y}%</span>
+                    <span className="ml-2 text-gray-600">(default 50% × 50%)</span>
+                  </p>
+                </div>
+
+                {/* Right: live previews at different aspect ratios */}
+                <div className="space-y-5">
+                  <p className="text-gray-400 text-sm">Live crop previews — updates as you drag:</p>
+
+                  {/* Square */}
+                  <div>
+                    <p className="text-gray-500 text-xs mb-1.5 font-medium">Library thumbnail · Square (1:1)</p>
+                    <div className="aspect-square w-full rounded-lg overflow-hidden bg-black">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={editingFocalPoint.url}
+                        alt=""
+                        className="w-full h-full object-cover"
+                        style={{ objectPosition: `${tempFocal.x}% ${tempFocal.y}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Portrait */}
+                  <div>
+                    <p className="text-gray-500 text-xs mb-1.5 font-medium">Portfolio card · Portrait (4:5)</p>
+                    <div className="w-full rounded-lg overflow-hidden bg-black" style={{ aspectRatio: '4/5' }}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={editingFocalPoint.url}
+                        alt=""
+                        className="w-full h-full object-cover"
+                        style={{ objectPosition: `${tempFocal.x}% ${tempFocal.y}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="flex items-center justify-between px-5 py-4 border-t border-white/10">
+                <p className="text-gray-600 text-xs max-w-xs">
+                  Saved focal points are applied automatically to all thumbnails in the admin library.
+                </p>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setEditingFocalPoint(null)}
+                    className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={saveFocalPoint}
+                    disabled={savingFocal}
+                    className="px-5 py-2 bg-purple-500 hover:bg-purple-600 disabled:opacity-50 text-white rounded-lg text-sm font-semibold transition-colors"
+                  >
+                    {savingFocal ? '⏳ Saving…' : '✅ Save Focal Point'}
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         )}
