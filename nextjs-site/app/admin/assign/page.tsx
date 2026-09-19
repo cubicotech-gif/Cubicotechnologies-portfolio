@@ -122,23 +122,25 @@ const IMAGE_SECTIONS: Record<string, ImageSection> = {
   },
   portfolio: {
     id: 'portfolio',
-    name: 'Portfolio Gallery',
-    description: 'Portfolio page project showcase',
-    icon: '📁',
+    name: 'Lesson Showcase',
+    description: 'Lessons shown on the showcase page, in both sections',
+    icon: '🎬',
     dimensions: {
-      width: 800,
-      height: 600,
-      aspectRatio: '4:3 (Landscape)',
-      note: 'High-quality project images. Displayed in masonry grid with filtering.'
+      width: 1280,
+      height: 800,
+      aspectRatio: '16:10 (Landscape)',
+      note: 'Poster frame for the lesson card. Leave the embed URL blank to use an uploaded video file instead.'
     },
     apiEndpoint: '/api/portfolio',
     extraFields: [
-      { name: 'title', label: 'Project Title', type: 'text', required: true },
-      { name: 'category', label: 'Category', type: 'select', options: ['Artwork Designing', 'Branding & Graphics', 'Social Media', 'Videography'], required: true },
-      { name: 'client', label: 'Client Name', type: 'text', required: true },
+      { name: 'title', label: 'Lesson Title', type: 'text', required: true },
+      { name: 'section', label: 'Showcase Section', type: 'select', options: ['academic', 'islamic'], required: true },
+      { name: 'subject', label: 'Subject', type: 'select', options: ['Mathematics', 'Science', 'History', 'Literacy', "Qur'anic Studies", 'Arabic Language', 'Islamic History', 'Foundations'], required: true },
       { name: 'description', label: 'Description', type: 'textarea', required: true },
-      { name: 'year', label: 'Year', type: 'select', options: ['2025', '2024', '2023', '2022', '2021', '2020'], required: true },
-      { name: 'services', label: 'Services (comma-separated)', type: 'text', required: false }
+      { name: 'year_group', label: 'Year Group', type: 'select', options: ['Early Years (3-5)', 'Primary (5-11)', 'Lower Secondary (11-14)', 'Upper Secondary (14-16)', 'Post-16 / College', 'Mixed / Whole school'], required: false },
+      { name: 'duration', label: 'Runtime (e.g. 4:20)', type: 'text', required: false },
+      { name: 'embed_url', label: 'YouTube / Vimeo URL (optional)', type: 'url', required: false },
+      { name: 'outcomes', label: 'Learning outcomes (one per line)', type: 'textarea', required: false }
     ]
   },
   logos: {
@@ -243,14 +245,24 @@ export default function UnifiedImageManager() {
         delete requestBody.filename;
         delete requestBody.url;
       } else if (currentSection.id === 'portfolio') {
+        // A selected video from the library becomes the playable file; a
+        // selected image becomes the poster frame.
+        const isVideoFile = selectedImage.media_type === 'video';
         requestBody = {
           title: extraFieldValues.title,
-          category: extraFieldValues.category,
-          client: extraFieldValues.client,
+          section: extraFieldValues.section,
+          subject: extraFieldValues.subject,
           description: extraFieldValues.description,
-          image_url: selectedImage.url,
-          year: extraFieldValues.year,
-          services: extraFieldValues.services ? extraFieldValues.services.split(',').map((s: string) => s.trim()) : [],
+          image_url: isVideoFile ? null : selectedImage.url,
+          poster_url: isVideoFile ? null : selectedImage.url,
+          video_url: isVideoFile ? selectedImage.url : null,
+          embed_url: extraFieldValues.embed_url || null,
+          media_type: isVideoFile || extraFieldValues.embed_url ? 'video' : 'image',
+          year_group: extraFieldValues.year_group || null,
+          duration: extraFieldValues.duration || null,
+          outcomes: extraFieldValues.outcomes
+            ? extraFieldValues.outcomes.split('\n').map((s: string) => s.trim()).filter(Boolean)
+            : [],
           order: order,
         };
       } else if (currentSection.id === 'logos') {

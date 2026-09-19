@@ -1,14 +1,29 @@
+// Derive the Supabase storage host from the env var so the image allowlist
+// follows the project instead of being pinned to one hardcoded ref.
+const supabaseHost = process.env.NEXT_PUBLIC_SUPABASE_URL
+  ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname
+  : 'snlehtiwmoxqxcglnlwd.supabase.co';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
-    serverBodySizeLimit: '110mb',
+    serverActions: {
+      // Large media never goes through the server: the admin panel uploads
+      // straight from the browser to Supabase. This only covers form posts.
+      bodySizeLimit: '10mb',
+    },
   },
   images: {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'snlehtiwmoxqxcglnlwd.supabase.co',
+        hostname: supabaseHost,
         pathname: '/storage/v1/object/public/**',
+      },
+      // Poster frames pulled from YouTube for embedded lessons.
+      {
+        protocol: 'https',
+        hostname: 'i.ytimg.com',
       },
     ],
     // Preserve image quality

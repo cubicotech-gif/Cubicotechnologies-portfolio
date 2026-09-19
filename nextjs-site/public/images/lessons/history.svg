@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 800" role="img" aria-label="Historical map">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2563eb"/>
+      <stop offset="1" stop-color="#1d4fd8"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="800" fill="url(#bg)"/>
+  <circle cx="1140" cy="110" r="150" fill="#ffffff" opacity=".07"/>
+  <circle cx="120" cy="700" r="190" fill="#ffffff" opacity=".05"/>
+
+  <g fill="none" stroke="#ffffff" stroke-width="9" opacity=".45">
+    <path d="M180 250 q140 -70 280 0 t280 -30 190 60"/>
+    <path d="M180 360 q140 -70 280 0 t280 -30 190 60"/>
+    <path d="M180 470 q140 -70 280 0 t280 -30 190 60"/>
+  </g>
+  <path d="M640 140 l150 90 v300 l-150 90 -150 -90 V230 Z" fill="#ffffff" opacity=".12"/>
+  <circle cx="640" cy="380" r="34" fill="#f6c945"/>
+  <g>
+    <rect x="180" y="640" width="920" height="8" rx="4" fill="#ffffff" opacity=".35"/>
+    <circle cx="280" cy="644" r="20" fill="#ffffff"/>
+    <circle cx="560" cy="644" r="20" fill="#f6c945"/>
+    <circle cx="840" cy="644" r="20" fill="#ffffff" opacity=".7"/>
+    <circle cx="1060" cy="644" r="20" fill="#ffffff" opacity=".5"/>
+  </g>
+</svg>

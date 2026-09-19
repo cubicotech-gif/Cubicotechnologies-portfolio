@@ -1,83 +1,92 @@
 import Link from 'next/link';
+import Icon from '@/components/Icon';
+import { SITE } from '@/lib/site';
+
+const quickLinks = [
+  { href: '/showcase', label: 'Showcase' },
+  { href: '/services', label: 'How we work' },
+  { href: '/about', label: 'About' },
+  { href: '/contact', label: 'Contact' },
+];
+
+const subjectLinks = [
+  { href: '/showcase#academic', label: 'Academic Concepts' },
+  { href: '/showcase#islamic', label: 'Islamic Studies & Arabic' },
+];
 
 export default function Footer() {
-  const currentYear = new Date().getFullYear();
-
-  const footerLinks = [
-    { href: '/portfolio', label: 'Portfolio' },
-    { href: '/services', label: 'Services' },
-    { href: '/about', label: 'About' },
-    { href: '/contact', label: 'Contact' },
-  ];
-
-  const socialLinks = [
-    { name: 'Instagram', icon: '📷', href: '#' },
-    { name: 'LinkedIn', icon: '💼', href: '#' },
-    { name: 'Behance', icon: '🎨', href: '#' },
-    { name: 'Twitter', icon: '🐦', href: '#' },
-  ];
+  const year = new Date().getFullYear();
 
   return (
-    <footer className="relative bg-black border-t border-white/10">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-          {/* Company Info */}
-          <div>
-            <h3 className="text-2xl font-bold text-white mb-3">CUBICO</h3>
-            <p className="text-gray-400 text-sm leading-relaxed">
-              Creative Excellence Since 2020
-              <br />
-              Crafting exceptional visual experiences for global brands.
-            </p>
+    <footer className="bg-navy-950 text-white">
+      <div className="section-shell grid gap-10 py-14 md:grid-cols-4">
+        <div className="md:col-span-2">
+          <div className="flex items-center gap-3">
+            <span
+              aria-hidden="true"
+              className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-600 text-white"
+            >
+              <Icon name="sparkles" size={18} />
+            </span>
+            <span className="font-semibold tracking-tight">{SITE.shortName}</span>
           </div>
-
-          {/* Quick Links */}
-          <div>
-            <h4 className="text-white font-semibold mb-4">Quick Links</h4>
-            <ul className="space-y-2">
-              {footerLinks.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-gray-400 hover:text-white text-sm transition-colors duration-300"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Social Media */}
-          <div>
-            <h4 className="text-white font-semibold mb-4">Connect With Us</h4>
-            <div className="flex space-x-4">
-              {socialLinks.map((social) => (
-                <a
-                  key={social.name}
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 flex items-center justify-center bg-white/5 hover:bg-white/10 rounded-full transition-all duration-300 hover:scale-110"
-                  aria-label={social.name}
-                >
-                  <span className="text-xl">{social.icon}</span>
-                </a>
-              ))}
-            </div>
-          </div>
+          <p className="mt-4 max-w-md text-sm leading-7 text-[#c8d9f4]">
+            {SITE.description}
+          </p>
+          <a
+            href={`mailto:${SITE.email}`}
+            className="focus-ring mt-5 inline-flex items-center gap-2 rounded-lg text-sm font-semibold text-white hover:text-accent-300"
+          >
+            <Icon name="mail" size={17} />
+            {SITE.email}
+          </a>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="pt-8 border-t border-white/10">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-gray-400 text-sm text-center md:text-left">
-              © {currentYear} Cubico Technologies. All rights reserved.
-            </p>
-            <p className="text-gray-500 text-xs">
-              Designed & Developed with ❤️ by Cubico
-            </p>
-          </div>
+        <nav aria-label="Footer">
+          <h2 className="text-sm font-bold uppercase tracking-[0.12em] text-[#8fd2ff]">
+            Studio
+          </h2>
+          <ul className="mt-4 space-y-2.5">
+            {quickLinks.map((link) => (
+              <li key={link.href}>
+                <Link
+                  href={link.href}
+                  className="focus-ring rounded text-sm text-[#c8d9f4] transition hover:text-white"
+                >
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        <nav aria-label="Showcase sections">
+          <h2 className="text-sm font-bold uppercase tracking-[0.12em] text-[#8fd2ff]">
+            Lesson areas
+          </h2>
+          <ul className="mt-4 space-y-2.5">
+            {subjectLinks.map((link) => (
+              <li key={link.href}>
+                <Link
+                  href={link.href}
+                  className="focus-ring rounded text-sm text-[#c8d9f4] transition hover:text-white"
+                >
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </div>
+
+      <div className="section-shell">
+        <div className="flex flex-col gap-3 border-t border-white/15 py-7 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-[#a9c0e5]">
+            &copy; {year} {SITE.name}. All rights reserved.
+          </p>
+          <p className="text-sm text-[#a9c0e5]">
+            Thoughtful animation for clearer learning.
+          </p>
         </div>
       </div>
     </footer>
