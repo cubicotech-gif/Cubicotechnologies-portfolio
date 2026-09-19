@@ -1,7 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase';
+import { supabaseAdmin, supabaseConfigError, explainSupabaseError } from '@/lib/supabase';
 
 export const runtime = 'nodejs';
+
+/**
+ * Fails fast with the actual cause when Supabase is misconfigured, rather
+ * than letting the request surface an opaque "fetch failed".
+ */
+function configGuard() {
+  if (!supabaseConfigError) return null;
+  return NextResponse.json(
+    { success: false, error: supabaseConfigError },
+    { status: 503 }
+  );
+}
 
 // Increase body size limit for large file uploads (100MB)
 export const maxDuration = 60;
@@ -10,6 +22,9 @@ export const maxDuration = 60;
 const LIBRARY_FOLDER = 'library';
 
 export async function POST(request: NextRequest) {
+  const blocked = configGuard();
+  if (blocked) return blocked;
+
   try {
     const formData = await request.formData();
     const files = formData.getAll('file') as File[];
@@ -127,6 +142,9 @@ export async function POST(request: NextRequest) {
 
 // GET: List all images from the library
 export async function GET(request: NextRequest) {
+  const blocked = configGuard();
+  if (blocked) return blocked;
+
   try {
     const { data: files, error } = await supabaseAdmin.storage
       .from('images')
@@ -187,6 +205,9 @@ export async function GET(request: NextRequest) {
 
 // DELETE: Remove file from library storage
 export async function DELETE(request: NextRequest) {
+  const blocked = configGuard();
+  if (blocked) return blocked;
+
   try {
     const { searchParams } = new URL(request.url);
     const filename = searchParams.get('filename');
