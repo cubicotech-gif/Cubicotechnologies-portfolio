@@ -5,12 +5,16 @@ export const runtime = 'nodejs';
 
 export interface ContactSubmission {
   id: string;
-  name: string;
-  email: string;
+  institution_name: string;
+  contact_name: string;
+  role?: string;
+  work_email: string;
   phone?: string;
-  service: string;
-  budget?: string;
-  message: string;
+  curriculum_area: string;
+  year_group: string;
+  timeline?: string;
+  project_brief: string;
+  consent_given: boolean;
   created_at: string;
   status: 'new' | 'read' | 'replied';
 }
@@ -53,58 +57,90 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST: Submit new contact form
+// POST: Submit a new institution enquiry
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, email, phone, service, budget, message } = body;
+    const {
+      institution_name,
+      contact_name,
+      role,
+      work_email,
+      phone,
+      curriculum_area,
+      year_group,
+      timeline,
+      project_brief,
+      consent_given,
+    } = body;
 
-    // Validation
-    if (!name || !email || !service || !message) {
+    const missing = [
+      ['institution_name', institution_name],
+      ['contact_name', contact_name],
+      ['work_email', work_email],
+      ['curriculum_area', curriculum_area],
+      ['year_group', year_group],
+      ['project_brief', project_brief],
+    ].filter(([, value]) => !value || !String(value).trim());
+
+    if (missing.length > 0) {
       return NextResponse.json(
-        { success: false, error: 'Name, email, service, and message are required' },
+        {
+          success: false,
+          error: `Missing required field(s): ${missing.map(([key]) => key).join(', ')}`,
+        },
         { status: 400 }
       );
     }
 
-    // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    if (!emailRegex.test(String(work_email).trim())) {
       return NextResponse.json(
-        { success: false, error: 'Valid email is required' },
+        { success: false, error: 'A valid work email address is required' },
         { status: 400 }
       );
     }
 
-    // Insert into database
+    if (!consent_given) {
+      return NextResponse.json(
+        { success: false, error: 'Consent is required before we can store your details' },
+        { status: 400 }
+      );
+    }
+
     const { data, error } = await supabaseAdmin
       .from('contact_submissions')
-      .insert([{
-        name: name.trim(),
-        email: email.trim().toLowerCase(),
-        phone: phone?.trim() || null,
-        service: service.trim(),
-        budget: budget?.trim() || null,
-        message: message.trim(),
-        status: 'new',
-      }])
+      .insert([
+        {
+          institution_name: String(institution_name).trim(),
+          contact_name: String(contact_name).trim(),
+          role: role ? String(role).trim() : null,
+          work_email: String(work_email).trim().toLowerCase(),
+          phone: phone ? String(phone).trim() : null,
+          curriculum_area: String(curriculum_area).trim(),
+          year_group: String(year_group).trim(),
+          timeline: timeline ? String(timeline).trim() : null,
+          project_brief: String(project_brief).trim(),
+          consent_given: true,
+          status: 'new',
+        },
+      ])
       .select()
       .single();
 
     if (error) {
-      console.error('Error saving contact submission:', error);
+      console.error('Error saving enquiry:', error);
       return NextResponse.json(
-        { success: false, error: 'Failed to save submission' },
+        { success: false, error: 'Failed to save your enquiry' },
         { status: 500 }
       );
     }
 
-    // TODO: Send email notification (optional)
-    // You can integrate with Resend, SendGrid, or other email service here
+    // TODO: notify the studio by email (Resend/SendGrid) once a provider is chosen.
 
     return NextResponse.json({
       success: true,
-      message: 'Thank you for contacting us! We will get back to you soon.',
+      message: 'Thank you for your enquiry. We reply within two working days.',
       submission: data,
     });
   } catch (error: any) {

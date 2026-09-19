@@ -1,25 +1,52 @@
 import type { Metadata } from 'next';
-import { Inter, Space_Grotesk } from 'next/font/google';
+import { DM_Sans, Fraunces } from 'next/font/google';
 import './globals.css';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import { SITE } from '@/lib/site';
 
-const inter = Inter({
+const dmSans = DM_Sans({
   subsets: ['latin'],
-  variable: '--font-inter',
+  variable: '--font-dm-sans',
   display: 'swap',
 });
 
-const spaceGrotesk = Space_Grotesk({
+const fraunces = Fraunces({
   subsets: ['latin'],
-  variable: '--font-space-grotesk',
+  variable: '--font-fraunces',
   display: 'swap',
+  axes: ['SOFT', 'WONK', 'opsz'],
 });
 
 export const metadata: Metadata = {
-  title: 'Cubico Technologies | Digital Creative Agency',
-  description: 'Creating exceptional visual experiences for global brands. Specializing in digital artwork, brand identity, social media content, and videography.',
-  keywords: ['digital agency', 'creative agency', 'branding', 'design', 'videography', 'social media'],
+  metadataBase: new URL(SITE.url),
+  title: {
+    default: `${SITE.name} | Animated Lessons for Schools`,
+    template: `%s | ${SITE.name}`,
+  },
+  description: SITE.description,
+  keywords: [
+    'educational animation',
+    'animated lessons',
+    'curriculum animation',
+    'Islamic studies animation',
+    'Arabic language learning videos',
+    'school animation studio',
+    'e-learning video production',
+  ],
+  openGraph: {
+    type: 'website',
+    siteName: SITE.name,
+    title: `${SITE.name} | Animated Lessons for Schools`,
+    description: SITE.description,
+    url: SITE.url,
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: `${SITE.name} | Animated Lessons for Schools`,
+    description: SITE.description,
+  },
+  robots: { index: true, follow: true },
 };
 
 export default function RootLayout({
@@ -29,10 +56,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="scroll-smooth">
-      <body className={`${inter.variable} ${spaceGrotesk.variable} font-sans antialiased`}>
-        <div className="relative min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a1a] to-[#0a0a0a]">
+      <body className={`${dmSans.variable} ${fraunces.variable} bg-white font-sans text-ink antialiased`}>
+        <a href="#main-content" className="skip-link">
+          Skip to main content
+        </a>
+        <div className="relative flex min-h-screen flex-col">
           <Navigation />
-          {children}
+          <main id="main-content" className="flex-1">
+            {children}
+          </main>
           <Footer />
         </div>
       </body>

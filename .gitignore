@@ -98,3 +98,4 @@ coverage/
 .sass-cache/
 .connect.lock
 .lock-wscript
+nextjs-site/tsconfig.tsbuildinfo

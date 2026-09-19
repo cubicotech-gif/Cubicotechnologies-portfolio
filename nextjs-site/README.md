@@ -1,134 +1,74 @@
-# Cubico Technologies - Next.js Website
+# Cubico Educational Animation Studio
 
-Modern, professional website built with Next.js 14, TypeScript, and Tailwind CSS.
+Next.js 14 (App Router) site for an educational animation studio, backed by
+Supabase for content and media.
 
-## 🚀 Features
+## Pages
 
-- ✅ **Next.js 14** - Latest React framework with App Router
-- ✅ **TypeScript** - Type-safe code
-- ✅ **Tailwind CSS** - Modern utility-first CSS
-- ✅ **Black/White/Grey Theme** - Clean, professional design
-- ✅ **Responsive** - Mobile-first design
-- ✅ **Animated Counters** - Statistics count up on scroll
-- ✅ **Client Testimonials** - 6 real testimonials with ratings
-- ✅ **SEO Optimized** - Meta tags and semantic HTML
-- ✅ **Fast Performance** - Optimized images and code splitting
+| Route       | Purpose                                                        |
+|-------------|----------------------------------------------------------------|
+| `/`         | Hero, capabilities, the two lesson strands, process, CTA         |
+| `/showcase` | Video showcase split into **Academic Concepts** and **Islamic Studies & Arabic Language** |
+| `/services` | Production offerings and the six-stage process                   |
+| `/about`    | Studio positioning and principles                                |
+| `/contact`  | Institution enquiry form                                         |
+| `/admin/*`  | Content management (see the security note below)                 |
 
-## 📦 Installation
+`/portfolio` permanently redirects to `/showcase`.
+
+## Theming
+
+The whole visual system lives in two files:
+
+- `tailwind.config.ts` — colour scales (`navy`, `brand`, `accent`, `sky`) and
+  semantic aliases (`ink`, `muted`, `line`, `canvas`)
+- `app/globals.css` — CSS variables plus component classes
+  (`.btn-primary`, `.surface-card`, `.field`, `.heading-xl`, …)
+
+Pages use those semantic classes rather than raw colours, so a retheme means
+editing these two files, not every component.
+
+Fonts: **Fraunces** (display) and **DM Sans** (body), loaded via `next/font`.
+
+## Lesson content
+
+Lessons are `portfolio_items` rows. Each has a `section` (`academic` or
+`islamic`) and a `subject` used for the filter chips.
+
+Media resolution is handled by `lib/media.ts`, which supports three sources:
+
+1. `embed_url` — a YouTube or Vimeo link (played via a no-cookie iframe that is
+   only injected after the viewer presses play)
+2. `video_url` — a self-hosted file uploaded through the admin media library
+3. `image_url` / `poster_url` — the still shown on the card and as the poster
+
+`lib/lessons.ts` holds seed lessons that render before Supabase returns data,
+so the showcase is never empty.
+
+## Setup
 
 ```bash
-# Install dependencies
 npm install
-
-# Run development server
+cp .env.example .env.local   # fill in the Supabase values
 npm run dev
-
-# Build for production
-npm run build
-
-# Start production server
-npm start
 ```
 
-## 🌐 Development
+## Database
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+1. Run `DATABASE_SETUP.sql` on a fresh Supabase project.
+2. Run `MIGRATION-education-studio.sql` to add the lesson and enquiry columns.
 
-## 📁 Project Structure
+The migration is idempotent and non-destructive: old agency columns are made
+nullable rather than dropped, and existing rows are back-filled. A commented
+cleanup block at the bottom drops them once you have verified the live site.
 
-```
-nextjs-site/
-├── app/
-│   ├── layout.tsx          # Root layout with Navigation & Footer
-│   ├── page.tsx            # Homepage
-│   ├── globals.css         # Global styles
-│   ├── services/           # Services page
-│   ├── process/            # Process page
-│   └── contact/            # Contact page
-├── components/
-│   ├── Navigation.tsx      # Header navigation
-│   └── Footer.tsx          # Footer component
-├── public/
-│   └── images/
-│       └── logos/          # Logo files
-├── tailwind.config.ts      # Tailwind configuration
-├── tsconfig.json           # TypeScript configuration
-└── package.json            # Dependencies
-```
+## Known issue: the admin panel is unauthenticated
 
-## 🎨 Color Scheme
+`/admin` and the write endpoints under `/api` have **no authentication**. Anyone
+who knows the URL can upload, edit and delete site content, because the API
+routes write with the Supabase service-role key.
 
-- **Primary**: White (#ffffff)
-- **Secondary**: Grey (#888888)
-- **Background**: Black (#050505)
-- **Text**: White/Grey tones
-
-## 🚢 Deployment
-
-### Option 1: Vercel (Recommended - FREE)
-
-1. Push code to GitHub
-2. Go to [vercel.com](https://vercel.com)
-3. Import your repository
-4. Deploy (automatic!)
-
-### Option 2: Export Static Files
-
-```bash
-# Build static export
-npm run build
-
-# Upload 'out' folder to any hosting (HostGator, Netlify, etc.)
-```
-
-### Option 3: Node.js Server
-
-```bash
-npm run build
-npm start
-```
-
-## 📝 Pages
-
-- `/` - Homepage with hero, stats, testimonials
-- `/services` - All services and offerings
-- `/process` - Our work process
-- `/contact` - Contact form and information
-
-## 🔧 Customization
-
-Edit these files to customize:
-- `app/layout.tsx` - Site-wide layout, metadata
-- `tailwind.config.ts` - Colors, fonts, animations
-- `components/` - Reusable UI components
-- `public/images/` - Add your images/logos
-
-## 📊 Performance
-
-- **Lighthouse Score**: 95+ (aim)
-- **First Contentful Paint**: < 1.5s
-- **Time to Interactive**: < 3s
-- **Bundle Size**: Optimized with code splitting
-
-## 🎯 Next Steps
-
-1. Add your logo to `public/images/logos/`
-2. Customize content in page files
-3. Add contact form integration (Supabase, etc.)
-4. Deploy to Vercel or your preferred host
-
-## 💡 Tech Stack
-
-- **Framework**: Next.js 14
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **Deployment**: Vercel (recommended)
-- **Image Optimization**: Next/Image
-
-## 📄 License
-
-Private - Cubico Technologies
-
----
-
-**Built with ❤️ by Claude for Cubico Technologies**
+This was deliberately left out of the redesign and needs closing before the site
+handles real content. The smallest fix is a `middleware.ts` matching
+`/admin/:path*` that checks a password from an environment variable; a fuller
+fix is Supabase Auth, which the project already depends on.

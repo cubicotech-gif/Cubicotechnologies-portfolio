@@ -3,8 +3,14 @@
 @tailwind utilities;
 
 :root {
-  --font-inter: 'Inter', system-ui, -apple-system, sans-serif;
-  --font-space-grotesk: 'Space Grotesk', system-ui, sans-serif;
+  --color-navy: #102a5c;
+  --color-brand: #2563eb;
+  --color-accent: #f6c945;
+  --color-ink: #17315f;
+  --color-muted: #5d6f8e;
+  --color-line: #dce7f4;
+  --color-sky: #e8f6ff;
+  --color-canvas: #f7fbff;
 }
 
 * {
@@ -18,55 +24,116 @@ html {
 }
 
 body {
-  font-family: var(--font-inter);
+  background: #ffffff;
+  color: var(--color-ink);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Skip link — visible only once focused */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  z-index: 100;
+}
+.skip-link:focus {
+  left: 1rem;
+  top: 1rem;
+  padding: 0.75rem 1.25rem;
+  background: var(--color-navy);
+  color: #fff;
+  border-radius: 0.75rem;
+}
+
+@layer components {
+  /* Consistent keyboard focus treatment across every interactive element */
+  .focus-ring:focus-visible {
+    outline: 3px solid var(--color-accent);
+    outline-offset: 3px;
+  }
+
+  .section-shell {
+    @apply mx-auto w-full max-w-7xl px-5 sm:px-8;
+  }
+
+  .eyebrow {
+    @apply text-sm font-bold uppercase tracking-[0.14em] text-brand-600;
+  }
+
+  .heading-xl {
+    @apply font-display text-4xl font-semibold leading-[1.08] tracking-tight text-navy-950 sm:text-5xl lg:text-6xl;
+  }
+
+  .heading-lg {
+    @apply font-display text-3xl font-semibold tracking-tight text-navy-950 sm:text-4xl;
+  }
+
+  .heading-md {
+    @apply font-display text-2xl font-semibold tracking-tight text-navy-950 sm:text-3xl;
+  }
+
+  .body-copy {
+    @apply leading-7 text-muted;
+  }
+
+  .btn-primary {
+    @apply focus-ring inline-flex items-center justify-center gap-2 rounded-full bg-brand-600 px-6 py-3.5 font-bold text-white shadow-lg shadow-brand-200 transition hover:-translate-y-0.5 hover:bg-brand-700;
+  }
+
+  .btn-secondary {
+    @apply focus-ring inline-flex items-center justify-center gap-2 rounded-full border border-line bg-white px-6 py-3.5 font-bold text-navy-950 transition hover:-translate-y-0.5 hover:border-brand-300;
+  }
+
+  .btn-dark {
+    @apply focus-ring inline-flex items-center justify-center gap-2 rounded-full bg-navy-950 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-navy-900;
+  }
+
+  .surface-card {
+    @apply rounded-3xl border border-line bg-white shadow-card;
+  }
+
+  .tag-soft {
+    @apply inline-flex rounded-full bg-sky px-3 py-1 text-sm font-bold text-brand-600;
+  }
+
+  .field {
+    @apply w-full rounded-xl border border-[#c8d7ea] bg-white px-4 py-3 text-ink transition placeholder:text-muted/60;
+  }
+  .field:focus {
+    @apply border-brand-600 outline-none;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+  }
+  .field-invalid {
+    @apply border-red-600 bg-red-50/40;
+  }
+}
+
 @layer utilities {
-  .gradient-text {
-    @apply bg-gradient-to-r from-purple-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent;
-    background-size: 200% auto;
-    animation: gradient-shift 3s ease infinite;
+  /* Card lift shared by lesson and project cards */
+  .card-lift {
+    @apply transition duration-200;
+  }
+  .card-lift:hover {
+    @apply -translate-y-1 border-brand-300 shadow-lift;
   }
 
-  .glass {
-    @apply bg-white/5 backdrop-blur-xl border border-white/10;
-  }
-
-  .animate-gradient {
-    background-size: 200% 200%;
-    animation: gradient 8s ease infinite;
+  .thumb-overlay {
+    background: linear-gradient(180deg, rgba(7, 27, 72, 0) 28%, rgba(7, 27, 72, 0.78) 100%);
   }
 }
 
-@keyframes gradient {
-  0%, 100% {
-    background-position: 0% 50%;
+/* Respect the OS reduced-motion setting: the previous dark build animated
+   heavily with no opt-out. Framer Motion reads this too via useReducedMotion. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
   }
-  50% {
-    background-position: 100% 50%;
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
-}
-
-@keyframes gradient-shift {
-  0%, 100% {
-    background-position: 0% center;
-  }
-  50% {
-    background-position: 100% center;
-  }
-}
-
-@keyframes marquee {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
-}
-
-.animate-marquee {
-  animation: marquee 30s linear infinite;
 }
