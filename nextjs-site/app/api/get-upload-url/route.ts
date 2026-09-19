@@ -1,7 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase';
+import { supabaseAdmin, supabaseConfigError, explainSupabaseError } from '@/lib/supabase';
 
 export const runtime = 'nodejs';
+
+/**
+ * Fails fast with the actual cause when Supabase is misconfigured, rather
+ * than letting the request surface an opaque "fetch failed".
+ */
+function configGuard() {
+  if (!supabaseConfigError) return null;
+  return NextResponse.json(
+    { success: false, error: supabaseConfigError },
+    { status: 503 }
+  );
+}
 
 const LIBRARY_FOLDER = 'library';
 
@@ -13,6 +25,9 @@ const validTypes = [
 // POST: Generate a Supabase signed upload URL so the browser can upload directly,
 // bypassing Vercel's 4.5MB serverless function body size limit.
 export async function POST(request: NextRequest) {
+  const blocked = configGuard();
+  if (blocked) return blocked;
+
   try {
     if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
       console.error('SUPABASE_SERVICE_ROLE_KEY is not set — signed URL creation will fail');

@@ -1,7 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase';
+import { supabaseAdmin, supabaseConfigError, explainSupabaseError } from '@/lib/supabase';
 
 export const runtime = 'nodejs';
+
+/**
+ * Fails fast with the actual cause when Supabase is misconfigured, rather
+ * than letting the request surface an opaque "fetch failed".
+ */
+function configGuard() {
+  if (!supabaseConfigError) return null;
+  return NextResponse.json(
+    { success: false, error: supabaseConfigError },
+    { status: 503 }
+  );
+}
 
 /**
  * A lesson row. `section` splits the showcase into its two blocks and
@@ -63,6 +75,9 @@ function pickWritable(body: Record<string, any>): Record<string, any> {
 
 // GET: Retrieve lessons
 export async function GET(request: NextRequest) {
+  const blocked = configGuard();
+  if (blocked) return blocked;
+
   try {
     const { searchParams } = new URL(request.url);
     const section = searchParams.get('section');
@@ -88,18 +103,21 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       console.error('Error fetching lessons:', error);
-      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+      return NextResponse.json({ success: false, error: explainSupabaseError(error) }, { status: 500 });
     }
 
     return NextResponse.json({ success: true, items: data || [] });
   } catch (error: any) {
     console.error('Error:', error);
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    return NextResponse.json({ success: false, error: explainSupabaseError(error) }, { status: 500 });
   }
 }
 
 // POST: Add a lesson
 export async function POST(request: NextRequest) {
+  const blocked = configGuard();
+  if (blocked) return blocked;
+
   try {
     const body = await request.json();
     const { title, section, subject, description } = body;
@@ -133,18 +151,21 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
-      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+      return NextResponse.json({ success: false, error: explainSupabaseError(error) }, { status: 500 });
     }
 
     return NextResponse.json({ success: true, message: 'Lesson added', item: data });
   } catch (error: any) {
     console.error('Error:', error);
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    return NextResponse.json({ success: false, error: explainSupabaseError(error) }, { status: 500 });
   }
 }
 
 // PUT: Update a lesson
 export async function PUT(request: NextRequest) {
+  const blocked = configGuard();
+  if (blocked) return blocked;
+
   try {
     const body = await request.json();
     const { id } = body;
@@ -173,18 +194,21 @@ export async function PUT(request: NextRequest) {
       .single();
 
     if (error) {
-      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+      return NextResponse.json({ success: false, error: explainSupabaseError(error) }, { status: 500 });
     }
 
     return NextResponse.json({ success: true, message: 'Lesson updated', item: data });
   } catch (error: any) {
     console.error('Error:', error);
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    return NextResponse.json({ success: false, error: explainSupabaseError(error) }, { status: 500 });
   }
 }
 
 // DELETE: Remove a lesson
 export async function DELETE(request: NextRequest) {
+  const blocked = configGuard();
+  if (blocked) return blocked;
+
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
@@ -196,12 +220,12 @@ export async function DELETE(request: NextRequest) {
     const { error } = await supabaseAdmin.from('portfolio_items').delete().eq('id', id);
 
     if (error) {
-      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+      return NextResponse.json({ success: false, error: explainSupabaseError(error) }, { status: 500 });
     }
 
     return NextResponse.json({ success: true, message: 'Lesson deleted' });
   } catch (error: any) {
     console.error('Error:', error);
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    return NextResponse.json({ success: false, error: explainSupabaseError(error) }, { status: 500 });
   }
 }

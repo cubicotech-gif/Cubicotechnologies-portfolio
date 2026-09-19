@@ -76,6 +76,32 @@ has run.
 Tables created: `portfolio_items` (lessons), `contact_submissions` (enquiries)
 and `site_settings` (navigation logo).
 
+## When something is not working
+
+Open any admin page. If the backend is misconfigured, a red panel at the top
+names the failing checks instead of leaving you to read 500s in the console.
+The same data is available as JSON at `/api/health`, which reports:
+
+- whether each environment variable is set, and whether it has stray
+  whitespace (a trailing newline pasted into an env value produces a bare
+  "fetch failed" and is otherwise invisible)
+- whether `NEXT_PUBLIC_SUPABASE_URL` parses, and whether it points at the
+  dashboard rather than the project API
+- whether each key is the right role, belongs to the same project as the URL,
+  has expired, or was truncated when pasted
+- whether each table is present and readable
+- whether the `images` storage bucket exists
+
+A key from one project paired with another project's URL is accepted by the
+Supabase client and only fails later with "signature verification failed",
+naming neither project. Supabase's legacy keys are JWTs carrying their own
+project ref, so the check reads that claim and compares it with the URL. The
+signature is never verified locally — only Supabase can do that — and the
+claim is read purely to report the mismatch.
+
+Environment values are trimmed before use, so whitespace is reported but no
+longer breaks anything. `/api/health` never returns a key, only its length.
+
 ## Admin panel
 
 | Page                | What it does                                                   |

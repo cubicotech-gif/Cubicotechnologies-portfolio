@@ -1,7 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase';
+import { supabaseAdmin, supabaseConfigError, explainSupabaseError } from '@/lib/supabase';
 
 export const runtime = 'nodejs';
+
+/**
+ * Fails fast with the actual cause when Supabase is misconfigured, rather
+ * than letting the request surface an opaque "fetch failed".
+ */
+function configGuard() {
+  if (!supabaseConfigError) return null;
+  return NextResponse.json(
+    { success: false, error: supabaseConfigError },
+    { status: 503 }
+  );
+}
 
 export interface SiteSetting {
   id: string;
@@ -14,6 +26,9 @@ export interface SiteSetting {
 
 // GET: Retrieve site settings
 export async function GET(request: NextRequest) {
+  const blocked = configGuard();
+  if (blocked) return blocked;
+
   try {
     const { searchParams } = new URL(request.url);
     const key = searchParams.get('key');
@@ -29,7 +44,7 @@ export async function GET(request: NextRequest) {
       if (error && error.code !== 'PGRST116') {
         console.error('Error fetching settings:', error);
         return NextResponse.json(
-          { success: false, error: error.message },
+          { success: false, error: explainSupabaseError(error) },
           { status: 500 }
         );
       }
@@ -47,7 +62,7 @@ export async function GET(request: NextRequest) {
       if (error) {
         console.error('Error fetching settings:', error);
         return NextResponse.json(
-          { success: false, error: error.message },
+          { success: false, error: explainSupabaseError(error) },
           { status: 500 }
         );
       }
@@ -60,7 +75,7 @@ export async function GET(request: NextRequest) {
   } catch (error: any) {
     console.error('Error:', error);
     return NextResponse.json(
-      { success: false, error: error.message },
+      { success: false, error: explainSupabaseError(error) },
       { status: 500 }
     );
   }
@@ -68,6 +83,9 @@ export async function GET(request: NextRequest) {
 
 // POST: Create or update site setting
 export async function POST(request: NextRequest) {
+  const blocked = configGuard();
+  if (blocked) return blocked;
+
   try {
     const body = await request.json();
     const { url, type = 'Main Logo' } = body;
@@ -104,7 +122,7 @@ export async function POST(request: NextRequest) {
 
       if (error) {
         return NextResponse.json(
-          { success: false, error: error.message },
+          { success: false, error: explainSupabaseError(error) },
           { status: 500 }
         );
       }
@@ -128,7 +146,7 @@ export async function POST(request: NextRequest) {
 
       if (error) {
         return NextResponse.json(
-          { success: false, error: error.message },
+          { success: false, error: explainSupabaseError(error) },
           { status: 500 }
         );
       }
@@ -142,7 +160,7 @@ export async function POST(request: NextRequest) {
   } catch (error: any) {
     console.error('Error:', error);
     return NextResponse.json(
-      { success: false, error: error.message },
+      { success: false, error: explainSupabaseError(error) },
       { status: 500 }
     );
   }
@@ -150,6 +168,9 @@ export async function POST(request: NextRequest) {
 
 // PUT: Update setting
 export async function PUT(request: NextRequest) {
+  const blocked = configGuard();
+  if (blocked) return blocked;
+
   try {
     const body = await request.json();
     const { id, key, value, type } = body;
@@ -188,7 +209,7 @@ export async function PUT(request: NextRequest) {
 
     if (error) {
       return NextResponse.json(
-        { success: false, error: error.message },
+        { success: false, error: explainSupabaseError(error) },
         { status: 500 }
       );
     }
@@ -201,7 +222,7 @@ export async function PUT(request: NextRequest) {
   } catch (error: any) {
     console.error('Error:', error);
     return NextResponse.json(
-      { success: false, error: error.message },
+      { success: false, error: explainSupabaseError(error) },
       { status: 500 }
     );
   }
@@ -209,6 +230,9 @@ export async function PUT(request: NextRequest) {
 
 // DELETE: Delete setting
 export async function DELETE(request: NextRequest) {
+  const blocked = configGuard();
+  if (blocked) return blocked;
+
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
@@ -238,7 +262,7 @@ export async function DELETE(request: NextRequest) {
 
     if (error) {
       return NextResponse.json(
-        { success: false, error: error.message },
+        { success: false, error: explainSupabaseError(error) },
         { status: 500 }
       );
     }
@@ -250,7 +274,7 @@ export async function DELETE(request: NextRequest) {
   } catch (error: any) {
     console.error('Error:', error);
     return NextResponse.json(
-      { success: false, error: error.message },
+      { success: false, error: explainSupabaseError(error) },
       { status: 500 }
     );
   }
