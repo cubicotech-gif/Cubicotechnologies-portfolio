@@ -1,8 +1,6 @@
 import type { Metadata } from 'next';
 import { DM_Sans, Fraunces } from 'next/font/google';
 import './globals.css';
-import Navigation from '@/components/Navigation';
-import Footer from '@/components/Footer';
 import { SITE } from '@/lib/site';
 
 const dmSans = DM_Sans({
@@ -57,16 +55,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <body className={`${dmSans.variable} ${fraunces.variable} bg-white font-sans text-ink antialiased`}>
-        <a href="#main-content" className="skip-link">
-          Skip to main content
-        </a>
-        <div className="relative flex min-h-screen flex-col">
-          <Navigation />
-          <main id="main-content" className="flex-1">
-            {children}
-          </main>
-          <Footer />
-        </div>
+        {children}
       </body>
     </html>
   );
