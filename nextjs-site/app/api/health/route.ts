@@ -5,6 +5,8 @@ import {
   supabaseHost,
   hasServiceRoleKey,
   explainSupabaseError,
+  inspectKey,
+  projectRef,
 } from '@/lib/supabase';
 
 export const runtime = 'nodejs';
@@ -42,6 +44,52 @@ function envCheck(name: string, required: boolean): Check {
 }
 
 /**
+ * Compares the project ref embedded in a Supabase key against the ref in the
+ * URL. A mismatch is the usual cause of "signature verification failed".
+ */
+function keyCheck(envName: string, expectedRole: string): Check {
+  const key = (process.env[envName] ?? '').trim();
+  const name = `${envName} identity`;
+
+  if (!key) return { name, status: 'skipped', detail: 'Not set.' };
+
+  const info = inspectKey(key);
+
+  if (info.format === 'modern') {
+    return { name, status: 'ok', detail: 'Using a current-format key (sb_...).' };
+  }
+  if (info.format !== 'jwt') {
+    return {
+      name,
+      status: 'fail',
+      detail: 'Not a recognisable Supabase key. It may have been truncated when pasted — the keys are long, so check the whole value was copied.',
+    };
+  }
+  if (info.expired) {
+    return { name, status: 'fail', detail: 'This key has expired. Generate fresh keys in Settings → API.' };
+  }
+  if (info.role && info.role !== expectedRole) {
+    return {
+      name,
+      status: 'fail',
+      detail: `This is a "${info.role}" key, but ${envName} expects the "${expectedRole}" key. The two sit next to each other in Settings → API and are easy to swap.`,
+    };
+  }
+  if (info.ref && projectRef && info.ref !== projectRef) {
+    return {
+      name,
+      status: 'fail',
+      detail: `Key belongs to project "${info.ref}" but the URL points at project "${projectRef}". Copy both keys from Settings → API of the "${projectRef}" project.`,
+    };
+  }
+  return {
+    name,
+    status: 'ok',
+    detail: `Valid ${info.role ?? 'unknown'} key for project "${info.ref ?? 'unknown'}".`,
+  };
+}
+
+/**
  * Diagnostics for the admin setup panel. Returns the state of configuration,
  * connectivity, tables and storage, so a failure names its own cause instead
  * of surfacing "fetch failed".
@@ -51,6 +99,8 @@ export async function GET() {
     envCheck('NEXT_PUBLIC_SUPABASE_URL', true),
     envCheck('NEXT_PUBLIC_SUPABASE_ANON_KEY', true),
     envCheck('SUPABASE_SERVICE_ROLE_KEY', false),
+    keyCheck('NEXT_PUBLIC_SUPABASE_ANON_KEY', 'anon'),
+    keyCheck('SUPABASE_SERVICE_ROLE_KEY', 'service_role'),
   ];
 
   if (supabaseConfigError) {
@@ -139,7 +189,7 @@ export async function GET() {
   }
 
   return NextResponse.json(
-    { ok: checks.every((c) => c.status === 'ok' || c.status === 'warn'), host: supabaseHost, checks },
+    { ok: !checks.some((c) => c.status === 'fail'), host: supabaseHost, checks },
     { status: 200 }
   );
 }
