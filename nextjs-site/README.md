@@ -62,13 +62,30 @@ The migration is idempotent and non-destructive: old agency columns are made
 nullable rather than dropped, and existing rows are back-filled. A commented
 cleanup block at the bottom drops them once you have verified the live site.
 
-## Known issue: the admin panel is unauthenticated
+## Admin panel
 
-`/admin` and the write endpoints under `/api` have **no authentication**. Anyone
-who knows the URL can upload, edit and delete site content, because the API
-routes write with the Supabase service-role key.
+| Page                | What it does                                                   |
+|---------------------|----------------------------------------------------------------|
+| `/admin`            | Overview: live lesson counts per section, new enquiry count      |
+| `/admin/lessons`    | Create, edit, reorder, hide and delete lessons                   |
+| `/admin/enquiries`  | Read contact-form enquiries, change status, reply by email       |
+| `/admin/library`    | Everything in storage; upload, copy URL, delete                  |
 
-This was deliberately left out of the redesign and needs closing before the site
-handles real content. The smallest fix is a `middleware.ts` matching
-`/admin/:path*` that checks a password from an environment variable; a fuller
-fix is Supabase Auth, which the project already depends on.
+### Adding a lesson
+
+`/admin/lessons` -> **New lesson**. Each lesson needs a title, section, subject
+and description. For the video, use whichever suits:
+
+- **Paste a YouTube or Vimeo link.** The form recognises the URL and shows a
+  live preview so you can confirm it before saving.
+- **Upload the video file.** It goes browser-to-storage via a signed URL, so
+  the 100MB limit applies rather than Vercel's 4.5MB request cap. A progress
+  bar tracks the real upload.
+- **Poster image.** Optional for embeds (YouTube's thumbnail is used as a
+  fallback), recommended for uploaded files.
+
+Lessons are ordered per section with the up/down arrows, and **Hide** takes one
+off the public site without deleting it.
+
+Until you save your first lesson, the public showcase falls back to the eight
+built-in samples in `lib/lessons.ts` so the site is never empty.
