@@ -55,12 +55,26 @@ npm run dev
 
 ## Database
 
-1. Run `DATABASE_SETUP.sql` on a fresh Supabase project.
-2. Run `MIGRATION-education-studio.sql` to add the lesson and enquiry columns.
+Pick **one** of these, depending on what your Supabase project already has.
 
-The migration is idempotent and non-destructive: old agency columns are made
-nullable rather than dropped, and existing rows are back-filled. A commented
-cleanup block at the bottom drops them once you have verified the live site.
+**A new / empty project** — run `DATABASE_SETUP.sql` in the Supabase SQL editor.
+It creates the final schema directly, so no migration is needed afterwards.
+
+**A project still holding the old agency schema** (tables named `hero_images`,
+`featured_projects`, `client_logos`) — run `MIGRATION-education-studio.sql`
+instead. It converts the schema in place and keeps your rows: old columns are
+made nullable and back-filled rather than dropped, and a commented block at the
+bottom removes them once you have verified the live site.
+
+Running the wrong one is safe — each detects the situation and either no-ops or
+tells you which script to use.
+
+Both scripts create the `images` storage bucket with a 100MB file size limit.
+The bucket is what the uploader writes to, so nothing uploads until one of them
+has run.
+
+Tables created: `portfolio_items` (lessons), `contact_submissions` (enquiries)
+and `site_settings` (navigation logo).
 
 ## Admin panel
 

@@ -1,314 +1,186 @@
 -- ===================================================================
--- COMPLETE DATABASE SETUP FOR CUBICO PORTFOLIO
--- Run this in Supabase SQL Editor
+--  CUBICO EDUCATIONAL ANIMATION STUDIO — FRESH DATABASE SETUP
+-- ===================================================================
+--  Run this ONCE in the Supabase SQL editor on a NEW project.
+--  It creates the final schema directly, so no migration is needed
+--  afterwards.
+--
+--  Safe to re-run: every statement is guarded.
+--
+--  If you instead have an OLD database from the previous agency site
+--  (tables called hero_images, featured_projects, client_logos …),
+--  do NOT run this. Run MIGRATION-education-studio.sql, which converts
+--  that schema in place and keeps your data.
 -- ===================================================================
 
--- ===================================================================
--- 1. HERO IMAGES TABLE
--- ===================================================================
-CREATE TABLE IF NOT EXISTS hero_images (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  filename TEXT NOT NULL,
-  url TEXT,
-  category TEXT NOT NULL,
-  "order" INTEGER NOT NULL DEFAULT 1,
-  active BOOLEAN DEFAULT true,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
 
--- Indexes for performance
-CREATE INDEX IF NOT EXISTS idx_hero_images_order ON hero_images("order");
-CREATE INDEX IF NOT EXISTS idx_hero_images_active ON hero_images(active);
-
--- Enable Row Level Security
-ALTER TABLE hero_images ENABLE ROW LEVEL SECURITY;
-
--- Drop existing policies if they exist
-DROP POLICY IF EXISTS "Public read access" ON hero_images;
-DROP POLICY IF EXISTS "Service role full access" ON hero_images;
-
--- Policies
-CREATE POLICY "Public read access" ON hero_images
-  FOR SELECT USING (true);
-
-CREATE POLICY "Service role full access" ON hero_images
-  FOR ALL USING (auth.role() = 'service_role');
-
--- ===================================================================
--- 2. FEATURED PROJECTS TABLE
--- ===================================================================
-CREATE TABLE IF NOT EXISTS featured_projects (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  title TEXT NOT NULL,
-  category TEXT NOT NULL,
-  description TEXT NOT NULL,
-  image_url TEXT NOT NULL,
-  "order" INTEGER NOT NULL DEFAULT 1,
-  active BOOLEAN DEFAULT true,
-  client_name TEXT,
-  project_url TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- Indexes for performance
-CREATE INDEX IF NOT EXISTS idx_featured_projects_order ON featured_projects("order");
-CREATE INDEX IF NOT EXISTS idx_featured_projects_active ON featured_projects(active);
-CREATE INDEX IF NOT EXISTS idx_featured_projects_category ON featured_projects(category);
-
--- Enable Row Level Security
-ALTER TABLE featured_projects ENABLE ROW LEVEL SECURITY;
-
--- Drop existing policies if they exist
-DROP POLICY IF EXISTS "Public read access" ON featured_projects;
-DROP POLICY IF EXISTS "Service role full access" ON featured_projects;
-
--- Policies
-CREATE POLICY "Public read access" ON featured_projects
-  FOR SELECT USING (true);
-
-CREATE POLICY "Service role full access" ON featured_projects
-  FOR ALL USING (auth.role() = 'service_role');
-
--- ===================================================================
--- 3. CLIENT LOGOS TABLE
--- ===================================================================
-CREATE TABLE IF NOT EXISTS client_logos (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  client_name TEXT NOT NULL,
-  logo_url TEXT NOT NULL,
-  "order" INTEGER NOT NULL DEFAULT 1,
-  active BOOLEAN DEFAULT true,
-  website_url TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- Indexes for performance
-CREATE INDEX IF NOT EXISTS idx_client_logos_order ON client_logos("order");
-CREATE INDEX IF NOT EXISTS idx_client_logos_active ON client_logos(active);
-
--- Enable Row Level Security
-ALTER TABLE client_logos ENABLE ROW LEVEL SECURITY;
-
--- Drop existing policies if they exist
-DROP POLICY IF EXISTS "Public read access" ON client_logos;
-DROP POLICY IF EXISTS "Service role full access" ON client_logos;
-
--- Policies
-CREATE POLICY "Public read access" ON client_logos
-  FOR SELECT USING (true);
-
-CREATE POLICY "Service role full access" ON client_logos
-  FOR ALL USING (auth.role() = 'service_role');
-
--- ===================================================================
--- 4. SITE SETTINGS TABLE (Logo, Favicon, etc.)
--- ===================================================================
-CREATE TABLE IF NOT EXISTS site_settings (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  key TEXT UNIQUE NOT NULL,
-  value TEXT NOT NULL,
-  type TEXT DEFAULT 'Main Logo',
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- Index for performance
-CREATE INDEX IF NOT EXISTS idx_site_settings_key ON site_settings(key);
-
--- Enable Row Level Security
-ALTER TABLE site_settings ENABLE ROW LEVEL SECURITY;
-
--- Drop existing policies if they exist
-DROP POLICY IF EXISTS "Public read access" ON site_settings;
-DROP POLICY IF EXISTS "Service role full access" ON site_settings;
-
--- Policies
-CREATE POLICY "Public read access" ON site_settings
-  FOR SELECT USING (true);
-
-CREATE POLICY "Service role full access" ON site_settings
-  FOR ALL USING (auth.role() = 'service_role');
-
--- ===================================================================
--- 5. SERVICE IMAGES TABLE
--- ===================================================================
-CREATE TABLE IF NOT EXISTS service_images (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  service_type TEXT NOT NULL,
-  image_slot INTEGER NOT NULL CHECK (image_slot >= 1 AND image_slot <= 4),
-  image_url TEXT NOT NULL,
-  alt_text TEXT,
-  "order" INTEGER NOT NULL DEFAULT 1,
-  active BOOLEAN DEFAULT true,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW(),
-  UNIQUE(service_type, image_slot)
-);
-
--- Indexes for performance
-CREATE INDEX IF NOT EXISTS idx_service_images_service_type ON service_images(service_type);
-CREATE INDEX IF NOT EXISTS idx_service_images_active ON service_images(active);
-CREATE INDEX IF NOT EXISTS idx_service_images_order ON service_images("order");
-
--- Enable Row Level Security
-ALTER TABLE service_images ENABLE ROW LEVEL SECURITY;
-
--- Drop existing policies if they exist
-DROP POLICY IF EXISTS "Public read access" ON service_images;
-DROP POLICY IF EXISTS "Service role full access" ON service_images;
-
--- Policies
-CREATE POLICY "Public read access" ON service_images
-  FOR SELECT USING (true);
-
-CREATE POLICY "Service role full access" ON service_images
-  FOR ALL USING (auth.role() = 'service_role');
-
--- ===================================================================
--- 6. PORTFOLIO ITEMS TABLE
--- ===================================================================
+-- -------------------------------------------------------------------
+-- 1. LESSONS  (table name kept as portfolio_items so existing
+--    deployments and API routes keep working)
+-- -------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS portfolio_items (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  title TEXT NOT NULL,
-  category TEXT NOT NULL,
-  client TEXT NOT NULL,
-  description TEXT NOT NULL,
-  image_url TEXT NOT NULL,
-  year TEXT NOT NULL,
-  services TEXT[] DEFAULT '{}',
-  "order" INTEGER NOT NULL DEFAULT 1,
-  active BOOLEAN DEFAULT true,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
+  id           UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+
+  title        TEXT NOT NULL,
+  -- Which showcase block the lesson belongs to.
+  section      TEXT NOT NULL CHECK (section IN ('academic', 'islamic')),
+  -- Filter chip within that section, e.g. 'Mathematics'.
+  subject      TEXT NOT NULL,
+  description  TEXT NOT NULL,
+
+  -- Media. A lesson needs at least one of these three.
+  image_url    TEXT,   -- card art / fallback still
+  poster_url   TEXT,   -- explicit poster frame
+  video_url    TEXT,   -- self-hosted file in Supabase storage
+  embed_url    TEXT,   -- YouTube or Vimeo link
+  media_type   TEXT CHECK (media_type IS NULL OR media_type IN ('image', 'video')),
+
+  year_group   TEXT,
+  duration     TEXT,
+  outcomes     TEXT[] DEFAULT '{}',
+
+  "order"      INTEGER NOT NULL DEFAULT 1,
+  active       BOOLEAN DEFAULT true,
+  created_at   TIMESTAMPTZ DEFAULT NOW(),
+  updated_at   TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Indexes for performance
-CREATE INDEX IF NOT EXISTS idx_portfolio_items_category ON portfolio_items(category);
-CREATE INDEX IF NOT EXISTS idx_portfolio_items_active ON portfolio_items(active);
-CREATE INDEX IF NOT EXISTS idx_portfolio_items_order ON portfolio_items("order");
-CREATE INDEX IF NOT EXISTS idx_portfolio_items_year ON portfolio_items(year);
+CREATE INDEX IF NOT EXISTS idx_portfolio_items_section ON portfolio_items(section);
+CREATE INDEX IF NOT EXISTS idx_portfolio_items_subject ON portfolio_items(subject);
+CREATE INDEX IF NOT EXISTS idx_portfolio_items_active  ON portfolio_items(active);
+CREATE INDEX IF NOT EXISTS idx_portfolio_items_order   ON portfolio_items("order");
 
--- Enable Row Level Security
 ALTER TABLE portfolio_items ENABLE ROW LEVEL SECURITY;
 
--- Drop existing policies if they exist
-DROP POLICY IF EXISTS "Public read access" ON portfolio_items;
+DROP POLICY IF EXISTS "Public read access"       ON portfolio_items;
 DROP POLICY IF EXISTS "Service role full access" ON portfolio_items;
 
--- Policies
 CREATE POLICY "Public read access" ON portfolio_items
   FOR SELECT USING (true);
-
 CREATE POLICY "Service role full access" ON portfolio_items
   FOR ALL USING (auth.role() = 'service_role');
 
--- ===================================================================
--- 7. CONTACT SUBMISSIONS TABLE
--- ===================================================================
+
+-- -------------------------------------------------------------------
+-- 2. INSTITUTION ENQUIRIES
+-- -------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS contact_submissions (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  name TEXT NOT NULL,
-  email TEXT NOT NULL,
-  phone TEXT,
-  service TEXT NOT NULL,
-  budget TEXT,
-  message TEXT NOT NULL,
-  status TEXT DEFAULT 'new' CHECK (status IN ('new', 'read', 'replied')),
-  created_at TIMESTAMPTZ DEFAULT NOW()
+  id               UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+
+  institution_name TEXT NOT NULL,
+  contact_name     TEXT NOT NULL,
+  role             TEXT,
+  work_email       TEXT NOT NULL,
+  phone            TEXT,
+  curriculum_area  TEXT NOT NULL,
+  year_group       TEXT NOT NULL,
+  timeline         TEXT,
+  project_brief    TEXT NOT NULL,
+  consent_given    BOOLEAN DEFAULT false,
+
+  status           TEXT DEFAULT 'new' CHECK (status IN ('new', 'read', 'replied')),
+  created_at       TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Indexes for performance
-CREATE INDEX IF NOT EXISTS idx_contact_submissions_status ON contact_submissions(status);
-CREATE INDEX IF NOT EXISTS idx_contact_submissions_created_at ON contact_submissions(created_at DESC);
-CREATE INDEX IF NOT EXISTS idx_contact_submissions_email ON contact_submissions(email);
+CREATE INDEX IF NOT EXISTS idx_contact_submissions_status
+  ON contact_submissions(status);
+CREATE INDEX IF NOT EXISTS idx_contact_submissions_created_at
+  ON contact_submissions(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_contact_submissions_work_email
+  ON contact_submissions(work_email);
+CREATE INDEX IF NOT EXISTS idx_contact_submissions_institution
+  ON contact_submissions(institution_name);
 
--- Enable Row Level Security
 ALTER TABLE contact_submissions ENABLE ROW LEVEL SECURITY;
 
--- Drop existing policies if they exist
+-- Enquiries are never publicly readable: only the service role (the API
+-- routes) may touch them.
 DROP POLICY IF EXISTS "Service role full access" ON contact_submissions;
-
--- Policies (only service role can access - for admin use)
 CREATE POLICY "Service role full access" ON contact_submissions
   FOR ALL USING (auth.role() = 'service_role');
 
+
+-- -------------------------------------------------------------------
+-- 3. SITE SETTINGS  (used for the navigation logo)
+-- -------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS site_settings (
+  id         UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  key        TEXT UNIQUE NOT NULL,
+  value      TEXT NOT NULL,
+  type       TEXT DEFAULT 'Main Logo',
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_site_settings_key ON site_settings(key);
+
+ALTER TABLE site_settings ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Public read access"       ON site_settings;
+DROP POLICY IF EXISTS "Service role full access" ON site_settings;
+
+CREATE POLICY "Public read access" ON site_settings
+  FOR SELECT USING (true);
+CREATE POLICY "Service role full access" ON site_settings
+  FOR ALL USING (auth.role() = 'service_role');
+
+
+-- -------------------------------------------------------------------
+-- 4. STORAGE BUCKET
+-- -------------------------------------------------------------------
+-- The bucket must exist before any upload works. The old setup script
+-- created the policies but not the bucket itself, which is why uploads
+-- failed on a fresh project.
+--
+-- file_size_limit is 100MB to match the video ceiling enforced in
+-- app/api/get-upload-url/route.ts.
+INSERT INTO storage.buckets (id, name, public, file_size_limit)
+VALUES ('images', 'images', true, 104857600)
+ON CONFLICT (id) DO UPDATE
+  SET public = true,
+      file_size_limit = GREATEST(
+        COALESCE(storage.buckets.file_size_limit, 0),
+        104857600
+      );
+
+
+-- -------------------------------------------------------------------
+-- 5. STORAGE POLICIES
+-- -------------------------------------------------------------------
+DROP POLICY IF EXISTS "Public read access"   ON storage.objects;
+DROP POLICY IF EXISTS "Service role upload"  ON storage.objects;
+DROP POLICY IF EXISTS "Service role update"  ON storage.objects;
+DROP POLICY IF EXISTS "Service role delete"  ON storage.objects;
+
+CREATE POLICY "Public read access" ON storage.objects
+  FOR SELECT USING (bucket_id = 'images');
+
+CREATE POLICY "Service role upload" ON storage.objects
+  FOR INSERT WITH CHECK (bucket_id = 'images' AND auth.role() = 'service_role');
+
+-- Needed because the admin uploader sends x-upsert, which performs an
+-- UPDATE when a file of the same name already exists.
+CREATE POLICY "Service role update" ON storage.objects
+  FOR UPDATE USING (bucket_id = 'images' AND auth.role() = 'service_role');
+
+CREATE POLICY "Service role delete" ON storage.objects
+  FOR DELETE USING (bucket_id = 'images' AND auth.role() = 'service_role');
+
+
 -- ===================================================================
--- 8. STORAGE POLICIES (Run only if not already created)
+--  VERIFY
 -- ===================================================================
-
--- Allow public to read all images
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies
-    WHERE schemaname = 'storage'
-    AND tablename = 'objects'
-    AND policyname = 'Public read access'
-  ) THEN
-    CREATE POLICY "Public read access"
-    ON storage.objects FOR SELECT
-    USING (bucket_id = 'images');
-  END IF;
-END $$;
-
--- Allow service role to upload
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies
-    WHERE schemaname = 'storage'
-    AND tablename = 'objects'
-    AND policyname = 'Service role upload'
-  ) THEN
-    CREATE POLICY "Service role upload"
-    ON storage.objects FOR INSERT
-    WITH CHECK (
-      bucket_id = 'images'
-      AND auth.role() = 'service_role'
-    );
-  END IF;
-END $$;
-
--- Allow service role to delete
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies
-    WHERE schemaname = 'storage'
-    AND tablename = 'objects'
-    AND policyname = 'Service role delete'
-  ) THEN
-    CREATE POLICY "Service role delete"
-    ON storage.objects FOR DELETE
-    USING (
-      bucket_id = 'images'
-      AND auth.role() = 'service_role'
-    );
-  END IF;
-END $$;
-
--- ===================================================================
--- VERIFICATION QUERIES
--- ===================================================================
-
--- Check tables
-SELECT 'Tables Created:' as status;
-SELECT table_name FROM information_schema.tables
+SELECT 'Tables' AS check, table_name AS result
+FROM information_schema.tables
 WHERE table_schema = 'public'
-AND table_name IN ('hero_images', 'featured_projects', 'client_logos', 'site_settings', 'service_images', 'portfolio_items', 'contact_submissions');
+  AND table_name IN ('portfolio_items', 'contact_submissions', 'site_settings')
 
--- Check storage policies
-SELECT 'Storage Policies:' as status;
-SELECT policyname FROM pg_policies
-WHERE schemaname = 'storage'
-AND tablename = 'objects'
-ORDER BY policyname;
+UNION ALL
+SELECT 'Bucket', id FROM storage.buckets WHERE id = 'images'
 
--- ===================================================================
--- SUCCESS MESSAGE
--- ===================================================================
-SELECT
-  '✅ Database setup complete!' as message,
-  'Tables: hero_images, featured_projects, client_logos, site_settings, service_images, portfolio_items, contact_submissions' as tables,
-  'Storage: images bucket with read/write/delete policies' as storage,
-  'Security: RLS enabled on all tables' as security;
+UNION ALL
+SELECT 'Storage policy', policyname
+FROM pg_policies
+WHERE schemaname = 'storage' AND tablename = 'objects'
+
+ORDER BY 1, 2;
